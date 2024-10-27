@@ -2,6 +2,7 @@
 
 PocketPal AI is a pocket-sized AI assistant powered by small language models (SLMs) that run directly on your phone. Designed for both iOS and Android, PocketPal AI lets you interact with various SLMs without the need for an internet connection.
 
+
 ## Table of Contents
 
 - [PocketPal AI 📱🚀](#pocketpal-ai-)
