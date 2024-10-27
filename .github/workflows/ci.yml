@@ -21,10 +21,10 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache@v3
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          path: ~/.yarn/cache
+          key: ${{ runner.os }}-node-${{ hashFiles('yarn.lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-yarn-
         
       # Step 2: Set up Node.js environment
       - name: Set up Node.js
@@ -63,10 +63,10 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache@v3
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          path: ~/.yarn/cache
+          key: ${{ runner.os }}-node-${{ hashFiles('yarn.lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-yarn-
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
@@ -105,10 +105,10 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache@v3
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          path: ~/.yarn/cache
+          key: ${{ runner.os }}-node-${{ hashFiles('yarn.lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-        
+            ${{ runner.os }}-yarn-    
 
       - name: Install Yarn
         run: npm install -g yarn
