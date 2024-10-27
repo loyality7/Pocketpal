@@ -34,7 +34,7 @@ describe('ModelsScreen', () => {
 
     const flatList = getByTestId('flat-list');
     const refreshControl = flatList.props.refreshControl;
-    await act( () => {
+    await act(async () => {
       refreshControl.props.onRefresh();
     });
 
