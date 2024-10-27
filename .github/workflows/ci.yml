@@ -81,8 +81,16 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Build Android
-        run: yarn build:android
+      - name: Build Gradle dependencies
+        run: cd android && ./gradlew build --no-daemon
+
+      - name: bases 
+        run: |
+           ls -al ~
+
+
+      # - name: Build Android
+      #   run: yarn build:android
 
   # Job for iOS build
   build-ios:
