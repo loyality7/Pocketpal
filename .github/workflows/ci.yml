@@ -47,9 +47,9 @@ jobs:
       - name: Run TypeScript type check
         run: yarn typecheck
 
-      # # Step 6: Run unit tests (Jest)
-      # - name: Run unit tests
-      #   run: yarn test --coverage
+      # Step 6: Run unit tests (Jest)
+      - name: Run unit tests
+        run: yarn test --coverage
 
   # Job for Android build
   build-android:
@@ -84,13 +84,8 @@ jobs:
       - name: Build Gradle dependencies
         run: cd android && ./gradlew build --no-daemon
 
-      - name: bases 
-        run: |
-           ls -al ~
-
-
-      # - name: Build Android
-      #   run: yarn build:android
+      - name: Build Android
+        run: yarn build:android
 
   # Job for iOS build
   build-ios:
