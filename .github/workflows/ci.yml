@@ -21,7 +21,7 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache@v3
         with:
-          path: ~/.yarn/cache
+          path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('yarn.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -63,7 +63,7 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache@v3
         with:
-          path: ~/.yarn/cache
+          path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('yarn.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -105,7 +105,7 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache@v3
         with:
-          path: ~/.yarn/cache
+          path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('yarn.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-yarn-    
