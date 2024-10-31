@@ -121,6 +121,8 @@ export const defaultCompletionParams: CompletionParams = {
   top_k: 40,
   top_p: 0.95,
   tfs_z: 1.0,
+  xtc_threshold: 0.1,
+  xtc_probability: 0.95,
   typical_p: 1.0,
   penalty_last_n: 64,
   penalty_repeat: 1.0,
