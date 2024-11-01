@@ -48,7 +48,13 @@ describe('useChatSession', () => {
 
   it('should handle model not loaded scenario', async () => {
     const {result} = renderHook(() =>
-      useChatSession(null, {current: null}, [], textMessage.author, assistant),
+      useChatSession(
+        undefined,
+        {current: null},
+        [],
+        textMessage.author,
+        assistant,
+      ),
     );
 
     await act(async () => {
