@@ -1,7 +1,7 @@
 import React, {useRef, useCallback, useState} from 'react';
 
 import {toJS} from 'mobx';
-import {LlamaContext} from 'llama.rn';
+import {LlamaContext} from '@pocketpalai/llama.rn';
 import throttle from 'lodash.throttle';
 
 import {randId} from '../utils';

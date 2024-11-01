@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {ScrollView, View} from 'react-native';
 
-import {CompletionParams} from 'llama.rn';
+import {CompletionParams} from '@pocketpalai/llama.rn';
 import Slider from '@react-native-community/slider';
 import {Card, Text, Switch, TextInput, Divider, Chip} from 'react-native-paper';
 

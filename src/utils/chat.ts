@@ -1,7 +1,7 @@
 import {applyTemplate, Templates} from 'chat-formatter';
 import {ChatMessage, ChatTemplateConfig, MessageType} from './types';
 //import {assistant} from '../store/ChatSessionStore';
-import {CompletionParams} from 'llama.rn';
+import {CompletionParams} from '@pocketpalai/llama.rn';
 
 export const userId = 'y9d7f8pgn';
 export const assistantId = 'h3o3lc5xj';

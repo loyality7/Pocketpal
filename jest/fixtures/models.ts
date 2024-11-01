@@ -1,4 +1,4 @@
-import {CompletionParams} from 'llama.rn';
+import {CompletionParams} from '@pocketpalai/llama.rn';
 
 import {deviceInfo} from './device-info';
 
