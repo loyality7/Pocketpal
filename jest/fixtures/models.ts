@@ -11,6 +11,7 @@ export const mockDefaultCompletionParams: CompletionParams = {
   top_k: 40,
   top_p: 0.95,
   tfs_z: 1.0,
+  min_p: 0.05,
   xtc_threshold: 0.1,
   xtc_probability: 0.01,
   typical_p: 1.0,
