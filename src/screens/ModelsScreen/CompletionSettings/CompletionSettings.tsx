@@ -97,6 +97,8 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
           {renderSlider('top_k', 1, 128, 1)}
           {renderSlider('top_p', 0, 1)}
           {renderSlider('tfs_z', 0, 2)}
+          {renderSlider('xtc_threshold', 0, 1)}
+          {renderSlider('xtc_probability', 0, 1)}
           {renderSlider('typical_p', 0, 2)}
           {renderSlider('penalty_last_n', 0, 256, 1)}
           {renderSlider('penalty_repeat', 0, 2)}
