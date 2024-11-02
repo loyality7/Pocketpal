@@ -2,7 +2,7 @@ import {Model} from '../utils/types';
 import {chatTemplates, defaultCompletionParams} from '../utils/chat';
 import {Platform} from 'react-native';
 
-export const MODEL_LIST_VERSION = 6;
+export const MODEL_LIST_VERSION = 7;
 
 export const defaultModels: Model[] = [
   {
@@ -535,6 +535,34 @@ export const defaultModels: Model[] = [
       n_predict: 500,
       temperature: 0.5,
       stop: ['<|eot_id|>'],
+    },
+  },
+  {
+    id: 'default-bartowski/SmolLM2-1.7B-Instruct-GGUF',
+    name: 'SmolLM2-1.7B-Instruct',
+    type: 'SmolLM',
+    size: '1.82',
+    params: '1.7',
+    isDownloaded: false,
+    downloadUrl:
+      'https://huggingface.co/bartowski/SmolLM2-1.7B-Instruct-GGUF/resolve/main/SmolLM2-1.7B-Instruct-Q8_0.gguf?download=true',
+    hfUrl: 'https://huggingface.co/bartowski/SmolLM2-1.7B-Instruct-GGUF',
+    progress: 0,
+    filename: 'default-SmolLM2-1.7B-Instruct.Q8_0.gguf',
+    isLocal: false,
+    defaultChatTemplate: chatTemplates.smolLM,
+    chatTemplate: chatTemplates.smolLM,
+    defaultCompletionSettings: {
+      ...defaultCompletionParams,
+      n_predict: 500,
+      temperature: 0.7,
+      stop: ['<|endoftext|>', '<|im_end|>'],
+    },
+    completionSettings: {
+      ...defaultCompletionParams,
+      n_predict: 500,
+      temperature: 0.7,
+      stop: ['<|endoftext|>', '<|im_end|>'],
     },
   },
 ];
