@@ -7,6 +7,7 @@ import {derivedTextMessage} from '../../../../jest/fixtures';
 import {TextMessage} from '../TextMessage';
 
 describe('text message', () => {
+  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('renders preview image and handles link press', async () => {
     const link = 'https://github.com/flyerhq/';
     const getPreviewDataMock = jest

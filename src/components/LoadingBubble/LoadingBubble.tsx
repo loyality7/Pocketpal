@@ -41,7 +41,11 @@ export const LoadingBubble = () => {
   const theme = useTheme();
 
   return (
-    <View style={[styles.container, {backgroundColor: theme.colors.surfaceVariant}]}>
+    <View
+      style={[
+        styles.container,
+        {backgroundColor: theme.colors.surfaceVariant},
+      ]}>
       <LoadingDot delay={0} theme={theme} />
       <LoadingDot delay={200} theme={theme} />
       <LoadingDot delay={400} theme={theme} />

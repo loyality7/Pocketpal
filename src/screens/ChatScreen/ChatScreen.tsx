@@ -44,19 +44,17 @@ export const ChatScreen: React.FC = observer(() => {
     null,
   );
   const l10n = React.useContext(L10nContext);
-  const baseMessages: MessageType.Any[] = chatSessionStore.currentSessionMessages;
-  
-  const {handleSendPress, handleStopPress, inferencing, isStreaming} = useChatSession(
-    context,
-    currentMessageInfo,
-    baseMessages,
-    user,
-    assistant,
-  );
+  const baseMessages: MessageType.Any[] =
+    chatSessionStore.currentSessionMessages;
+
+  const {handleSendPress, handleStopPress, inferencing, isStreaming} =
+    useChatSession(context, currentMessageInfo, baseMessages, user, assistant);
 
   // Add loading message if inferencing but not yet streaming
   const messages = React.useMemo(() => {
-    if (!inferencing || isStreaming) return baseMessages;
+    if (!inferencing || isStreaming) {
+      return baseMessages;
+    }
     return [
       {
         id: 'loading-indicator',

@@ -128,7 +128,9 @@ export const useChatSession = (
         {...completionParams, prompt},
         data => {
           if (data.token && currentMessageInfo.current) {
-            if (!isStreaming) setIsStreaming(true);
+            if (!isStreaming) {
+              setIsStreaming(true);
+            }
             tokenBufferRef.current += data.token;
             // Avoid variable shadowing by using properties directly
             throttledFlushTokenBuffer(
