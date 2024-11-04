@@ -26,6 +26,7 @@ export const useChatSession = (
   assistant: User,
 ) => {
   const [inferencing, setInferencing] = useState<boolean>(false);
+  const [isStreaming, setIsStreaming] = useState<boolean>(false);
   const l10n = React.useContext(L10nContext);
   const conversationIdRef = useRef<string>(randId());
 
@@ -93,6 +94,7 @@ export const useChatSession = (
     };
     addMessage(textMessage);
     setInferencing(true);
+    setIsStreaming(false);
 
     const id = randId();
     const createdAt = Date.now();
@@ -126,6 +128,7 @@ export const useChatSession = (
         {...completionParams, prompt},
         data => {
           if (data.token && currentMessageInfo.current) {
+            if (!isStreaming) setIsStreaming(true);
             tokenBufferRef.current += data.token;
             // Avoid variable shadowing by using properties directly
             throttledFlushTokenBuffer(
@@ -152,8 +155,10 @@ export const useChatSession = (
         metadata: {timings: result.timings, copyable: true},
       });
       setInferencing(false);
+      setIsStreaming(false);
     } catch (error) {
       setInferencing(false);
+      setIsStreaming(false);
       const errorMessage = (error as Error).message;
       if (errorMessage.includes('network')) {
         // TODO: This can be removed. We don't use network for chat.
@@ -189,5 +194,6 @@ export const useChatSession = (
     handleResetConversation,
     handleStopPress,
     inferencing,
+    isStreaming,
   };
 };

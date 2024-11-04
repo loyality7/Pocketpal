@@ -4,6 +4,7 @@ import {observer} from 'mobx-react';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 import {Bubble, ChatView} from '../../components';
+import {LoadingBubble} from '../../components/LoadingBubble';
 
 import {useChatSession} from '../../hooks';
 
@@ -23,13 +24,19 @@ const renderBubble = ({
   child: ReactNode;
   message: MessageType.Any;
   nextMessageInGroup: boolean;
-}) => (
-  <Bubble
-    child={child}
-    message={message}
-    nextMessageInGroup={nextMessageInGroup}
-  />
-);
+}) => {
+  // Check for our special loading message
+  if (message.id === 'loading-indicator') {
+    return <LoadingBubble />;
+  }
+  return (
+    <Bubble
+      child={child}
+      message={message}
+      nextMessageInGroup={nextMessageInGroup}
+    />
+  );
+};
 
 export const ChatScreen: React.FC = observer(() => {
   const context = modelStore.context;
@@ -37,15 +44,29 @@ export const ChatScreen: React.FC = observer(() => {
     null,
   );
   const l10n = React.useContext(L10nContext);
-  const messages: MessageType.Any[] = chatSessionStore.currentSessionMessages;
-
-  const {handleSendPress, handleStopPress, inferencing} = useChatSession(
+  const baseMessages: MessageType.Any[] = chatSessionStore.currentSessionMessages;
+  
+  const {handleSendPress, handleStopPress, inferencing, isStreaming} = useChatSession(
     context,
     currentMessageInfo,
-    messages,
+    baseMessages,
     user,
     assistant,
   );
+
+  // Add loading message if inferencing but not yet streaming
+  const messages = React.useMemo(() => {
+    if (!inferencing || isStreaming) return baseMessages;
+    return [
+      {
+        id: 'loading-indicator',
+        type: 'text',
+        text: '',
+        author: assistant,
+      } as MessageType.Text,
+      ...baseMessages,
+    ];
+  }, [baseMessages, inferencing, isStreaming]);
 
   return (
     <SafeAreaProvider>
@@ -60,10 +81,10 @@ export const ChatScreen: React.FC = observer(() => {
         onSendPress={handleSendPress}
         onStopPress={handleStopPress}
         user={user}
-        //onAttachmentPress={!context ? handlePickModel : undefined}
         isStopVisible={inferencing}
         textInputProps={{
-          editable: !!context,
+          editable: !!context && !inferencing,
+          value: inferencing ? '' : undefined,
           placeholder: !context
             ? modelStore.isContextLoading
               ? l10n.loadingModel
