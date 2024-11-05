@@ -20,6 +20,9 @@ export const styles = StyleSheet.create({
     margin: 16,
     right: 0,
   },
+  fabHF: {
+    bottom: 190, // Ensure the top FAB is positioned slightly higher
+  },
   fabTop: {
     bottom: 90, // Ensure the top FAB is positioned slightly higher
   },

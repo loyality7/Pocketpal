@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useContext} from 'react';
+import React, {useState, useMemo, useContext, useRef} from 'react';
 import {View, FlatList, RefreshControl, Platform, Alert} from 'react-native';
 
 import {toJS} from 'mobx';
@@ -28,6 +28,7 @@ import {uiStore, modelStore} from '../../store';
 
 import {Model} from '../../utils/types';
 import {L10nContext} from '../../utils';
+import {HFModelSearch} from './HFModelSearch';
 
 export const ModelsScreen: React.FC = observer(() => {
   const l10n = useContext(L10nContext);
@@ -36,6 +37,7 @@ export const ModelsScreen: React.FC = observer(() => {
   const [resetDialogVisible, setResetDialogVisible] = useState(false);
   const [_, setTrigger] = useState<boolean>(false);
   const {colors} = useTheme();
+  const modelSearchRef = useRef<any>(null);
 
   const filters = uiStore.pageStates.modelsScreen.filters;
   const setFilters = (value: string[]) => {
@@ -49,6 +51,11 @@ export const ModelsScreen: React.FC = observer(() => {
     await modelStore.refreshDownloadStatuses();
     setTrigger(prev => !prev);
     setRefreshing(false);
+  };
+
+  const handleAddHFModel = () => {
+    console.log('handleAddHFModel');
+    modelSearchRef.current?.showSearch();
   };
 
   const handleAddLocalModel = async () => {
@@ -314,13 +321,23 @@ export const ModelsScreen: React.FC = observer(() => {
 
       <SafeAreaView style={styles.safeArea} edges={['bottom']}>
         <AnimatedFAB
+          testID="add-hf-model-fab"
+          icon={'plus'}
+          label={l10n.hfModel}
+          extended={isExtended}
+          onPress={handleAddHFModel}
+          animateFrom={'right'}
+          style={[styles.fab, styles.fabHF]}
+        />
+
+        <AnimatedFAB
           testID="add-local-model-fab"
           icon={'plus'}
           label={l10n.localModel}
           extended={isExtended}
           onPress={handleAddLocalModel}
           animateFrom={'right'}
-          style={[styles.fab, styles.fabTop]} // Updated to add styles for spacing
+          style={[styles.fab, styles.fabTop]}
         />
 
         <AnimatedFAB
@@ -333,6 +350,7 @@ export const ModelsScreen: React.FC = observer(() => {
           style={[styles.fab, styles.fabBottom]} // Updated to ensure this is below the first one
         />
       </SafeAreaView>
+      <HFModelSearch ref={modelSearchRef} />
     </View>
   );
 });
