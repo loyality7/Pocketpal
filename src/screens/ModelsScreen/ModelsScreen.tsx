@@ -32,7 +32,7 @@ import {HFModelSearch} from './HFModelSearch';
 
 export const ModelsScreen: React.FC = observer(() => {
   const l10n = useContext(L10nContext);
-  const [isExtended, setIsExtended] = React.useState(true);
+  const [isExtended, setIsExtended] = useState(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [resetDialogVisible, setResetDialogVisible] = useState(false);
   const [_, setTrigger] = useState<boolean>(false);
@@ -319,6 +319,7 @@ export const ModelsScreen: React.FC = observer(() => {
         }
       />
 
+      <HFModelSearch ref={modelSearchRef} />
       <SafeAreaView style={styles.safeArea} edges={['bottom']}>
         <AnimatedFAB
           testID="add-hf-model-fab"
@@ -350,7 +351,6 @@ export const ModelsScreen: React.FC = observer(() => {
           style={[styles.fab, styles.fabBottom]} // Updated to ensure this is below the first one
         />
       </SafeAreaView>
-      <HFModelSearch ref={modelSearchRef} />
     </View>
   );
 });
