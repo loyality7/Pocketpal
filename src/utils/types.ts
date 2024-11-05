@@ -237,3 +237,32 @@ export type TokenNativeEvent = {
   contextId: number;
   tokenResult: TokenData;
 };
+
+export interface ModelFile {
+  rfilename: string;
+}
+
+export interface HuggingFaceModel {
+  _id: string;
+  id: string;
+  author: string;
+  gated: boolean;
+  inference: string;
+  lastModified: string;
+  likes: number;
+  trendingScore: number;
+  private: boolean;
+  sha: string;
+  downloads: number;
+  tags: string[];
+  library_name: string;
+  createdAt: string;
+  model_id: string;
+  siblings: ModelFile[];
+  url?: string;
+}
+
+export interface HuggingFaceModelsResponse {
+  models: HuggingFaceModel[];
+  nextLink: string | null; // null if there is no next page
+}
