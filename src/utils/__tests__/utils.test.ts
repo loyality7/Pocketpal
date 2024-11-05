@@ -6,9 +6,24 @@ describe('formatBytes', () => {
     expect(formatBytes(0)).toBe('0 B');
   });
 
-  it('formats bytes correctly', () => {
+  it('formats kiB correctly', () => {
     expect.assertions(1);
-    expect(formatBytes(1024)).toBe('1 kB');
+    expect(formatBytes(1024)).toBe('1 KiB');
+  });
+
+  it('formats GiB correctly', () => {
+    expect.assertions(1);
+    expect(formatBytes(1024 * 1024 * 1024, 2, true)).toBe('1 GiB');
+  });
+
+  it('formats MB correctly', () => {
+    expect.assertions(1);
+    expect(formatBytes(1234567, 2, false)).toBe('1.23 MB');
+  });
+
+  it('formats GB correctly', () => {
+    expect.assertions(1);
+    expect(formatBytes(12345678901, 2, false)).toBe('12.35 GB');
   });
 });
 

@@ -1,9 +1,29 @@
 // api/hf.ts
 import axios from 'axios';
-import {HuggingFaceModel, HuggingFaceModelsResponse} from '../utils/types';
+
+import {
+  HuggingFaceModel,
+  HuggingFaceModelsResponse,
+  ModelFileDetails,
+} from '../utils/types';
 
 const BASE_URL = 'https://huggingface.co/api/models';
 
+/**
+ * Get information from all models in the Hub.
+ * The response is paginated, use the Link header to get the next pages.
+ *
+ * search: Filter based on substrings for repos and their usernames, such as resnet or microsoft
+ * author: Filter models by an author or organization, such as huggingface or microsoft
+ * filter: Filter based on tags, such as text-classification or spacy.
+ * sort: Property to use when sorting, such as downloads or author.
+ * direction: Direction in which to sort, such as -1 for descending, and anything else for ascending.
+ * limit: Limit the number of models fetched.
+ * full: Whether to fetch most model data, such as all tags, the files, etc.
+ * config: Whether to also fetch the repo config.
+ *
+ * @see https://huggingface.co/docs/api-reference/api-endpoints#get-models
+ */
 export async function fetchModels({
   search,
   author,
@@ -54,3 +74,29 @@ export async function fetchModels({
     throw error;
   }
 }
+
+/**
+ * Fetches the details of the model's files. Mainly the size is used.
+ * @param modelId - The ID of the model.
+ * @returns An array of ModelFileDetails.
+ */
+export const fetchModelFilesDetails = async (
+  modelId: string,
+): Promise<ModelFileDetails[]> => {
+  const url = `https://huggingface.co/api/models/${modelId}/tree/main?recursive=true`;
+
+  try {
+    const response = await fetch(url);
+
+    console.log('fetchModelFilesDetails response: ', response);
+    if (!response.ok) {
+      throw new Error(`Error fetching model files: ${response.statusText}`);
+    }
+
+    const data: ModelFileDetails[] = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Failed to fetch model files:', error);
+    throw error;
+  }
+};

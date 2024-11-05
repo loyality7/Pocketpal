@@ -240,6 +240,7 @@ export type TokenNativeEvent = {
 
 export interface ModelFile {
   rfilename: string;
+  size?: number;
 }
 
 export interface HuggingFaceModel {
@@ -265,4 +266,16 @@ export interface HuggingFaceModel {
 export interface HuggingFaceModelsResponse {
   models: HuggingFaceModel[];
   nextLink: string | null; // null if there is no next page
+}
+
+export interface ModelFileDetails {
+  type: string;
+  oid: string;
+  size: number;
+  lfs?: {
+    oid: string;
+    size: number;
+    pointerSize: number;
+  };
+  path: string;
 }

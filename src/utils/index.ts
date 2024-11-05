@@ -15,15 +15,26 @@ export const L10nContext = React.createContext<
 export const UserContext = React.createContext<User | undefined>(undefined);
 
 /** Returns text representation of a provided bytes value (e.g. 1kB, 1GB) */
-export const formatBytes = (size: number, fractionDigits = 2) => {
+export const formatBytes = (
+  size: number,
+  fractionDigits = 2,
+  useBinary = true,
+) => {
   if (size <= 0) {
     return '0 B';
   }
-  const multiple = Math.floor(Math.log(size) / Math.log(1024));
+
+  const base = useBinary ? 1024 : 1000;
+  const multiple = Math.floor(Math.log(size) / Math.log(base));
+
+  const units = useBinary
+    ? ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+    : ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
   return (
-    parseFloat((size / Math.pow(1024, multiple)).toFixed(fractionDigits)) +
+    parseFloat((size / Math.pow(base, multiple)).toFixed(fractionDigits)) +
     ' ' +
-    ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'][multiple]
+    units[multiple]
   );
 };
 
@@ -267,9 +278,9 @@ export function roundToBillion(num: number) {
 }
 
 export function bytesToGB(bytes: number): string {
-  const bytesPerGiB = 1000 ** 3; // 1 GiB = 1024^3 bytes
-  const gib = bytes / bytesPerGiB;
-  return gib.toFixed(2); // Convert to string with 2 decimal places
+  const bytesPerGB = 1000 ** 3;
+  const gib = bytes / bytesPerGB;
+  return gib.toFixed(2);
 }
 
 export const getModelDescription = (
@@ -374,15 +385,19 @@ export function timeAgo(
   }
 }
 
-export function formatNumber(num: number): string {
+export function formatNumber(num: number, fractionDigits = 2): string {
   if (num < 1000) {
     return num.toString();
   } else if (num < 1_000_000) {
-    return `${(num / 1_000).toFixed(2).replace(/\.?0+$/, '')}k`;
+    return `${(num / 1_000).toFixed(fractionDigits).replace(/\.?0+$/, '')}k`;
   } else if (num < 1_000_000_000) {
-    return `${(num / 1_000_000).toFixed(2).replace(/\.?0+$/, '')}m`;
+    return `${(num / 1_000_000)
+      .toFixed(fractionDigits)
+      .replace(/\.?0+$/, '')}m`;
   } else {
-    return `${(num / 1_000_000_000).toFixed(2).replace(/\.?0+$/, '')}b`;
+    return `${(num / 1_000_000_000)
+      .toFixed(fractionDigits)
+      .replace(/\.?0+$/, '')}b`;
   }
 }
 

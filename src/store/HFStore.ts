@@ -1,14 +1,15 @@
-// store.ts
 import {makeAutoObservable, runInAction} from 'mobx';
-import {fetchModels} from '../api/hf';
+
+import {fetchModelFilesDetails, fetchModels} from '../api/hf';
+
 import {HuggingFaceModel} from '../utils/types';
 
 class HFStore {
   models: HuggingFaceModel[] = [];
   isLoading = false;
   error = '';
-  nextPageLink: string | null = null; // Updated to match type
-  searchQuery = ''; // Search query term
+  nextPageLink: string | null = null;
+  searchQuery = '';
   filter = 'gguf';
   full = true;
 
@@ -20,6 +21,33 @@ class HFStore {
     this.searchQuery = query;
   }
 
+  // Fetch the sizes of the model files
+  async fetchModelFileSizes(modelId: string) {
+    try {
+      console.log('Fetching model file sizes for', modelId);
+      const fileDetails = await fetchModelFilesDetails(modelId);
+      runInAction(() => {
+        const model = this.models.find(m => m.id === modelId);
+        if (model) {
+          model.siblings = model.siblings.map(file => {
+            const details = fileDetails.find(
+              detail => detail.path === file.rfilename,
+            );
+            console.log('details', details);
+            return {
+              ...file,
+              size: details ? details.size : undefined,
+            };
+          });
+        }
+        console.log('Model file sizes fetched model', JSON.stringify(model));
+      });
+    } catch (error) {
+      console.error('Error fetching model file sizes:', error);
+    }
+  }
+
+  // Process the models to add the URL and filter our non-gguf files from the siblings
   private processModels(models: HuggingFaceModel[]) {
     return models.map(model => {
       const filteredSiblings =
@@ -35,6 +63,7 @@ class HFStore {
     });
   }
 
+  // Fetch the models from the Hugging Face API
   async fetchModels() {
     this.isLoading = true;
     this.error = '';
@@ -66,6 +95,7 @@ class HFStore {
     }
   }
 
+  // Fetch the next page of models
   async fetchMoreModels() {
     if (!this.nextPageLink) {
       return;
