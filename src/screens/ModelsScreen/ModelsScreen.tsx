@@ -7,9 +7,7 @@ import {v4 as uuidv4} from 'uuid';
 import RNFS from 'react-native-fs';
 import {observer} from 'mobx-react-lite';
 import DocumentPicker from 'react-native-document-picker';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {
-  AnimatedFAB,
   Button,
   Dialog,
   Paragraph,
@@ -29,10 +27,10 @@ import {uiStore, modelStore} from '../../store';
 import {Model} from '../../utils/types';
 import {L10nContext} from '../../utils';
 import {HFModelSearch} from './HFModelSearch';
+import {FABGroup} from './FABGroup';
 
 export const ModelsScreen: React.FC = observer(() => {
   const l10n = useContext(L10nContext);
-  const [isExtended, setIsExtended] = useState(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [resetDialogVisible, setResetDialogVisible] = useState(false);
   const [hfSearchVisible, setHFSearchVisible] = useState(false);
@@ -53,11 +51,6 @@ export const ModelsScreen: React.FC = observer(() => {
     setTrigger(prev => !prev);
     setRefreshing(false);
   };
-
-  /*const handleAddHFModel = () => {
-    console.log('handleAddHFModel');
-    modelSearchRef.current?.showSearch();
-  };*/
 
   const handleAddLocalModel = async () => {
     DocumentPicker.pick({
@@ -207,21 +200,6 @@ export const ModelsScreen: React.FC = observer(() => {
     }))
     .filter(group => group.items.length > 0);
 
-  const onScroll = ({nativeEvent}) => {
-    const currentScrollPosition =
-      Math.floor(nativeEvent?.contentOffset?.y) ?? 0;
-    const maxScrollPosition =
-      nativeEvent.contentSize.height - nativeEvent.layoutMeasurement.height;
-
-    // Hide FABs if the user scrolls near the bottom (last card area)
-    setIsExtended(currentScrollPosition <= 0);
-
-    if (currentScrollPosition >= maxScrollPosition - 50) {
-      // User is at the bottom of the list, hide or move FABs
-      setIsExtended(false); // Optionally hide the FAB when near the bottom
-    }
-  };
-
   const showResetDialog = () => setResetDialogVisible(true);
   const hideResetDialog = () => setResetDialogVisible(false);
 
@@ -310,7 +288,6 @@ export const ModelsScreen: React.FC = observer(() => {
         renderItem={
           filters.includes('grouped') ? renderGroupHeader : renderItem
         }
-        onScroll={onScroll}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -324,37 +301,11 @@ export const ModelsScreen: React.FC = observer(() => {
         visible={hfSearchVisible}
         onDismiss={() => setHFSearchVisible(false)}
       />
-      <SafeAreaView style={styles.safeArea} edges={['bottom']}>
-        <AnimatedFAB
-          testID="add-hf-model-fab"
-          icon={'plus'}
-          label={l10n.hfModel}
-          extended={isExtended}
-          onPress={() => setHFSearchVisible(true)}
-          animateFrom={'right'}
-          style={[styles.fab, styles.fabHF]}
-        />
-
-        <AnimatedFAB
-          testID="add-local-model-fab"
-          icon={'plus'}
-          label={l10n.localModel}
-          extended={isExtended}
-          onPress={handleAddLocalModel}
-          animateFrom={'right'}
-          style={[styles.fab, styles.fabTop]}
-        />
-
-        <AnimatedFAB
-          testID="reset-models-fab"
-          icon={'restart'}
-          label={l10n.resetModels}
-          extended={isExtended}
-          onPress={showResetDialog}
-          animateFrom={'right'}
-          style={[styles.fab, styles.fabBottom]} // Updated to ensure this is below the first one
-        />
-      </SafeAreaView>
+      <FABGroup
+        onAddHFModel={() => setHFSearchVisible(true)}
+        onAddLocalModel={handleAddLocalModel}
+        onResetModels={showResetDialog}
+      />
     </View>
   );
 });

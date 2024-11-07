@@ -86,7 +86,9 @@ export const DetailsView = ({
           </View>
           <Title style={styles.sectionTitle}>Available GGUF Files</Title>
           {model.siblings.map((file, index) => {
-            const hasEnoughStorage = hasEnoughSpace(hfAsAppModel(model, file));
+            const hasEnoughStorage = file.size
+              ? hasEnoughSpace(hfAsAppModel(model, file))
+              : true;
             return (
               <View key={index} style={styles.fileCard}>
                 <View style={styles.fileContent}>

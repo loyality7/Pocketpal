@@ -15,20 +15,6 @@ export const styles = StyleSheet.create({
     marginVertical: 15,
     marginHorizontal: 15,
   },
-  fab: {
-    position: 'absolute',
-    margin: 16,
-    right: 0,
-  },
-  fabHF: {
-    bottom: 190, // Ensure the top FAB is positioned slightly higher
-  },
-  fabTop: {
-    bottom: 90, // Ensure the top FAB is positioned slightly higher
-  },
-  fabBottom: {
-    bottom: 25, // Keep the bottom FAB at the lowest position
-  },
   paragraph: {
     marginBottom: 8,
   },
