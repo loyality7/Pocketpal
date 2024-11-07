@@ -217,7 +217,7 @@ export interface Model {
   name: string;
   type?: string;
   size: number; // Size in bytes
-  params: string; // in Billion
+  params: number;
   isDownloaded: boolean;
   downloadUrl: string;
   hfUrl: string;

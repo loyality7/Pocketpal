@@ -14,7 +14,6 @@ import {
   extractHFModelTitle,
   extractHFModelType,
   formatBytes,
-  formatNumber,
   hasEnoughSpace,
 } from '../utils';
 import {defaultModels, MODEL_LIST_VERSION} from './defaultModels';
@@ -472,7 +471,7 @@ class ModelStore {
       type: extractHFModelType(hfModel.id),
       name: extractHFModelTitle(hfModel.id),
       size: modelFile.size ?? 0,
-      params: formatNumber(hfModel.specs?.gguf?.total ?? 0),
+      params: hfModel.specs?.gguf?.total ?? 0,
       isDownloaded: false,
       downloadUrl: modelFile.url ?? '',
       hfUrl: hfModel.url ?? '',
@@ -505,7 +504,7 @@ class ModelStore {
       id: uuidv4(), // Generate a unique ID
       name: filename,
       size: 0, // Placeholder for UI to ignore
-      params: '', // Placeholder for UI to ignore
+      params: 0, // Placeholder for UI to ignore
       isDownloaded: true,
       downloadUrl: '',
       hfUrl: '',

@@ -288,18 +288,25 @@ export const getModelDescription = (
   isActiveModel: boolean,
   modelStore: any,
 ): string => {
-  let size: string;
-  let params: string;
+  // Get size and params from context if the model is active.
+  // This is relevant only for local models (when we don't know size/params upfront),
+  // otherwise the values should be the same.
+  const {size, params} =
+    isActiveModel && modelStore.context?.model
+      ? {
+          size: modelStore.context.model.size,
+          params: modelStore.context.model.nParams,
+        }
+      : {
+          size: model.size,
+          params: model.params,
+        };
 
-  if (isActiveModel && modelStore.context?.model) {
-    size = `${formatBytes((modelStore.context.model as any).size)}`;
-    params = `${roundToBillion((modelStore.context.model as any).nParams)} B`;
-  } else {
-    size = `${formatBytes(model.size)}`;
-    params = model.params ? `${model.params} B` : 'N/A';
-  }
+  const sizeString = size > 0 ? formatBytes(size) : 'N/A';
+  const paramsString =
+    params > 0 ? formatNumber(params, 2, true, false) : 'N/A';
 
-  return `Size: ${size} | Parameters: ${params}`;
+  return `Size: ${sizeString} | Parameters: ${paramsString}`;
 };
 
 export async function hasEnoughSpace(model: Model): Promise<boolean> {
@@ -382,19 +389,31 @@ export function timeAgo(
   }
 }
 
-export function formatNumber(num: number, fractionDigits = 2): string {
+export function formatNumber(
+  num: number,
+  fractionDigits = 2,
+  uppercase = false,
+  withSpace = false,
+): string {
+  const space = withSpace ? ' ' : '';
+
   if (num < 1000) {
     return num.toString();
   } else if (num < 1_000_000) {
-    return `${(num / 1_000).toFixed(fractionDigits).replace(/\.?0+$/, '')}k`;
+    const suffix = uppercase ? 'K' : 'k';
+    return `${(num / 1_000)
+      .toFixed(fractionDigits)
+      .replace(/\.?0+$/, '')}${space}${suffix}`;
   } else if (num < 1_000_000_000) {
+    const suffix = uppercase ? 'M' : 'm';
     return `${(num / 1_000_000)
       .toFixed(fractionDigits)
-      .replace(/\.?0+$/, '')}m`;
+      .replace(/\.?0+$/, '')}${space}${suffix}`;
   } else {
+    const suffix = uppercase ? 'B' : 'b';
     return `${(num / 1_000_000_000)
       .toFixed(fractionDigits)
-      .replace(/\.?0+$/, '')}b`;
+      .replace(/\.?0+$/, '')}${space}${suffix}`;
   }
 }
 

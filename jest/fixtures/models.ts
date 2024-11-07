@@ -2,7 +2,7 @@ import {CompletionParams} from '@pocketpalai/llama.rn';
 
 import {deviceInfo} from './device-info';
 
-import {Model} from '../../src/utils/types';
+import {Model, ModelOrigin} from '../../src/utils/types';
 
 export const mockDefaultCompletionParams: CompletionParams = {
   prompt: '',
@@ -56,14 +56,15 @@ export const mockBasicModel: Model = {
   id: 'model-1',
   name: 'Test Model 1',
   type: 'Test Model Type',
-  size: '2',
-  params: '2',
+  size: 2 * 10 ** 9,
+  params: 2 * 10 ** 9,
   isDownloaded: false,
   downloadUrl: 'https://huggingface.co/test/test-model-1',
   hfUrl: 'https://huggingface.co/test/test-model-1',
   progress: 0,
   filename: 'test-model-1.gguf',
   isLocal: false,
+  origin: ModelOrigin.PRESET,
   defaultChatTemplate: mockDefaultChatTemplate,
   chatTemplate: mockChatTemplate,
   defaultCompletionSettings: mockDefaultCompletionParams,

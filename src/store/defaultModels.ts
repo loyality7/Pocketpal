@@ -13,7 +13,7 @@ const androidOnlyModels: Model[] = [
     name: 'llama-3.2-1b-instruct (Q4_0_4_4)',
     type: 'Llama',
     size: 770928768,
-    params: '1.23',
+    params: 1235814432,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_0_4_4.gguf?download=true',
@@ -42,7 +42,7 @@ const androidOnlyModels: Model[] = [
     name: 'llama-3.2-1b-instruct (Q4_0_4_8)',
     type: 'Llama',
     size: 770928768,
-    params: '1.23',
+    params: 1235814432,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_0_4_8.gguf?download=true',
@@ -71,7 +71,7 @@ const androidOnlyModels: Model[] = [
     name: 'llama-3.2-1b-instruct (Q4_0_8_8)',
     type: 'Llama',
     size: 770928768,
-    params: '1.23',
+    params: 1235814432,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_0_8_8.gguf?download=true',
@@ -101,7 +101,7 @@ const androidOnlyModels: Model[] = [
     name: 'SmolLM2-1.7B-Instruct (Q4_0_4_4)',
     type: 'SmolLM',
     size: 990729184,
-    params: '1.7',
+    params: 1711376384,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/bartowski/SmolLM2-1.7B-Instruct-GGUF/resolve/main/SmolLM2-1.7B-Instruct-Q4_0_4_4.gguf?download=true',
@@ -134,7 +134,7 @@ const crossPlatformModels: Model[] = [
     name: 'gemma-2-2b-it-GGUF (Q6_K)',
     type: 'Gemma',
     size: 2151393120,
-    params: '2',
+    params: 2614341888,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/bartowski/gemma-2-2b-it-GGUF/resolve/main/gemma-2-2b-it-Q6_K.gguf?download=true',
@@ -166,7 +166,7 @@ const crossPlatformModels: Model[] = [
     name: 'gemma-1.1-2b-it-GGUF (Q6_K)',
     type: 'Gemma',
     size: 2062124768,
-    params: '2',
+    params: 2506172416,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/bartowski/gemma-1.1-2b-it-GGUF/resolve/main/gemma-1.1-2b-it-Q6_K.gguf?download=true',
@@ -198,7 +198,7 @@ const crossPlatformModels: Model[] = [
     name: 'Gemmasutra-Mini-2B-v1-GGUF (Q6_K)',
     type: 'Gemma',
     size: 2151393152,
-    params: '2',
+    params: 2614341888,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/TheDrummer/Gemmasutra-Mini-2B-v1-GGUF/resolve/main/Gemmasutra-Mini-2B-v1-Q6_K.gguf?download=true',
@@ -230,7 +230,7 @@ const crossPlatformModels: Model[] = [
     name: 'H2O.ai Danube 3 (Q4_K_M)',
     type: 'Danube',
     size: 2394648960,
-    params: '3.96',
+    params: 3961839360,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/h2oai/h2o-danube3-4b-chat-GGUF/resolve/main/h2o-danube3-4b-chat-Q4_K_M.gguf?download=true',
@@ -263,7 +263,7 @@ const crossPlatformModels: Model[] = [
     name: 'H2O.ai Danube 2 (Q6_K)',
     type: 'Danube',
     size: 1503287456,
-    params: '1.8',
+    params: 1831201280,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/h2oai/h2o-danube2-1.8b-chat-GGUF/resolve/main/h2o-danube2-1.8b-chat-Q6_K.gguf?download=true',
@@ -296,7 +296,7 @@ const crossPlatformModels: Model[] = [
     name: 'H2O.ai Danube 2 (Q5_K_S)',
     type: 'Danube',
     size: 1270977696,
-    params: '1.8',
+    params: 1831201280,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/h2oai/h2o-danube2-1.8b-chat-GGUF/resolve/main/h2o-danube2-1.8b-chat-Q5_K_S.gguf?download=true',
@@ -330,7 +330,7 @@ const crossPlatformModels: Model[] = [
     name: 'Phi-3.5 mini 4k instruct (Q4_K_M)',
     type: 'Phi',
     size: 2394648960,
-    params: '3.8',
+    params: 3821079648,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/QuantFactory/Phi-3.5-mini-instruct-GGUF/resolve/main/Phi-3.5-mini-instruct.Q4_K_M.gguf?download=true',
@@ -359,7 +359,7 @@ const crossPlatformModels: Model[] = [
     name: 'Phi-3.1 mini 4k instruct (Q4_K_M)',
     type: 'Phi',
     size: 2394648960,
-    params: '3.8',
+    params: 3821079552,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/bartowski/Phi-3.1-mini-4k-instruct-GGUF/resolve/main/Phi-3.1-mini-4k-instruct-Q4_K_M.gguf?download=true',
@@ -389,7 +389,7 @@ const crossPlatformModels: Model[] = [
     name: 'Qwen2-1.5B-Instruct (Q8_0)',
     type: 'Qwen',
     size: 1652387840,
-    params: '1.54',
+    params: 1543714304,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/resolve/main/qwen2-1_5b-instruct-q8_0.gguf?download=true',
@@ -418,7 +418,7 @@ const crossPlatformModels: Model[] = [
     name: 'Qwen2.5-1.5B-Instruct (Q8_0)',
     type: 'Qwen',
     size: 1892387840,
-    params: '1.54',
+    params: 1777088000,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q8_0.gguf?download=true',
@@ -447,7 +447,7 @@ const crossPlatformModels: Model[] = [
     name: 'Qwen2.5-3B-Instruct (Q5_0)',
     type: 'Qwen',
     size: 2384387840,
-    params: '3.09',
+    params: 3397103616,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q5_0.gguf?download=true',
@@ -477,7 +477,7 @@ const crossPlatformModels: Model[] = [
     name: 'llama-3.2-1b-instruct (Q8_0)',
     type: 'Llama',
     size: 1321079200,
-    params: '1.23',
+    params: 1235814432,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/hugging-quants/Llama-3.2-1B-Instruct-Q8_0-GGUF/resolve/main/llama-3.2-1b-instruct-q8_0.gguf?download=true',
@@ -507,7 +507,7 @@ const crossPlatformModels: Model[] = [
     name: 'llama-3.2-3b-instruct (Q4_K)',
     type: 'Llama',
     size: 2019373920,
-    params: '3.21',
+    params: 3212749888,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/hugging-quants/Llama-3.2-3B-Instruct-Q4_K_M-GGUF/resolve/main/llama-3.2-3b-instruct-q4_k_m.gguf?download=true',
@@ -537,7 +537,7 @@ const crossPlatformModels: Model[] = [
     name: 'Llama-3.2-3B-Instruct (Q6_K)',
     type: 'Llama',
     size: 2643853856,
-    params: '3.21',
+    params: 3212749888,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q6_K.gguf?download=true',
@@ -567,7 +567,7 @@ const crossPlatformModels: Model[] = [
     name: 'llama-3.2-3b-instruct q8_k',
     type: 'Llama',
     size: 3421895520,
-    params: '3.21',
+    params: 3212749888,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/hugging-quants/Llama-3.2-3B-Instruct-Q8_0-GGUF/resolve/main/llama-3.2-3b-instruct-q8_0.gguf?download=true',
@@ -598,7 +598,7 @@ const crossPlatformModels: Model[] = [
     name: 'SmolLM2-1.7B-Instruct (Q8_0)',
     type: 'SmolLM',
     size: 1820414944,
-    params: '1.7',
+    params: 1711376384,
     isDownloaded: false,
     downloadUrl:
       'https://huggingface.co/bartowski/SmolLM2-1.7B-Instruct-GGUF/resolve/main/SmolLM2-1.7B-Instruct-Q8_0.gguf?download=true',
