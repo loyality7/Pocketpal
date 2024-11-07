@@ -99,14 +99,14 @@ export const largeDiskModel = createModel({
   id: 'model-4',
   name: 'large model',
   isDownloaded: false,
-  size: ((deviceInfo.freeDiskStorage * 1.1) / 1000 ** 3).toString(), // 10% more than free disk storage
+  size: deviceInfo.freeDiskStorage * 1.1, // 10% more than free disk storage
 });
 
 export const largeMemoryModel = createModel({
   id: 'model-5',
   name: 'large model for memory',
   isDownloaded: true,
-  size: ((deviceInfo.totalMemory * 1.1) / 1000 ** 3).toString(), // 10% more than total memory
+  size: deviceInfo.totalMemory * 1.1, // 10% more than total memory
 });
 
 export const localModel = createModel({
