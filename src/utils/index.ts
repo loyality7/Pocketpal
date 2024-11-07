@@ -18,7 +18,7 @@ export const UserContext = React.createContext<User | undefined>(undefined);
 export const formatBytes = (
   size: number,
   fractionDigits = 2,
-  useBinary = true,
+  useBinary = false,
 ) => {
   if (size <= 0) {
     return '0 B';
@@ -292,10 +292,10 @@ export const getModelDescription = (
   let params: string;
 
   if (isActiveModel && modelStore.context?.model) {
-    size = `${bytesToGB((modelStore.context.model as any).size)} GB`;
+    size = `${formatBytes((modelStore.context.model as any).size)}`;
     params = `${roundToBillion((modelStore.context.model as any).nParams)} B`;
   } else {
-    size = `${model.size} GB`;
+    size = `${formatBytes(model.size)}`;
     params = model.params ? `${model.params} B` : 'N/A';
   }
 
@@ -304,15 +304,12 @@ export const getModelDescription = (
 
 export async function hasEnoughSpace(model: Model): Promise<boolean> {
   try {
-    const requiredSizeGB = parseFloat(model.size);
+    const requiredSpaceBytes = model.size;
 
-    if (isNaN(requiredSizeGB) || requiredSizeGB <= 0) {
+    if (isNaN(requiredSpaceBytes) || requiredSpaceBytes <= 0) {
       console.error('Invalid model size:', model.size);
       return false;
     }
-
-    // Convert size from GB to bytes + buffer
-    const requiredSpaceBytes = requiredSizeGB * 1e9 + 1e7;
 
     const freeDiskBytes = await DeviceInfo.getFreeDiskStorage('important');
     // console.log('Free disk space:', freeDiskBytes);
@@ -399,6 +396,25 @@ export function formatNumber(num: number, fractionDigits = 2): string {
       .toFixed(fractionDigits)
       .replace(/\.?0+$/, '')}b`;
   }
+}
+
+export function extractHFModelType(modelId: string): string {
+  const match = modelId.match(/\/([^-]+)/);
+  return match ? match[1] : 'Unknown';
+}
+
+export function extractHFModelTitle(modelId: string): string {
+  // Remove "GGUF", "-GGUF", or "_GGUF" at the end regardless of case
+  const sanitizedModelId = modelId.replace(/[-_]?[Gg][Gg][Uu][Ff]$/, '');
+
+  // If there is no "/" in the modelId, ie owner is not included, return sanitizedModelId
+  if (!sanitizedModelId.includes('/')) {
+    return sanitizedModelId;
+  }
+
+  // Remove owner from the modelId
+  const match = sanitizedModelId.match(/^([^/]+)\/(.+)$/);
+  return match ? match[2] : 'Unknown';
 }
 
 export const randId = () => Math.random().toString(36).substring(2, 11);

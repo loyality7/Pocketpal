@@ -16,7 +16,7 @@ export const l10n = {
     pleaseLoadModel: 'Please load a model to start chatting.',
     shortMemoryWarning: 'Memory Warning',
     memoryWarning:
-      "Warning: Model size is close to or exceeds your device's total memory ({{totalMemory}} GB). This may cause unexpected behavior such as slow performance or system instability.",
+      "Warning: Model size is close to or exceeds your device's total memory ({{totalMemory}}). This may cause unexpected behavior such as slow performance or system instability.",
     load: 'Load',
     cancel: 'Cancel',
     download: 'Download',
@@ -72,7 +72,7 @@ export const l10n = {
     pleaseLoadModel: 'Por favor, cargue un modelo para comenzar a chatear.',
     shortMemoryWarning: 'Advertencia de memoria',
     memoryWarning:
-      'Advertencia: El tamaño del modelo está cerca de o excede la memoria total de su dispositivo ({{totalMemory}} GB). Esto puede causar comportamientos inesperados como rendimiento lento o inestabilidad del sistema.',
+      'Advertencia: El tamaño del modelo está cerca de o excede la memoria total de su dispositivo ({{totalMemory}}). Esto puede causar comportamientos inesperados como rendimiento lento o inestabilidad del sistema.',
     load: 'Cargar',
     cancel: 'Cancelar',
     download: 'Descargar',
@@ -133,7 +133,7 @@ export const l10n = {
     pleaseLoadModel: '채팅을 시작하려면 모델을 로드하세요.',
     shortMemoryWarning: '메모리 경고',
     memoryWarning:
-      '경고: 모델 크기가 또는 장치의 총 메모리를 초과합니다 ({{totalMemory}} GB). 이는 속도가 느려지거나 시스템 불안정성을 일으킬 수 있는 예기치 않은 동작을 일으켜 초래할 수 있습니다.',
+      '경고: 모델 크기가 또는 장치의 총 메모리를 초과합니다 ({{totalMemory}}). 이는 속도가 느려지거나 시스템 불안정성을 일으킬 수 있는 예기치 않은 동작을 일으켜 초래할 수 있습니다.',
     load: '로드',
     cancel: '취소',
     download: '다운로드',
@@ -190,7 +190,7 @@ export const l10n = {
     pleaseLoadModel: 'Proszę załadować model, aby rozpocząć rozmowę.',
     shortMemoryWarning: 'Ostrzeżenie o pamięci',
     memoryWarning:
-      'Ostrzeżenie: Rozmiar modelu jest bliski lub przekracza całkowitą pamięć swojego urządzenia ({{totalMemory}} GB). To może spowodować nieoczekiwane zachowanie, takie jak wolne wydajność lub niestabilność systemu.',
+      'Ostrzeżenie: Rozmiar modelu jest bliski lub przekracza całkowitą pamięć swojego urządzenia ({{totalMemory}}). To może spowodować nieoczekiwane zachowanie, takie jak wolne wydajność lub niestabilność systemu.',
     load: 'Załaduj',
     cancel: 'Anuluj',
     download: 'Pobierz',
@@ -247,7 +247,7 @@ export const l10n = {
     pleaseLoadModel: 'Por favor, carregue um modelo para começar a conversar.',
     shortMemoryWarning: 'Advertência de memória',
     memoryWarning:
-      'Advertência: O tamanho do modelo está próximo ou excede a memória total do seu dispositivo ({{totalMemory}} GB). Isso pode causar comportamentos inesperados como desempenho lento ou instabilidade do sistema.',
+      'Advertência: O tamanho do modelo está próximo ou excede a memória total do seu dispositivo ({{totalMemory}}). Isso pode causar comportamentos inesperados como desempenho lento ou instabilidade do sistema.',
     load: 'Carregar',
     cancel: 'Cancelar',
     download: 'Baixar',
@@ -304,7 +304,7 @@ export const l10n = {
     pleaseLoadModel: 'Пожалуйста, загрузите модель, чтобы начать общение.',
     shortMemoryWarning: 'Предупреждение о памяти',
     memoryWarning:
-      'Предупреждение: Размер модели близок или превышает общую память вашего устройства ({{totalMemory}} GB). Это может привести к непредвиденным поведением, таким как медленная производительность или нестабильность системы.',
+      'Предупреждение: Размер модели близок или превышает общую память вашего устройства ({{totalMemory}}). Это может привести к непредвиденным поведением, таким как медленная производительность или нестабильность системы.',
     load: 'Загрузить',
     cancel: 'Отменить',
     download: 'Скачать',
@@ -365,7 +365,7 @@ export const l10n = {
     pleaseLoadModel: 'Lütfen bir model yükleyin, sohbete başlamak için.',
     shortMemoryWarning: 'Hafıza Uyarısı',
     memoryWarning:
-      'Uyarı: Model boyutu cihazınızın toplam hafızasına yakın veya onu aşıyor ({{totalMemory}} GB). Bu, beklenmedik davranışlar, örneğin yavaş performans veya sistem istikrarının oluşmasına neden olabilir.',
+      'Uyarı: Model boyutu cihazınızın toplam hafızasına yakın veya onu aşıyor ({{totalMemory}}). Bu, beklenmedik davranışlar, örneğin yavaş performans veya sistem istikrarının oluşmasına neden olabilir.',
     load: 'Yükle',
     cancel: 'İptal',
     download: 'İndir',
@@ -422,7 +422,7 @@ export const l10n = {
     pleaseLoadModel: 'Пожалуйста, загрузите модель, чтобы начать общение.',
     shortMemoryWarning: 'Предупреждение о памяти',
     memoryWarning:
-      'Предупреждение: Размер модели близок или превышает общую память вашего устройства ({{totalMemory}} GB). Это может привести к непредвиденным поведением, таким как медленная производительность или нестабильность системы.',
+      'Предупреждение: Размер модели близок или превышает общую память вашего устройства ({{totalMemory}}). Это может привести к непредвиденным поведением, таким как медленная производительность или нестабильность системы.',
     load: 'Загрузить',
     cancel: 'Отменить',
     download: 'Скачать',
@@ -483,7 +483,7 @@ export const l10n = {
     pleaseLoadModel: 'Si us plau, carregueu un model per començar a xatejar.',
     shortMemoryWarning: 'Advertència de memòria',
     memoryWarning:
-      'Advertència: La mida del model està prop o supera la memòria total del dispositiu ({{totalMemory}} GB). Això pot causar comportaments inesperats com baix rendiment o inestabilitat del sistema.',
+      'Advertència: La mida del model està prop o supera la memòria total del dispositiu ({{totalMemory}}). Això pot causar comportaments inesperats com baix rendiment o inestabilitat del sistema.',
     load: 'Carregar',
     cancel: 'Cancel·lar',
     download: 'Descarregar',

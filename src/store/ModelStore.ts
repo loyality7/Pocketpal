@@ -9,12 +9,25 @@ import {computed, makeAutoObservable, ObservableMap, runInAction} from 'mobx';
 import {CompletionParams, LlamaContext, initLlama} from '@pocketpalai/llama.rn';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {bytesToGB, deepMerge, hasEnoughSpace} from '../utils';
+import {
+  deepMerge,
+  extractHFModelTitle,
+  extractHFModelType,
+  formatBytes,
+  formatNumber,
+  hasEnoughSpace,
+} from '../utils';
 import {defaultModels, MODEL_LIST_VERSION} from './defaultModels';
 
 import {chatTemplates} from '../utils/chat';
 import {defaultCompletionParams} from '../utils/chat';
-import {ChatTemplateConfig, Model} from '../utils/types';
+import {
+  ChatTemplateConfig,
+  HuggingFaceModel,
+  Model,
+  ModelFile,
+  ModelOrigin,
+} from '../utils/types';
 
 class ModelStore {
   models: Model[] = [];
@@ -234,8 +247,9 @@ class ModelStore {
 
       runInAction(() => {
         model.progress = newProgress;
-        model.downloadSpeed = `${bytesToGB(
+        model.downloadSpeed = `${formatBytes(
           data.bytesWritten,
+          0,
         )}  (${speedMBps} MB/s)`;
       });
 
@@ -435,6 +449,50 @@ class ModelStore {
     this.activeModelId = modelId;
   }
 
+  addHFModel = async (hfModel: HuggingFaceModel, modelFile: ModelFile) => {
+    const _defaultChatTemplate = {
+      addBosToken: false, // It is expected that chat templates will take care of this
+      addEosToken: false, // It is expected that chat templates will take care of this
+      bosToken: hfModel.specs?.gguf?.bos_token ?? '',
+      eosToken: hfModel.specs?.gguf?.eos_token ?? '',
+      chatTemplate: hfModel.specs?.gguf?.chat_template ?? '',
+      addGenerationPrompt: true,
+      name: 'hf-gguf',
+    };
+
+    const _defaultCompletionParams = {
+      ...defaultCompletionParams,
+      stop: _defaultChatTemplate.bosToken
+        ? [_defaultChatTemplate.bosToken]
+        : [],
+    };
+
+    const model: Model = {
+      id: uuidv4(), // Generate a unique ID
+      type: extractHFModelType(hfModel.id),
+      name: extractHFModelTitle(hfModel.id),
+      size: modelFile.size ?? 0,
+      params: formatNumber(hfModel.specs?.gguf?.total ?? 0),
+      isDownloaded: false,
+      downloadUrl: modelFile.url ?? '',
+      hfUrl: hfModel.url ?? '',
+      progress: 0,
+      filename: 'hf-' + modelFile.rfilename,
+      //fullPath: '',
+      isLocal: false,
+      origin: ModelOrigin.HF,
+      defaultChatTemplate: _defaultChatTemplate,
+      chatTemplate: _.cloneDeep(_defaultChatTemplate),
+      defaultCompletionSettings: _defaultCompletionParams,
+      completionSettings: {..._defaultCompletionParams},
+      hfModelFile: modelFile,
+    };
+    runInAction(() => {
+      this.models.push(model);
+      this.refreshDownloadStatuses();
+    });
+  };
+
   addLocalModel = async (localFilePath: string) => {
     const filename = localFilePath.split('/').pop(); // Extract filename from path
     if (!filename) {
@@ -446,7 +504,7 @@ class ModelStore {
     const model: Model = {
       id: uuidv4(), // Generate a unique ID
       name: filename,
-      size: '', // Placeholder for UI to ignore
+      size: 0, // Placeholder for UI to ignore
       params: '', // Placeholder for UI to ignore
       isDownloaded: true,
       downloadUrl: '',
@@ -455,6 +513,7 @@ class ModelStore {
       filename,
       fullPath: localFilePath,
       isLocal: true,
+      origin: ModelOrigin.LOCAL,
       defaultChatTemplate: {...defaultChatTemplate},
       chatTemplate: defaultChatTemplate,
       defaultCompletionSettings: {...defaultCompletionParams},

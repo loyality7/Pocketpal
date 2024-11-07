@@ -207,11 +207,16 @@ export type ChatMessage = {
   content: string;
 };
 
+export enum ModelOrigin {
+  PRESET = 'preset',
+  LOCAL = 'local',
+  HF = 'hf',
+}
 export interface Model {
   id: string;
   name: string;
   type?: string;
-  size: string; // Size in GB
+  size: number; // Size in bytes
   params: string; // in Billion
   isDownloaded: boolean;
   downloadUrl: string;
@@ -220,11 +225,16 @@ export interface Model {
   downloadSpeed?: string;
   filename: string;
   fullPath?: string; // Full path for local models
-  isLocal: boolean; // True if the model is manually added
+  /**
+   * @deprecated Use 'origin' instead.
+   */
+  isLocal: boolean; // this need to be deprecated
+  origin: ModelOrigin;
   defaultChatTemplate: ChatTemplateConfig;
   chatTemplate: ChatTemplateConfig;
   defaultCompletionSettings: CompletionParams;
   completionSettings: CompletionParams;
+  hfModelFile?: ModelFile;
 }
 
 export type RootDrawerParamList = {
@@ -241,6 +251,8 @@ export type TokenNativeEvent = {
 export interface ModelFile {
   rfilename: string;
   size?: number;
+  url?: string;
+  oid?: string;
 }
 
 export interface HuggingFaceModel {
@@ -261,6 +273,7 @@ export interface HuggingFaceModel {
   model_id: string;
   siblings: ModelFile[];
   url?: string;
+  specs?: GGUFSpecs;
 }
 
 export interface HuggingFaceModelsResponse {
@@ -278,4 +291,18 @@ export interface ModelFileDetails {
     pointerSize: number;
   };
   path: string;
+}
+
+export interface GGUFSpecs {
+  _id: string;
+  id: string;
+  gguf: {
+    total: number;
+    architecture: string;
+    context_length: number;
+    quantize_imatrix_file?: string;
+    chat_template?: string;
+    bos_token?: string;
+    eos_token?: string;
+  };
 }

@@ -1,16 +1,139 @@
-import {Model} from '../utils/types';
+import {Model, ModelOrigin} from '../utils/types';
 import {chatTemplates, defaultCompletionParams} from '../utils/chat';
 import {Platform} from 'react-native';
 
 export const MODEL_LIST_VERSION = 8;
 
-export const defaultModels: Model[] = [
+const iosOnlyModels: Model[] = [];
+
+const androidOnlyModels: Model[] = [
+  // --- Llama ---
+  {
+    id: 'default-llama-3.2-1b-instruct-q4_0_4_4.gguf',
+    name: 'llama-3.2-1b-instruct (Q4_0_4_4)',
+    type: 'Llama',
+    size: 770928768,
+    params: '1.23',
+    isDownloaded: false,
+    downloadUrl:
+      'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_0_4_4.gguf?download=true',
+    hfUrl: 'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF',
+    progress: 0,
+    filename: 'default-llama-3.2-1b-instruct-q4_0_4_4.gguf',
+    isLocal: false,
+    origin: ModelOrigin.PRESET,
+    defaultChatTemplate: {...chatTemplates.llama32},
+    chatTemplate: chatTemplates.llama32,
+    defaultCompletionSettings: {
+      ...defaultCompletionParams,
+      n_predict: 500,
+      temperature: 0.5,
+      stop: ['<|im_end|>'],
+    },
+    completionSettings: {
+      ...defaultCompletionParams,
+      n_predict: 500,
+      temperature: 0.5,
+      stop: ['<|im_end|>'],
+    },
+  },
+  {
+    id: 'default-llama-3.2-1b-instruct-q4_0_4_8.gguf',
+    name: 'llama-3.2-1b-instruct (Q4_0_4_8)',
+    type: 'Llama',
+    size: 770928768,
+    params: '1.23',
+    isDownloaded: false,
+    downloadUrl:
+      'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_0_4_8.gguf?download=true',
+    hfUrl: 'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF',
+    progress: 0,
+    filename: 'default-llama-3.2-1b-instruct-q4_0_4_8.gguf',
+    isLocal: false,
+    origin: ModelOrigin.PRESET,
+    defaultChatTemplate: {...chatTemplates.llama32},
+    chatTemplate: chatTemplates.llama32,
+    defaultCompletionSettings: {
+      ...defaultCompletionParams,
+      n_predict: 500,
+      temperature: 0.5,
+      stop: ['<|im_end|>'],
+    },
+    completionSettings: {
+      ...defaultCompletionParams,
+      n_predict: 500,
+      temperature: 0.5,
+      stop: ['<|im_end|>'],
+    },
+  },
+  {
+    id: 'default-llama-3.2-1b-instruct-q4_0_8_8.gguf',
+    name: 'llama-3.2-1b-instruct (Q4_0_8_8)',
+    type: 'Llama',
+    size: 770928768,
+    params: '1.23',
+    isDownloaded: false,
+    downloadUrl:
+      'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_0_8_8.gguf?download=true',
+    hfUrl: 'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF',
+    progress: 0,
+    filename: 'default-llama-3.2-1b-instruct-q4_0_8_8.gguf',
+    isLocal: false,
+    origin: ModelOrigin.PRESET,
+    defaultChatTemplate: {...chatTemplates.llama32},
+    chatTemplate: chatTemplates.llama32,
+    defaultCompletionSettings: {
+      ...defaultCompletionParams,
+      n_predict: 500,
+      temperature: 0.5,
+      stop: ['<|im_end|>'],
+    },
+    completionSettings: {
+      ...defaultCompletionParams,
+      n_predict: 500,
+      temperature: 0.5,
+      stop: ['<|im_end|>'],
+    },
+  },
+  // --- SmolLM ---
+  {
+    id: 'default-bartowski/SmolLM2-1.7B-Instruct-Q4_0_4_4.gguf',
+    name: 'SmolLM2-1.7B-Instruct (Q4_0_4_4)',
+    type: 'SmolLM',
+    size: 990729184,
+    params: '1.7',
+    isDownloaded: false,
+    downloadUrl:
+      'https://huggingface.co/bartowski/SmolLM2-1.7B-Instruct-GGUF/resolve/main/SmolLM2-1.7B-Instruct-Q4_0_4_4.gguf?download=true',
+    hfUrl: 'https://huggingface.co/bartowski/SmolLM2-1.7B-Instruct-GGUF',
+    progress: 0,
+    filename: 'default-SmolLM2-1.7B-Instruct-Q4_0_4_4.gguf',
+    isLocal: false,
+    origin: ModelOrigin.PRESET,
+    defaultChatTemplate: chatTemplates.smolLM,
+    chatTemplate: chatTemplates.smolLM,
+    defaultCompletionSettings: {
+      ...defaultCompletionParams,
+      n_predict: 1000,
+      temperature: 0.7,
+      stop: ['<|endoftext|>', '<|im_end|>'],
+    },
+    completionSettings: {
+      ...defaultCompletionParams,
+      n_predict: 1000,
+      temperature: 0.7,
+      stop: ['<|endoftext|>', '<|im_end|>'],
+    },
+  },
+];
+
+const crossPlatformModels: Model[] = [
   // -------- Gemma --------
   {
     id: 'google/gemma-2-2b-it-GGUF',
     name: 'gemma-2-2b-it-GGUF (Q6_K)',
     type: 'Gemma',
-    size: '2.15',
+    size: 2151393120,
     params: '2',
     isDownloaded: false,
     downloadUrl:
@@ -19,6 +142,7 @@ export const defaultModels: Model[] = [
     progress: 0,
     filename: 'gemma-2-2b-it-Q6_K.gguf',
     isLocal: false,
+    origin: ModelOrigin.PRESET,
     defaultChatTemplate: {...chatTemplates.gemmaIt},
     chatTemplate: chatTemplates.gemmaIt,
     defaultCompletionSettings: {
@@ -41,7 +165,7 @@ export const defaultModels: Model[] = [
     id: 'google/gemma-1.1-2b-it-GGUF',
     name: 'gemma-1.1-2b-it-GGUF (Q6_K)',
     type: 'Gemma',
-    size: '2.06',
+    size: 2062124768,
     params: '2',
     isDownloaded: false,
     downloadUrl:
@@ -50,6 +174,7 @@ export const defaultModels: Model[] = [
     progress: 0,
     filename: 'gemma-1.1-2b-it-Q6_K.gguf',
     isLocal: false,
+    origin: ModelOrigin.PRESET,
     defaultChatTemplate: {...chatTemplates.gemmaIt},
     chatTemplate: chatTemplates.gemmaIt,
     defaultCompletionSettings: {
@@ -72,7 +197,7 @@ export const defaultModels: Model[] = [
     id: 'Gemmasutra-Mini-2B-v1-Q6_K.gguf',
     name: 'Gemmasutra-Mini-2B-v1-GGUF (Q6_K)',
     type: 'Gemma',
-    size: '2.15',
+    size: 2151393152,
     params: '2',
     isDownloaded: false,
     downloadUrl:
@@ -81,6 +206,7 @@ export const defaultModels: Model[] = [
     progress: 0,
     filename: 'Gemmasutra-Mini-2B-v1-Q6_K.gguf',
     isLocal: false,
+    origin: ModelOrigin.PRESET,
     defaultChatTemplate: {...chatTemplates.gemmasutra},
     chatTemplate: chatTemplates.gemmasutra,
     defaultCompletionSettings: {
@@ -103,7 +229,7 @@ export const defaultModels: Model[] = [
     id: 'h2o-danube3-4b-chat-Q4_K_M.gguf',
     name: 'H2O.ai Danube 3 (Q4_K_M)',
     type: 'Danube',
-    size: '2.39',
+    size: 2394648960,
     params: '3.96',
     isDownloaded: false,
     downloadUrl:
@@ -112,6 +238,7 @@ export const defaultModels: Model[] = [
     progress: 0,
     filename: 'h2o-danube3-4b-chat-Q4_K_M.gguf',
     isLocal: false,
+    origin: ModelOrigin.PRESET,
     defaultChatTemplate: {
       ...chatTemplates.danube3,
     },
@@ -135,7 +262,7 @@ export const defaultModels: Model[] = [
     id: 'h2o-danube2-1.8b-chat-Q6_K.gguf',
     name: 'H2O.ai Danube 2 (Q6_K)',
     type: 'Danube',
-    size: '1.50',
+    size: 1503287456,
     params: '1.8',
     isDownloaded: false,
     downloadUrl:
@@ -144,6 +271,7 @@ export const defaultModels: Model[] = [
     progress: 0,
     filename: 'h2o-danube2-1.8b-chat-Q6_K.gguf',
     isLocal: false,
+    origin: ModelOrigin.PRESET,
     defaultChatTemplate: {
       ...chatTemplates.danube2,
     },
@@ -167,7 +295,7 @@ export const defaultModels: Model[] = [
     id: 'h2o-danube2-1.8b-chat-Q5_K_S.gguf',
     name: 'H2O.ai Danube 2 (Q5_K_S)',
     type: 'Danube',
-    size: '1.27',
+    size: 1270977696,
     params: '1.8',
     isDownloaded: false,
     downloadUrl:
@@ -176,6 +304,7 @@ export const defaultModels: Model[] = [
     progress: 0,
     filename: 'h2o-danube2-1.8b-chat-Q5_K_S.gguf',
     isLocal: false,
+    origin: ModelOrigin.PRESET,
     defaultChatTemplate: {
       ...chatTemplates.danube2,
     },
@@ -200,7 +329,7 @@ export const defaultModels: Model[] = [
     id: 'Phi-3.5-mini-instruct.Q4_K_M.gguf',
     name: 'Phi-3.5 mini 4k instruct (Q4_K_M)',
     type: 'Phi',
-    size: '2.39',
+    size: 2394648960,
     params: '3.8',
     isDownloaded: false,
     downloadUrl:
@@ -209,6 +338,7 @@ export const defaultModels: Model[] = [
     progress: 0,
     filename: 'Phi-3.5-mini-instruct.Q4_K_M.gguf',
     isLocal: false,
+    origin: ModelOrigin.PRESET,
     defaultChatTemplate: {...chatTemplates.phi3},
     chatTemplate: chatTemplates.phi3,
     defaultCompletionSettings: {
@@ -228,7 +358,7 @@ export const defaultModels: Model[] = [
     id: 'Phi-3-mini-4k-instruct-q4.gguf',
     name: 'Phi-3.1 mini 4k instruct (Q4_K_M)',
     type: 'Phi',
-    size: '2.39',
+    size: 2394648960,
     params: '3.8',
     isDownloaded: false,
     downloadUrl:
@@ -237,6 +367,7 @@ export const defaultModels: Model[] = [
     progress: 0,
     filename: 'Phi-3.1-mini-4k-instruct-Q4_K_M.gguf',
     isLocal: false,
+    origin: ModelOrigin.PRESET,
     defaultChatTemplate: {...chatTemplates.phi3},
     chatTemplate: chatTemplates.phi3,
     defaultCompletionSettings: {
@@ -257,7 +388,7 @@ export const defaultModels: Model[] = [
     id: 'qwen2-1_5b-instruct-q8_0.gguf',
     name: 'Qwen2-1.5B-Instruct (Q8_0)',
     type: 'Qwen',
-    size: '1.65',
+    size: 1652387840,
     params: '1.54',
     isDownloaded: false,
     downloadUrl:
@@ -266,6 +397,7 @@ export const defaultModels: Model[] = [
     progress: 0,
     filename: 'qwen2-1_5b-instruct-q8_0.gguf',
     isLocal: false,
+    origin: ModelOrigin.PRESET,
     defaultChatTemplate: {...chatTemplates.qwen2},
     chatTemplate: chatTemplates.qwen2,
     defaultCompletionSettings: {
@@ -285,7 +417,7 @@ export const defaultModels: Model[] = [
     id: 'qwen2.5-1.5b-instruct-q8_0.gguf',
     name: 'Qwen2.5-1.5B-Instruct (Q8_0)',
     type: 'Qwen',
-    size: '1.89',
+    size: 1892387840,
     params: '1.54',
     isDownloaded: false,
     downloadUrl:
@@ -294,6 +426,7 @@ export const defaultModels: Model[] = [
     progress: 0,
     filename: 'qwen2.5-1.5b-instruct-q8_0.gguf',
     isLocal: false,
+    origin: ModelOrigin.PRESET,
     defaultChatTemplate: {...chatTemplates.qwen25},
     chatTemplate: chatTemplates.qwen25,
     defaultCompletionSettings: {
@@ -313,7 +446,7 @@ export const defaultModels: Model[] = [
     id: 'qwen2.5-3b-instruct-q5_0.gguf',
     name: 'Qwen2.5-3B-Instruct (Q5_0)',
     type: 'Qwen',
-    size: '2.38',
+    size: 2384387840,
     params: '3.09',
     isDownloaded: false,
     downloadUrl:
@@ -322,6 +455,7 @@ export const defaultModels: Model[] = [
     progress: 0,
     filename: 'qwen2.5-3b-instruct-q5_0.gguf',
     isLocal: false,
+    origin: ModelOrigin.PRESET,
     defaultChatTemplate: {...chatTemplates.qwen25},
     chatTemplate: chatTemplates.qwen25,
     defaultCompletionSettings: {
@@ -338,99 +472,11 @@ export const defaultModels: Model[] = [
     },
   },
   // -------- Llama --------
-  ...(Platform.OS === 'android'
-    ? [
-        {
-          id: 'default-llama-3.2-1b-instruct-q4_0_4_4.gguf',
-          name: 'llama-3.2-1b-instruct (Q4_0_4_4)',
-          type: 'Llama',
-          size: '0.77',
-          params: '1.23',
-          isDownloaded: false,
-          downloadUrl:
-            'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_0_4_4.gguf?download=true',
-          hfUrl: 'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF',
-          progress: 0,
-          filename: 'default-llama-3.2-1b-instruct-q4_0_4_4.gguf',
-          isLocal: false,
-          defaultChatTemplate: {...chatTemplates.llama32},
-          chatTemplate: chatTemplates.llama32,
-          defaultCompletionSettings: {
-            ...defaultCompletionParams,
-            n_predict: 500,
-            temperature: 0.5,
-            stop: ['<|eot_id|>'],
-          },
-          completionSettings: {
-            ...defaultCompletionParams,
-            n_predict: 500,
-            temperature: 0.5,
-            stop: ['<|eot_id|>'],
-          },
-        },
-        {
-          id: 'default-llama-3.2-1b-instruct-q4_0_4_8.gguf',
-          name: 'llama-3.2-1b-instruct (Q4_0_4_8)',
-          type: 'Llama',
-          size: '0.77',
-          params: '1.23',
-          isDownloaded: false,
-          downloadUrl:
-            'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_0_4_8.gguf?download=true',
-          hfUrl: 'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF',
-          progress: 0,
-          filename: 'default-llama-3.2-1b-instruct-q4_0_4_8.gguf',
-          isLocal: false,
-          defaultChatTemplate: {...chatTemplates.llama32},
-          chatTemplate: chatTemplates.llama32,
-          defaultCompletionSettings: {
-            ...defaultCompletionParams,
-            n_predict: 500,
-            temperature: 0.5,
-            stop: ['<|eot_id|>'],
-          },
-          completionSettings: {
-            ...defaultCompletionParams,
-            n_predict: 500,
-            temperature: 0.5,
-            stop: ['<|eot_id|>'],
-          },
-        },
-        {
-          id: 'default-llama-3.2-1b-instruct-q4_0_8_8.gguf',
-          name: 'llama-3.2-1b-instruct (Q4_0_8_8)',
-          type: 'Llama',
-          size: '0.77',
-          params: '1.23',
-          isDownloaded: false,
-          downloadUrl:
-            'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_0_8_8.gguf?download=true',
-          hfUrl: 'https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF',
-          progress: 0,
-          filename: 'default-llama-3.2-1b-instruct-q4_0_8_8.gguf',
-          isLocal: false,
-          defaultChatTemplate: {...chatTemplates.llama32},
-          chatTemplate: chatTemplates.llama32,
-          defaultCompletionSettings: {
-            ...defaultCompletionParams,
-            n_predict: 500,
-            temperature: 0.5,
-            stop: ['<|eot_id|>'],
-          },
-          completionSettings: {
-            ...defaultCompletionParams,
-            n_predict: 500,
-            temperature: 0.5,
-            stop: ['<|eot_id|>'],
-          },
-        },
-      ]
-    : []),
   {
     id: 'default-llama-3.2-1b-instruct-q8_0.gguf',
     name: 'llama-3.2-1b-instruct (Q8_0)',
     type: 'Llama',
-    size: '1.32',
+    size: 1321079200,
     params: '1.23',
     isDownloaded: false,
     downloadUrl:
@@ -440,6 +486,7 @@ export const defaultModels: Model[] = [
     progress: 0,
     filename: 'default-llama-3.2-1b-instruct-q8_0.gguf',
     isLocal: false,
+    origin: ModelOrigin.PRESET,
     defaultChatTemplate: {...chatTemplates.llama32},
     chatTemplate: chatTemplates.llama32,
     defaultCompletionSettings: {
@@ -459,7 +506,7 @@ export const defaultModels: Model[] = [
     id: 'llama-3.2-3b-instruct-q4_k_m.gguf',
     name: 'llama-3.2-3b-instruct (Q4_K)',
     type: 'Llama',
-    size: '2.02',
+    size: 2019373920,
     params: '3.21',
     isDownloaded: false,
     downloadUrl:
@@ -469,6 +516,7 @@ export const defaultModels: Model[] = [
     progress: 0,
     filename: 'llama-3.2-3b-instruct-q4_k_m.gguf',
     isLocal: false,
+    origin: ModelOrigin.PRESET,
     defaultChatTemplate: {...chatTemplates.llama32},
     chatTemplate: chatTemplates.llama32,
     defaultCompletionSettings: {
@@ -488,7 +536,7 @@ export const defaultModels: Model[] = [
     id: 'Llama-3.2-3B-Instruct-Q6_K.gguf',
     name: 'Llama-3.2-3B-Instruct (Q6_K)',
     type: 'Llama',
-    size: '2.64',
+    size: 2643853856,
     params: '3.21',
     isDownloaded: false,
     downloadUrl:
@@ -497,6 +545,7 @@ export const defaultModels: Model[] = [
     progress: 0,
     filename: 'Llama-3.2-3B-Instruct-Q6_K.gguf',
     isLocal: false,
+    origin: ModelOrigin.PRESET,
     defaultChatTemplate: {...chatTemplates.llama32},
     chatTemplate: chatTemplates.llama32,
     defaultCompletionSettings: {
@@ -517,7 +566,7 @@ export const defaultModels: Model[] = [
     id: 'llama-3.2-3b-instruct-q8_0.gguf',
     name: 'llama-3.2-3b-instruct q8_k',
     type: 'Llama',
-    size: '3.42',
+    size: 3421895520,
     params: '3.21',
     isDownloaded: false,
     downloadUrl:
@@ -527,6 +576,7 @@ export const defaultModels: Model[] = [
     progress: 0,
     filename: 'llama-3.2-3b-instruct-q8_0.gguf',
     isLocal: false,
+    origin: ModelOrigin.PRESET,
     defaultChatTemplate: {...chatTemplates.llama32},
     chatTemplate: chatTemplates.llama32,
     defaultCompletionSettings: {
@@ -547,7 +597,7 @@ export const defaultModels: Model[] = [
     id: 'default-bartowski/SmolLM2-1.7B-Instruct-Q8_0.gguf',
     name: 'SmolLM2-1.7B-Instruct (Q8_0)',
     type: 'SmolLM',
-    size: '1.82',
+    size: 1820414944,
     params: '1.7',
     isDownloaded: false,
     downloadUrl:
@@ -556,6 +606,7 @@ export const defaultModels: Model[] = [
     progress: 0,
     filename: 'default-SmolLM2-1.7B-Instruct-Q8_0.gguf',
     isLocal: false,
+    origin: ModelOrigin.PRESET,
     defaultChatTemplate: chatTemplates.smolLM,
     chatTemplate: chatTemplates.smolLM,
     defaultCompletionSettings: {
@@ -571,36 +622,9 @@ export const defaultModels: Model[] = [
       stop: ['<|endoftext|>', '<|im_end|>'],
     },
   },
-  ...(Platform.OS === 'android'
-    ? [
-        {
-          id: 'default-bartowski/SmolLM2-1.7B-Instruct-Q4_0_4_4.gguf',
-          name: 'SmolLM2-1.7B-Instruct (Q4_0_4_4)',
-          type: 'SmolLM',
-          size: '0.99',
-          params: '1.7',
-          isDownloaded: false,
-          downloadUrl:
-            'https://huggingface.co/bartowski/SmolLM2-1.7B-Instruct-GGUF/resolve/main/SmolLM2-1.7B-Instruct-Q4_0_4_4.gguf?download=true',
-          hfUrl: 'https://huggingface.co/bartowski/SmolLM2-1.7B-Instruct-GGUF',
-          progress: 0,
-          filename: 'default-SmolLM2-1.7B-Instruct-Q4_0_4_4.gguf',
-          isLocal: false,
-          defaultChatTemplate: chatTemplates.smolLM,
-          chatTemplate: chatTemplates.smolLM,
-          defaultCompletionSettings: {
-            ...defaultCompletionParams,
-            n_predict: 1000,
-            temperature: 0.7,
-            stop: ['<|endoftext|>', '<|im_end|>'],
-          },
-          completionSettings: {
-            ...defaultCompletionParams,
-            n_predict: 1000,
-            temperature: 0.7,
-            stop: ['<|endoftext|>', '<|im_end|>'],
-          },
-        },
-      ]
-    : []),
 ];
+
+export const defaultModels =
+  Platform.OS === 'android'
+    ? [...androidOnlyModels, ...crossPlatformModels]
+    : [...iosOnlyModels, ...crossPlatformModels];
