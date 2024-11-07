@@ -23,8 +23,9 @@ import {Searchbar, Title, Button, IconButton, Chip} from 'react-native-paper';
 
 import {hfStore} from '../../../store/HFStore';
 
-import {HuggingFaceModel} from '../../../utils/types';
+import {HuggingFaceModel, ModelFile, ModelOrigin} from '../../../utils/types';
 import {formatBytes, formatNumber, timeAgo} from '../../../utils';
+import {modelStore} from '../../../store';
 
 export const HFModelSearch = observer(
   forwardRef((props, ref) => {
@@ -53,6 +54,24 @@ export const HFModelSearch = observer(
     useEffect(() => {
       handleSearch(hfStore.searchQuery);
     }, []);
+
+    const handleModelBookmark = (
+      hfModel: HuggingFaceModel,
+      modelFile: ModelFile,
+    ) => {
+      modelStore.addHFModel(hfModel, modelFile);
+    };
+
+    const isModelBookmarked = (
+      hfModel: HuggingFaceModel,
+      modelFile: ModelFile,
+    ) => {
+      return modelStore.models.some(
+        model =>
+          model.origin === ModelOrigin.HF &&
+          model.hfModelFile?.oid === modelFile.oid,
+      );
+    };
 
     const handleSearch = async (query: string) => {
       hfStore.setSearchQuery(query);
@@ -103,7 +122,7 @@ export const HFModelSearch = observer(
       setSelectedModel(model);
       setDetailsVisible(true);
 
-      await hfStore.fetchModelFileSizes(model.id);
+      await hfStore.fetchModelData(model.id);
 
       Animated.parallel([
         Animated.spring(detailsAnimation, {
@@ -181,7 +200,7 @@ export const HFModelSearch = observer(
       hideDetails,
     );
 
-    return (
+    return searchVisible || detailsVisible ? (
       <>
         <Animated.View
           style={[
@@ -277,11 +296,17 @@ export const HFModelSearch = observer(
                           )}
                         </View>
                         <View style={styles.fileActions}>
-                          <IconButton icon="plus" onPress={() => {}} />
                           <IconButton
-                            icon="bookmark-outline"
-                            onPress={() => {}}
+                            icon={
+                              isModelBookmarked(selectedModel, file)
+                                ? 'bookmark'
+                                : 'bookmark-outline'
+                            }
+                            onPress={() =>
+                              handleModelBookmark(selectedModel, file)
+                            }
                           />
+                          <IconButton icon="download" onPress={() => {}} />
                         </View>
                       </View>
                     </View>
@@ -298,12 +323,31 @@ export const HFModelSearch = observer(
           </Animated.View>
         )}
       </>
-    );
+    ) : null;
   }),
 );
 
 const styles = StyleSheet.create({
   backdrop: {
+    position: 'absolute', // Change from ...StyleSheet.absoluteFillObject
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  bottomSheet: {
+    position: 'absolute', // Change from ...StyleSheet.absoluteFillObject
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    overflow: 'hidden',
+  },
+  /*backdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
@@ -313,7 +357,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     overflow: 'hidden',
-  },
+  },*/
   bottomSheetContent: {
     flex: 1,
   },
