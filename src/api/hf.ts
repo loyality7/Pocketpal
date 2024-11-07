@@ -2,6 +2,7 @@
 import axios from 'axios';
 
 import {
+  GGUFSpecs,
   HuggingFaceModel,
   HuggingFaceModelsResponse,
   ModelFileDetails,
@@ -88,7 +89,6 @@ export const fetchModelFilesDetails = async (
   try {
     const response = await fetch(url);
 
-    console.log('fetchModelFilesDetails response: ', response);
     if (!response.ok) {
       throw new Error(`Error fetching model files: ${response.statusText}`);
     }
@@ -97,6 +97,30 @@ export const fetchModelFilesDetails = async (
     return data;
   } catch (error) {
     console.error('Failed to fetch model files:', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetches the specs of the GGUF for a specific model.
+ * @param modelId - The ID of the model.
+ * @returns The GGUF specs.
+ */
+export const fetchGGUFSpecs = async (modelId: string): Promise<GGUFSpecs> => {
+  const url = `https://huggingface.co/api/models/${modelId}?expand[]=gguf`;
+
+  try {
+    const response = await fetch(url);
+
+    console.log('fetchGGUFSpecs response: ', response);
+    if (!response.ok) {
+      throw new Error(`Error fetching GGUF specs: ${response.statusText}`);
+    }
+
+    const data: GGUFSpecs = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Failed to fetch GGUF specs:', error);
     throw error;
   }
 };
