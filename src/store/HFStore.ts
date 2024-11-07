@@ -1,6 +1,6 @@
 import {makeAutoObservable, runInAction} from 'mobx';
 
-import {fetchModelFilesDetails, fetchModels} from '../api/hf';
+import {fetchGGUFSpecs, fetchModelFilesDetails, fetchModels} from '../api/hf';
 
 import {HuggingFaceModel} from '../utils/types';
 
@@ -21,6 +21,22 @@ class HFStore {
     this.searchQuery = query;
   }
 
+  // Fetch the GGUF specs for a specific model,
+  // such as number of parameters, context length, chat template, etc.
+  async fetchAndSetGGUFSpecs(modelId: string) {
+    try {
+      console.log('Fetching GGUF specs for', modelId);
+      const specs = await fetchGGUFSpecs(modelId);
+      console.log('GGUF specs:', specs);
+      const model = this.models.find(m => m.id === modelId);
+      if (model) {
+        model.specs = specs;
+      }
+    } catch (error) {
+      console.error('Failed to fetch GGUF specs:', error);
+    }
+  }
+
   // Fetch the sizes of the model files
   async fetchModelFileSizes(modelId: string) {
     try {
@@ -37,6 +53,7 @@ class HFStore {
             return {
               ...file,
               size: details ? details.size : undefined,
+              oid: details ? details.oid : undefined,
             };
           });
         }
@@ -44,6 +61,15 @@ class HFStore {
       });
     } catch (error) {
       console.error('Error fetching model file sizes:', error);
+    }
+  }
+
+  async fetchModelData(modelId: string) {
+    try {
+      await this.fetchAndSetGGUFSpecs(modelId);
+      await this.fetchModelFileSizes(modelId);
+    } catch (error) {
+      console.error('Error fetching model data:', error);
     }
   }
 
@@ -55,10 +81,16 @@ class HFStore {
           sibling => sibling.rfilename.toLowerCase().endsWith('.gguf'), // Filter for .gguf files
         ) || [];
 
+      // Add download URL to each sibling
+      const siblingsWithUrl = filteredSiblings.map(sibling => ({
+        ...sibling,
+        url: `https://huggingface.co/${model.id}/resolve/main/${sibling.rfilename}`,
+      }));
+
       return {
         ...model,
         url: `https://huggingface.co/${model.id}`,
-        siblings: filteredSiblings,
+        siblings: siblingsWithUrl,
       };
     });
   }
