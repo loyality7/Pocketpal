@@ -4,7 +4,7 @@ import {Theme} from '../../../../utils/types';
 export const createStyles = (theme: Theme) =>
   StyleSheet.create({
     searchBar: {
-      margin: 16,
+      marginHorizontal: 16,
       elevation: 0,
       backgroundColor: theme.colors.surfaceVariant,
     },

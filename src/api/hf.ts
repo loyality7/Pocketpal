@@ -65,7 +65,7 @@ export async function fetchModels({
         config,
       },
     });
-    //console.log('response', response);
+    // console.log('response.data: ', response.data);
     return {
       models: response.data as HuggingFaceModel[],
       nextLink: response.headers.link || null, // null if no pagination link is provided

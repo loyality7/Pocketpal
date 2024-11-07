@@ -3,6 +3,7 @@ import {ScrollView} from 'react-native';
 
 import {observer} from 'mobx-react';
 import {Searchbar, Text} from 'react-native-paper';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -33,19 +34,6 @@ export const SearchView = observer(
 
     return (
       <>
-        <Searchbar
-          placeholder="Search HuggingFace models"
-          onChangeText={onSearchChange}
-          value={searchQuery}
-          style={styles.searchBar}
-          icon={() => (
-            <Icon name="magnify" size={24} color={theme.colors.primary} />
-          )}
-          clearIcon={() => (
-            <Icon name="close" size={24} color={theme.colors.primary} />
-          )}
-          ref={searchInputRef}
-        />
         <ScrollView style={styles.searchResults}>
           {hfStore.isLoading ? (
             <Text style={styles.loadingText}>Loading...</Text>
@@ -62,6 +50,25 @@ export const SearchView = observer(
             ))
           )}
         </ScrollView>
+        <SafeAreaView edges={['bottom']}>
+          <Searchbar
+            placeholder="Search HuggingFace models"
+            onChangeText={onSearchChange}
+            value={searchQuery}
+            style={styles.searchBar}
+            icon={() => (
+              <Icon name="magnify" size={24} color={theme.colors.primary} />
+            )}
+            clearIcon={
+              searchQuery.length > 0
+                ? () => (
+                    <Icon name="close" size={24} color={theme.colors.primary} />
+                  )
+                : undefined
+            }
+            ref={searchInputRef}
+          />
+        </SafeAreaView>
       </>
     );
   },

@@ -10,16 +10,19 @@ export const createStyles = (theme: Theme) =>
     content: {
       padding: 16,
     },
+    modelAuthor: {
+      marginBottom: 8,
+    },
     modelTitle: {
-      fontSize: 28,
+      //fontSize: 28,
       fontWeight: 'bold',
       marginBottom: 16,
-      color: theme.colors.onSurface,
+      //color: theme.colors.onSurface,
     },
     modelStats: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 8,
+      gap: 4,
       marginBottom: 24,
     },
     stat: {
@@ -36,27 +39,29 @@ export const createStyles = (theme: Theme) =>
       marginBottom: 8,
       backgroundColor: theme.colors.surfaceVariant,
       borderRadius: 8,
-      padding: 12,
+      padding: 8,
     },
     fileContent: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
       alignItems: 'center',
+      gap: 4,
+    },
+    fileInfo: {
+      flex: 1,
+      marginRight: 4,
     },
     fileName: {
-      fontSize: 16,
-      fontWeight: 'bold',
+      fontSize: 14,
       color: theme.colors.onSurface,
     },
     fileSize: {
-      fontSize: 14,
+      fontSize: 12,
       color: theme.colors.onSurfaceVariant,
-      marginTop: 4,
+      marginTop: 2,
     },
     fileActions: {
       flexDirection: 'row',
-    },
-    closeButton: {
-      margin: 16,
+      alignItems: 'center',
+      gap: -8, // Bring icons closer together
     },
   });

@@ -32,6 +32,21 @@ describe('formatBytes', () => {
     expect.assertions(1);
     expect(formatBytes(12345678901, 2, false)).toBe('12.35 GB');
   });
+
+  it('formats correctly with three digits with 2 decimals', () => {
+    expect.assertions(1);
+    expect(formatBytes(1234567890, 2, false, true)).toBe('1.23 GB');
+  });
+
+  it('formats correctly with three digits with 1 decimals', () => {
+    expect.assertions(1);
+    expect(formatBytes(12345678901, 2, false, true)).toBe('12.3 GB');
+  });
+
+  it('formats correctly with three digits with 0 decimals', () => {
+    expect.assertions(1);
+    expect(formatBytes(123456789000, 2, false, true)).toBe('123 GB');
+  });
 });
 
 describe('getTextSizeInBytes', () => {

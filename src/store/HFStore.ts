@@ -10,8 +10,9 @@ class HFStore {
   error = '';
   nextPageLink: string | null = null;
   searchQuery = '';
-  filter = 'gguf';
-  full = true;
+  queryFilter = 'gguf';
+  queryFull = true;
+  queryConfig = true;
 
   constructor() {
     makeAutoObservable(this);
@@ -49,7 +50,6 @@ class HFStore {
             const details = fileDetails.find(
               detail => detail.path === file.rfilename,
             );
-            console.log('details', details);
             return {
               ...file,
               size: details ? details.size : undefined,
@@ -57,11 +57,14 @@ class HFStore {
             };
           });
         }
-        console.log('Model file sizes fetched model', JSON.stringify(model));
       });
     } catch (error) {
       console.error('Error fetching model file sizes:', error);
     }
+  }
+
+  getModelById(id: string): HuggingFaceModel | null {
+    return this.models.find(model => model.id === id) || null;
   }
 
   async fetchModelData(modelId: string) {
@@ -106,8 +109,9 @@ class HFStore {
         limit: 10,
         sort: 'downloads',
         direction: '-1',
-        filter: this.filter,
-        full: this.full,
+        filter: this.queryFilter,
+        full: this.queryFull,
+        config: this.queryConfig,
       });
 
       const modelsWithUrl = this.processModels(models);
@@ -142,8 +146,9 @@ class HFStore {
         limit: 10,
         sort: 'downloads',
         direction: '-1',
-        filter: this.filter,
-        full: this.full,
+        filter: this.queryFilter,
+        full: this.queryFull,
+        config: this.queryConfig,
       });
 
       const modelsWithUrl = this.processModels(models);

@@ -55,6 +55,10 @@ export const HFModelSearch: React.FC<HFModelSearchProps> = observer(
       setSelectedModel(model);
       setDetailsVisible(true);
       await hfStore.fetchModelData(model.id);
+      const updatedModel = hfStore.getModelById(model.id);
+      if (updatedModel) {
+        setSelectedModel({...updatedModel});
+      }
     };
 
     const handleModelBookmark = (
@@ -80,7 +84,7 @@ export const HFModelSearch: React.FC<HFModelSearchProps> = observer(
         <BottomSheet
           visible={visible}
           onDismiss={onDismiss}
-          snapPoints={['90%']}>
+          snapPoints={['94%']}>
           <SearchView
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -96,7 +100,7 @@ export const HFModelSearch: React.FC<HFModelSearchProps> = observer(
           {selectedModel && (
             <DetailsView
               model={selectedModel}
-              onClose={() => setDetailsVisible(false)}
+              //onClose={() => setDetailsVisible(false)}
               onModelBookmark={handleModelBookmark}
               isModelBookmarked={isModelBookmarked}
             />

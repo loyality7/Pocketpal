@@ -14,11 +14,23 @@ export const L10nContext = React.createContext<
 >(l10n.en);
 export const UserContext = React.createContext<User | undefined>(undefined);
 
-/** Returns text representation of a provided bytes value (e.g. 1kB, 1GB) */
+/**
+ * Formats a byte value into a human-readable string with appropriate units
+ * @param size - The size in bytes to format
+ * @param fractionDigits - Number of decimal places to show (default: 2)
+ * @param useBinary - Whether to use binary (1024) or decimal (1000) units (default: false)
+ * @param threeDigits - Whether to format the number to always show 3 significant digits (default: false)
+ *                      When true:
+ *                      - Numbers >= 100 show no decimals (e.g., "234 MB")
+ *                      - Numbers >= 10 show 1 decimal (e.g., "23.4 MB")
+ *                      - Numbers < 10 show 2 decimals (e.g., "2.34 MB")
+ * @returns Formatted string with units (e.g., "1.5 MB" or "2 GiB")
+ */
 export const formatBytes = (
   size: number,
   fractionDigits = 2,
   useBinary = false,
+  threeDigits = false,
 ) => {
   if (size <= 0) {
     return '0 B';
@@ -31,13 +43,15 @@ export const formatBytes = (
     ? ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
     : ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-  return (
-    parseFloat((size / Math.pow(base, multiple)).toFixed(fractionDigits)) +
-    ' ' +
-    units[multiple]
-  );
-};
+  const value = size / Math.pow(base, multiple);
 
+  if (threeDigits) {
+    const digits = value >= 100 ? 0 : value >= 10 ? 1 : 2;
+    return value.toFixed(digits) + ' ' + units[multiple];
+  }
+
+  return parseFloat(value.toFixed(fractionDigits)) + ' ' + units[multiple];
+};
 /** Returns size in bytes of the provided text */
 export const getTextSizeInBytes = (text: string) => new Blob([text]).size;
 
@@ -358,7 +372,7 @@ export const deepMerge = (target: any, source: any): any => {
 
 export function timeAgo(
   dateString: string,
-  prefix: string = 'updated: ',
+  prefix: string = 'Updated ',
   suffix: string = ' ago',
 ): string {
   const inputDate = new Date(dateString);

@@ -1,49 +1,68 @@
 import React from 'react';
 import {ScrollView, View} from 'react-native';
 
-import {Title, Text, Chip, Button, IconButton} from 'react-native-paper';
+import {Title, Text, Chip, IconButton, Tooltip} from 'react-native-paper';
 
 import {useTheme} from '../../../../hooks';
 
 import {createStyles} from './styles';
 
 import {HuggingFaceModel, ModelFile} from '../../../../utils/types';
-import {formatBytes, formatNumber, timeAgo} from '../../../../utils';
+import {
+  extractHFModelTitle,
+  formatBytes,
+  formatNumber,
+  timeAgo,
+} from '../../../../utils';
 
 interface DetailsViewProps {
   model: HuggingFaceModel;
-  onClose: () => void;
   onModelBookmark: (model: HuggingFaceModel, file: ModelFile) => void;
   isModelBookmarked: (model: HuggingFaceModel, file: ModelFile) => boolean;
 }
 
 export const DetailsView = ({
   model,
-  onClose,
   onModelBookmark,
   isModelBookmarked,
 }: DetailsViewProps) => {
   const theme = useTheme();
   const styles = createStyles(theme);
+  console.log('model.trendingScore: ', model.trendingScore);
 
   return (
     <View style={styles.container}>
       <ScrollView>
         <View style={styles.content}>
-          <Title style={styles.modelTitle}>{model.id}</Title>
+          <Text variant="headlineSmall" style={styles.modelAuthor}>
+            {model.author}
+          </Text>
+          <Tooltip title={model.id}>
+            <Text
+              ellipsizeMode="middle"
+              numberOfLines={1}
+              variant="headlineSmall"
+              style={styles.modelTitle}>
+              {extractHFModelTitle(model.id)}
+            </Text>
+          </Tooltip>
           <View style={styles.modelStats}>
-            <Chip icon="clock" style={styles.stat}>
+            <Chip icon="clock" compact style={styles.stat}>
               {timeAgo(model.lastModified)}
             </Chip>
-            <Chip icon="download" style={styles.stat}>
+            <Chip icon="download" compact style={styles.stat}>
               {formatNumber(model.downloads, 0)}
             </Chip>
-            <Chip icon="heart" style={styles.stat}>
+            <Chip icon="heart" compact style={styles.stat}>
               {formatNumber(model.likes, 0)}
             </Chip>
             {model.trendingScore > 20 && (
-              <Chip icon="trending-up" style={styles.stat}>
-                Trending
+              <Chip
+                icon="trending-up"
+                style={styles.stat}
+                compact
+                mode="outlined">
+                🔥
               </Chip>
             )}
           </View>
@@ -51,11 +70,18 @@ export const DetailsView = ({
           {model.siblings.map((file, index) => (
             <View key={index} style={styles.fileCard}>
               <View style={styles.fileContent}>
-                <View>
-                  <Text style={styles.fileName}>{file.rfilename}</Text>
+                <View style={styles.fileInfo}>
+                  <Tooltip title={file.rfilename}>
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode="head"
+                      style={styles.fileName}>
+                      {file.rfilename}
+                    </Text>
+                  </Tooltip>
                   {file.size && (
                     <Text style={styles.fileSize}>
-                      {`Size: ${formatBytes(file.size, 2, false)}`}
+                      {formatBytes(file.size, 2, false, true)}
                     </Text>
                   )}
                 </View>
@@ -67,17 +93,15 @@ export const DetailsView = ({
                         : 'bookmark-outline'
                     }
                     onPress={() => onModelBookmark(model, file)}
+                    size={20}
                   />
-                  <IconButton icon="download" onPress={() => {}} />
+                  <IconButton icon="download" onPress={() => {}} size={20} />
                 </View>
               </View>
             </View>
           ))}
         </View>
       </ScrollView>
-      <Button mode="contained" onPress={onClose} style={styles.closeButton}>
-        Close
-      </Button>
     </View>
   );
 };
