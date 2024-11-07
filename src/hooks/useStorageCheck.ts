@@ -4,7 +4,7 @@ import DeviceInfo from 'react-native-device-info';
 
 import {formatBytes, hasEnoughSpace} from '../utils';
 
-import {Model} from '../utils/types';
+import {Model, ModelOrigin} from '../utils/types';
 
 export const useStorageCheck = (model: Model) => {
   const [storageStatus, setStorageStatus] = useState({
@@ -17,7 +17,11 @@ export const useStorageCheck = (model: Model) => {
 
     const checkStorage = async () => {
       try {
-        if (model.isDownloaded || model.isLocal) {
+        if (
+          model.isDownloaded ||
+          model.isLocal ||
+          model.origin === ModelOrigin.LOCAL
+        ) {
           return;
         }
 

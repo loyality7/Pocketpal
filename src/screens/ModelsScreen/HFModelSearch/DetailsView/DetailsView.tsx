@@ -12,23 +12,41 @@ import {
   extractHFModelTitle,
   formatBytes,
   formatNumber,
+  hasEnoughSpace,
+  hfAsAppModel,
   timeAgo,
 } from '../../../../utils';
 
 interface DetailsViewProps {
   model: HuggingFaceModel;
   onModelBookmark: (model: HuggingFaceModel, file: ModelFile) => void;
-  isModelBookmarked: (model: HuggingFaceModel, file: ModelFile) => boolean;
+  onModelUnbookmark: (file: ModelFile) => void;
+  isModelBookmarked: (file: ModelFile) => boolean;
+  onModelDownload: (model: HuggingFaceModel, file: ModelFile) => void;
+  onModelDelete: (file: ModelFile) => void;
+  isModelDownloaded: (file: ModelFile) => boolean;
 }
 
 export const DetailsView = ({
   model,
   onModelBookmark,
+  onModelUnbookmark,
   isModelBookmarked,
+  onModelDownload,
+  onModelDelete,
+  isModelDownloaded,
 }: DetailsViewProps) => {
   const theme = useTheme();
   const styles = createStyles(theme);
   console.log('model.trendingScore: ', model.trendingScore);
+
+  const toggleBookmark = (file: ModelFile) => {
+    if (isModelBookmarked(file)) {
+      onModelUnbookmark(file);
+    } else {
+      onModelBookmark(model, file);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -67,39 +85,66 @@ export const DetailsView = ({
             )}
           </View>
           <Title style={styles.sectionTitle}>Available GGUF Files</Title>
-          {model.siblings.map((file, index) => (
-            <View key={index} style={styles.fileCard}>
-              <View style={styles.fileContent}>
-                <View style={styles.fileInfo}>
-                  <Tooltip title={file.rfilename}>
-                    <Text
-                      numberOfLines={1}
-                      ellipsizeMode="head"
-                      style={styles.fileName}>
-                      {file.rfilename}
-                    </Text>
-                  </Tooltip>
-                  {file.size && (
-                    <Text style={styles.fileSize}>
-                      {formatBytes(file.size, 2, false, true)}
-                    </Text>
-                  )}
-                </View>
-                <View style={styles.fileActions}>
-                  <IconButton
-                    icon={
-                      isModelBookmarked(model, file)
-                        ? 'bookmark'
-                        : 'bookmark-outline'
-                    }
-                    onPress={() => onModelBookmark(model, file)}
-                    size={20}
-                  />
-                  <IconButton icon="download" onPress={() => {}} size={20} />
+          {model.siblings.map((file, index) => {
+            const hasEnoughStorage = hasEnoughSpace(hfAsAppModel(model, file));
+            return (
+              <View key={index} style={styles.fileCard}>
+                <View style={styles.fileContent}>
+                  <View style={styles.fileInfo}>
+                    <Tooltip title={file.rfilename}>
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="head"
+                        style={styles.fileName}>
+                        {file.rfilename}
+                      </Text>
+                    </Tooltip>
+                    {file.size && (
+                      <Text style={styles.fileSize}>
+                        {formatBytes(file.size, 2, false, true)}
+                      </Text>
+                    )}
+                  </View>
+                  <View style={styles.fileActions}>
+                    <IconButton
+                      icon={
+                        isModelBookmarked(file)
+                          ? 'bookmark'
+                          : 'bookmark-outline'
+                      }
+                      onPress={() => toggleBookmark(file)}
+                      size={20}
+                    />
+                    <Tooltip
+                      title={
+                        !hasEnoughStorage
+                          ? 'Not enough storage space available'
+                          : ''
+                      }>
+                      <View>
+                        <IconButton
+                          icon={
+                            isModelDownloaded(file)
+                              ? 'delete'
+                              : 'download-outline'
+                          }
+                          onPress={() =>
+                            isModelDownloaded(file)
+                              ? onModelDelete(file)
+                              : onModelDownload(model, file)
+                          }
+                          size={20}
+                          disabled={
+                            !isModelDownloaded(file) && !hasEnoughStorage
+                          }
+                        />
+                      </View>
+                    </Tooltip>
+                  </View>
                 </View>
               </View>
-            </View>
-          ))}
+            );
+          })}
         </View>
       </ScrollView>
     </View>

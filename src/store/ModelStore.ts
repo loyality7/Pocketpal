@@ -9,13 +9,7 @@ import {computed, makeAutoObservable, ObservableMap, runInAction} from 'mobx';
 import {CompletionParams, LlamaContext, initLlama} from '@pocketpalai/llama.rn';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {
-  deepMerge,
-  extractHFModelTitle,
-  extractHFModelType,
-  formatBytes,
-  hasEnoughSpace,
-} from '../utils';
+import {deepMerge, formatBytes, hasEnoughSpace, hfAsAppModel} from '../utils';
 import {defaultModels, MODEL_LIST_VERSION} from './defaultModels';
 
 import {chatTemplates} from '../utils/chat';
@@ -168,21 +162,68 @@ class ModelStore {
     });
   };
 
-  getModelFullPath(model: Model): string {
-    if (model.isLocal) {
+  /**
+   * Determines the full path for a model file on the device's storage.
+   * This path is used for multiple purposes:
+   * - As the destination path when downloading a model
+   * - To check if a model is downloaded (by checking file existence at this path)
+   * - To access the model file for operations like context initialization or deletion
+   *
+   * Path structure varies by model origin:
+   * - LOCAL: Uses the model's fullPath property
+   * - PRESET: Checks both legacy path (DocumentDirectoryPath/filename) and
+   *          new path (DocumentDirectoryPath/models/preset/author/filename)
+   * - HF: Uses DocumentDirectoryPath/models/hf/author/filename
+   *
+   * @param model - The model object containing necessary metadata (origin, filename, author, etc.)
+   * @returns Promise<string> - The full path where the model file is or should be stored
+   * @throws Error if filename is undefined or if fullPath is undefined for local models
+   */
+  getModelFullPath = async (model: Model): Promise<string> => {
+    // For local models, use the fullPath
+    if (model.isLocal || model.origin === ModelOrigin.LOCAL) {
       if (!model.fullPath) {
         throw new Error('Full path is undefined for local model');
       }
       return model.fullPath;
     }
+
     if (!model.filename) {
       throw new Error('Model filename is undefined');
     }
+
+    // For preset models, check both old and new paths
+    if (model.origin === ModelOrigin.PRESET) {
+      const author = model.author || 'unknown';
+      const oldPath = `${RNFS.DocumentDirectoryPath}/${model.filename}`; // old path is deprecated. We keep it for now for backwards compatibility.
+      const newPath = `${RNFS.DocumentDirectoryPath}/models/preset/${author}/${model.filename}`;
+
+      // If the file exists in old path, use that (for backwards compatibility)
+      try {
+        if (await RNFS.exists(oldPath)) {
+          return oldPath;
+        }
+      } catch (err) {
+        console.log('Error checking old path:', err);
+      }
+
+      // Otherwise use new path
+      return newPath;
+    }
+
+    // For HF models, use author/model structure
+    if (model.origin === ModelOrigin.HF) {
+      const author = model.author || 'unknown';
+      return `${RNFS.DocumentDirectoryPath}/models/hf/${author}/${model.filename}`;
+    }
+
+    // Fallback (shouldn't reach here)
+    console.error('should not reach here. model: ', model);
     return `${RNFS.DocumentDirectoryPath}/${model.filename}`;
-  }
+  };
 
   async checkFileExists(model: Model) {
-    const exists = await RNFS.exists(this.getModelFullPath(model));
+    const exists = await RNFS.exists(await this.getModelFullPath(model));
     runInAction(() => {
       model.isDownloaded = exists;
     });
@@ -201,14 +242,24 @@ class ModelStore {
   removeInvalidLocalModels = () => {
     runInAction(() => {
       this.models = this.models.filter(
-        model => !model.isLocal || model.isDownloaded,
+        model =>
+          // Keep all non-local models (preset and HF)
+          !(model.isLocal || model.origin === ModelOrigin.LOCAL) ||
+          // This condition ensures that we keep models that are downloaded.
+          // For local models, being downloaded is a requirement for them to be considered valid.
+          model.isDownloaded,
       );
     });
   };
 
   checkSpaceAndDownload = async (modelId: string) => {
     const model = this.models.find(m => m.id === modelId);
-    if (!model || model.isLocal || !model.downloadUrl) {
+    if (
+      !model ||
+      model.isLocal ||
+      model.origin === ModelOrigin.LOCAL ||
+      !model.downloadUrl
+    ) {
       return;
     }
 
@@ -222,12 +273,21 @@ class ModelStore {
   };
 
   downloadModel = async (model: Model) => {
-    if (model.isLocal) {
+    if (model.isLocal || model.origin === ModelOrigin.LOCAL) {
       return;
     } // Skip downloading for local models
 
-    const downloadDest = this.getModelFullPath(model);
+    const downloadDest = await this.getModelFullPath(model);
     console.log('downloading: downloadDest: ', downloadDest);
+
+    // Ensure directory exists
+    const dirPath = downloadDest.substring(0, downloadDest.lastIndexOf('/'));
+    try {
+      await RNFS.mkdir(dirPath);
+    } catch (err) {
+      console.error('Failed to create directory:', err);
+      return;
+    }
 
     let lastBytesWritten = 0;
     let lastUpdateTime = Date.now();
@@ -242,14 +302,22 @@ class ModelStore {
       const currentTime = Date.now();
       const timeDiff = (currentTime - lastUpdateTime) / 1000; // Convert to seconds
       const bytesDiff = data.bytesWritten - lastBytesWritten;
-      const speedMBps = (bytesDiff / timeDiff / (1024 * 1024)).toFixed(2);
+      const speedBps = bytesDiff / timeDiff;
+      const speedMBps = (speedBps / (1024 * 1024)).toFixed(2);
+
+      // Calculate ETA
+      const remainingBytes = data.contentLength - data.bytesWritten;
+      const etaSeconds = speedBps > 0 ? remainingBytes / speedBps : 0;
+      const etaMinutes = Math.ceil(etaSeconds / 60);
+      const etaText =
+        etaMinutes > 0 ? `${etaMinutes} min` : `${etaSeconds} sec`;
 
       runInAction(() => {
         model.progress = newProgress;
         model.downloadSpeed = `${formatBytes(
           data.bytesWritten,
           0,
-        )}  (${speedMBps} MB/s)`;
+        )}  (${speedMBps} MB/s) ETA: ${etaText}`;
       });
 
       lastBytesWritten = data.bytesWritten;
@@ -306,7 +374,7 @@ class ModelStore {
     }
     console.log('cancelling model: ', model);
     if (model) {
-      const downloadDest = this.getModelFullPath(model);
+      const downloadDest = await this.getModelFullPath(model);
       try {
         // Ensure the destination file is deleted, this is specifically important for android
         await RNFS.unlink(downloadDest);
@@ -332,36 +400,62 @@ class ModelStore {
     };
   }
 
-  deleteModel = async (modelName: string) => {
-    const modelIndex = this.models.findIndex(m => m.name === modelName);
+  /**
+   * Removes a model from the models list if it is not downloaded.
+   * @param modelId - The ID of the model to remove.
+   * @returns boolean - Returns true if the model was removed, false otherwise.
+   */
+  removeModelFromList = (model: Model): boolean => {
+    const modelIndex = this.models.findIndex(
+      m => m.id === model.id && m.origin === model.origin,
+    );
+    if (modelIndex !== -1) {
+      const _model = this.models[modelIndex];
+      if (!_model.isDownloaded) {
+        runInAction(() => {
+          this.models.splice(modelIndex, 1);
+        });
+        return true;
+      }
+    }
+    return false;
+  };
+
+  deleteModel = async (model: Model) => {
+    // id should work as well, as long as we are differentiating between models by origin.
+    const modelIndex = this.models.findIndex(
+      m => m.id === model.id && m.origin === model.origin,
+    );
     if (modelIndex === -1) {
       return;
     }
-    const model = this.models[modelIndex];
+    const _model = this.models[modelIndex];
 
-    if (model.isLocal) {
+    const filePath = await this.getModelFullPath(_model);
+    if (_model.isLocal || _model.origin === ModelOrigin.LOCAL) {
+      // Local models are always removed from the list, when the file is deleted.
       runInAction(() => {
         this.models.splice(modelIndex, 1);
-        if (this.activeModelId === model.id) {
+        if (this.activeModelId === _model.id) {
           this.releaseContext();
         }
       });
       // Delete the file from internal storage
       try {
-        await RNFS.unlink(this.getModelFullPath(model));
+        await RNFS.unlink(filePath);
       } catch (err) {
         console.error('Failed to delete local model file:', err);
       }
     } else {
-      const filePath = this.getModelFullPath(model);
+      // Non-local models are not removed from the list, when the file is deleted.
       console.log('deleting: ', filePath);
 
       try {
         if (filePath) {
           await RNFS.unlink(filePath);
           runInAction(() => {
-            model.progress = 0;
-            if (this.activeModelId === model.id) {
+            _model.progress = 0;
+            if (this.activeModelId === _model.id) {
               this.releaseContext();
             }
           });
@@ -383,7 +477,7 @@ class ModelStore {
 
   initContext = async (model: Model) => {
     await this.releaseContext();
-    const filePath = this.getModelFullPath(model);
+    const filePath = await this.getModelFullPath(model);
     if (!filePath) {
       throw new Error('Model path is undefined');
     }
@@ -448,46 +542,14 @@ class ModelStore {
     this.activeModelId = modelId;
   }
 
+  downloadHFModel = async (hfModel: HuggingFaceModel, modelFile: ModelFile) => {
+    await this.addHFModel(hfModel, modelFile);
+    await this.downloadModel(this.models.find(m => m.id === hfModel.id)!);
+  };
+
   addHFModel = async (hfModel: HuggingFaceModel, modelFile: ModelFile) => {
-    const _defaultChatTemplate = {
-      addBosToken: false, // It is expected that chat templates will take care of this
-      addEosToken: false, // It is expected that chat templates will take care of this
-      bosToken: hfModel.specs?.gguf?.bos_token ?? '',
-      eosToken: hfModel.specs?.gguf?.eos_token ?? '',
-      chatTemplate: hfModel.specs?.gguf?.chat_template ?? '',
-      addGenerationPrompt: true,
-      name: 'hf-gguf',
-    };
-
-    const _defaultCompletionParams = {
-      ...defaultCompletionParams,
-      stop: _defaultChatTemplate.bosToken
-        ? [_defaultChatTemplate.bosToken]
-        : [],
-    };
-
-    const model: Model = {
-      id: uuidv4(), // Generate a unique ID
-      type: extractHFModelType(hfModel.id),
-      name: extractHFModelTitle(hfModel.id),
-      size: modelFile.size ?? 0,
-      params: hfModel.specs?.gguf?.total ?? 0,
-      isDownloaded: false,
-      downloadUrl: modelFile.url ?? '',
-      hfUrl: hfModel.url ?? '',
-      progress: 0,
-      filename: 'hf-' + modelFile.rfilename,
-      //fullPath: '',
-      isLocal: false,
-      origin: ModelOrigin.HF,
-      defaultChatTemplate: _defaultChatTemplate,
-      chatTemplate: _.cloneDeep(_defaultChatTemplate),
-      defaultCompletionSettings: _defaultCompletionParams,
-      completionSettings: {..._defaultCompletionParams},
-      hfModelFile: modelFile,
-    };
     runInAction(() => {
-      this.models.push(model);
+      this.models.push(hfAsAppModel(hfModel, modelFile));
       this.refreshDownloadStatuses();
     });
   };
@@ -502,6 +564,7 @@ class ModelStore {
 
     const model: Model = {
       id: uuidv4(), // Generate a unique ID
+      author: '',
       name: filename,
       size: 0, // Placeholder for UI to ignore
       params: 0, // Placeholder for UI to ignore
@@ -550,7 +613,9 @@ class ModelStore {
   };
 
   resetModels = () => {
-    const localModels = this.models.filter(model => model.isLocal);
+    const localModels = this.models.filter(
+      model => model.isLocal || model.origin === ModelOrigin.LOCAL,
+    );
 
     runInAction(() => {
       this.models = [];

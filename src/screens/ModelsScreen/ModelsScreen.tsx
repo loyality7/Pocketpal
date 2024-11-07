@@ -72,7 +72,7 @@ export const ModelsScreen: React.FC = observer(() => {
           let fileName =
             file.name || file.uri.split('/').pop() || `file_${uuidv4()}`;
 
-          const permanentDir = `${RNFS.DocumentDirectoryPath}/models`;
+          const permanentDir = `${RNFS.DocumentDirectoryPath}/models/local`;
           let permanentPath = `${permanentDir}/${fileName}`;
           if (!(await RNFS.exists(permanentDir))) {
             await RNFS.mkdir(permanentDir);

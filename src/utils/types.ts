@@ -214,6 +214,7 @@ export enum ModelOrigin {
 }
 export interface Model {
   id: string;
+  author: string;
   name: string;
   type?: string;
   size: number; // Size in bytes
@@ -235,6 +236,7 @@ export interface Model {
   defaultCompletionSettings: CompletionParams;
   completionSettings: CompletionParams;
   hfModelFile?: ModelFile;
+  hfModel?: HuggingFaceModel;
 }
 
 export type RootDrawerParamList = {

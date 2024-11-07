@@ -10,6 +10,7 @@ const androidOnlyModels: Model[] = [
   // --- Llama ---
   {
     id: 'default-llama-3.2-1b-instruct-q4_0_4_4.gguf',
+    author: 'bartowski',
     name: 'llama-3.2-1b-instruct (Q4_0_4_4)',
     type: 'Llama',
     size: 770928768,
@@ -39,6 +40,7 @@ const androidOnlyModels: Model[] = [
   },
   {
     id: 'default-llama-3.2-1b-instruct-q4_0_4_8.gguf',
+    author: 'bartowski',
     name: 'llama-3.2-1b-instruct (Q4_0_4_8)',
     type: 'Llama',
     size: 770928768,
@@ -68,6 +70,7 @@ const androidOnlyModels: Model[] = [
   },
   {
     id: 'default-llama-3.2-1b-instruct-q4_0_8_8.gguf',
+    author: 'bartowski',
     name: 'llama-3.2-1b-instruct (Q4_0_8_8)',
     type: 'Llama',
     size: 770928768,
@@ -98,6 +101,7 @@ const androidOnlyModels: Model[] = [
   // --- SmolLM ---
   {
     id: 'default-bartowski/SmolLM2-1.7B-Instruct-Q4_0_4_4.gguf',
+    author: 'bartowski',
     name: 'SmolLM2-1.7B-Instruct (Q4_0_4_4)',
     type: 'SmolLM',
     size: 990729184,
@@ -131,6 +135,7 @@ const crossPlatformModels: Model[] = [
   // -------- Gemma --------
   {
     id: 'google/gemma-2-2b-it-GGUF',
+    author: 'bartowski',
     name: 'gemma-2-2b-it-GGUF (Q6_K)',
     type: 'Gemma',
     size: 2151393120,
@@ -163,6 +168,7 @@ const crossPlatformModels: Model[] = [
   },
   {
     id: 'google/gemma-1.1-2b-it-GGUF',
+    author: 'bartowski',
     name: 'gemma-1.1-2b-it-GGUF (Q6_K)',
     type: 'Gemma',
     size: 2062124768,
@@ -195,6 +201,7 @@ const crossPlatformModels: Model[] = [
   },
   {
     id: 'Gemmasutra-Mini-2B-v1-Q6_K.gguf',
+    author: 'TheDrummer',
     name: 'Gemmasutra-Mini-2B-v1-GGUF (Q6_K)',
     type: 'Gemma',
     size: 2151393152,
@@ -227,6 +234,7 @@ const crossPlatformModels: Model[] = [
   // -------- Danube --------
   {
     id: 'h2o-danube3-4b-chat-Q4_K_M.gguf',
+    author: 'h2oai',
     name: 'H2O.ai Danube 3 (Q4_K_M)',
     type: 'Danube',
     size: 2394648960,
@@ -260,6 +268,7 @@ const crossPlatformModels: Model[] = [
   },
   {
     id: 'h2o-danube2-1.8b-chat-Q6_K.gguf',
+    author: 'h2oai',
     name: 'H2O.ai Danube 2 (Q6_K)',
     type: 'Danube',
     size: 1503287456,
@@ -293,6 +302,7 @@ const crossPlatformModels: Model[] = [
   },
   {
     id: 'h2o-danube2-1.8b-chat-Q5_K_S.gguf',
+    author: 'h2oai',
     name: 'H2O.ai Danube 2 (Q5_K_S)',
     type: 'Danube',
     size: 1270977696,
@@ -327,6 +337,7 @@ const crossPlatformModels: Model[] = [
   // -------- Phi --------
   {
     id: 'Phi-3.5-mini-instruct.Q4_K_M.gguf',
+    author: 'QuantFactory',
     name: 'Phi-3.5 mini 4k instruct (Q4_K_M)',
     type: 'Phi',
     size: 2394648960,
@@ -356,6 +367,7 @@ const crossPlatformModels: Model[] = [
   },
   {
     id: 'Phi-3-mini-4k-instruct-q4.gguf',
+    author: 'bartowski',
     name: 'Phi-3.1 mini 4k instruct (Q4_K_M)',
     type: 'Phi',
     size: 2394648960,
@@ -386,6 +398,7 @@ const crossPlatformModels: Model[] = [
   // -------- Qwen --------
   {
     id: 'qwen2-1_5b-instruct-q8_0.gguf',
+    author: 'Qwen',
     name: 'Qwen2-1.5B-Instruct (Q8_0)',
     type: 'Qwen',
     size: 1652387840,
@@ -415,6 +428,7 @@ const crossPlatformModels: Model[] = [
   },
   {
     id: 'qwen2.5-1.5b-instruct-q8_0.gguf',
+    author: 'Qwen',
     name: 'Qwen2.5-1.5B-Instruct (Q8_0)',
     type: 'Qwen',
     size: 1892387840,
@@ -444,6 +458,7 @@ const crossPlatformModels: Model[] = [
   },
   {
     id: 'qwen2.5-3b-instruct-q5_0.gguf',
+    author: 'Qwen',
     name: 'Qwen2.5-3B-Instruct (Q5_0)',
     type: 'Qwen',
     size: 2384387840,
@@ -474,6 +489,7 @@ const crossPlatformModels: Model[] = [
   // -------- Llama --------
   {
     id: 'default-llama-3.2-1b-instruct-q8_0.gguf',
+    author: 'hugging-quants',
     name: 'llama-3.2-1b-instruct (Q8_0)',
     type: 'Llama',
     size: 1321079200,
@@ -504,6 +520,7 @@ const crossPlatformModels: Model[] = [
   },
   {
     id: 'llama-3.2-3b-instruct-q4_k_m.gguf',
+    author: 'hugging-quants',
     name: 'llama-3.2-3b-instruct (Q4_K)',
     type: 'Llama',
     size: 2019373920,
@@ -534,6 +551,7 @@ const crossPlatformModels: Model[] = [
   },
   {
     id: 'Llama-3.2-3B-Instruct-Q6_K.gguf',
+    author: 'bartowski',
     name: 'Llama-3.2-3B-Instruct (Q6_K)',
     type: 'Llama',
     size: 2643853856,
@@ -564,6 +582,7 @@ const crossPlatformModels: Model[] = [
   // TODO: Add memory check for this model
   {
     id: 'llama-3.2-3b-instruct-q8_0.gguf',
+    author: 'hugging-quants',
     name: 'llama-3.2-3b-instruct q8_k',
     type: 'Llama',
     size: 3421895520,
@@ -595,6 +614,7 @@ const crossPlatformModels: Model[] = [
   // -------- SmolLM --------
   {
     id: 'default-bartowski/SmolLM2-1.7B-Instruct-Q8_0.gguf',
+    author: 'bartowski',
     name: 'SmolLM2-1.7B-Instruct (Q8_0)',
     type: 'SmolLM',
     size: 1820414944,

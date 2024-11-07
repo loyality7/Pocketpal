@@ -1,13 +1,23 @@
 import * as React from 'react';
 import {ColorValue} from 'react-native';
 
+import _ from 'lodash';
 import dayjs from 'dayjs';
 import {MD3Theme} from 'react-native-paper';
 import DeviceInfo from 'react-native-device-info';
 import Blob from 'react-native/Libraries/Blob/Blob';
 
 import {l10n} from './l10n';
-import {MessageType, Model, PreviewImage, User} from './types';
+import {defaultCompletionParams} from './chat';
+import {
+  HuggingFaceModel,
+  MessageType,
+  Model,
+  ModelFile,
+  ModelOrigin,
+  PreviewImage,
+  User,
+} from './types';
 
 export const L10nContext = React.createContext<
   (typeof l10n)[keyof typeof l10n]
@@ -450,4 +460,48 @@ export function extractHFModelTitle(modelId: string): string {
   return match ? match[2] : 'Unknown';
 }
 
+export function hfAsAppModel(
+  hfModel: HuggingFaceModel,
+  modelFile: ModelFile,
+): Model {
+  const _defaultChatTemplate = {
+    addBosToken: false, // It is expected that chat templates will take care of this
+    addEosToken: false, // It is expected that chat templates will take care of this
+    bosToken: hfModel.specs?.gguf?.bos_token ?? '',
+    eosToken: hfModel.specs?.gguf?.eos_token ?? '',
+    chatTemplate: hfModel.specs?.gguf?.chat_template ?? '',
+    addGenerationPrompt: true,
+    name: 'hf-gguf',
+  };
+
+  const _defaultCompletionParams = {
+    ...defaultCompletionParams,
+    stop: _defaultChatTemplate.bosToken ? [_defaultChatTemplate.bosToken] : [],
+  };
+
+  const _model: Model = {
+    id: hfModel.id + '/' + modelFile.rfilename,
+    type: extractHFModelType(hfModel.id),
+    author: hfModel.author,
+    name: extractHFModelTitle(modelFile.rfilename),
+    size: modelFile.size ?? 0,
+    params: hfModel.specs?.gguf?.total ?? 0,
+    isDownloaded: false,
+    downloadUrl: modelFile.url ?? '',
+    hfUrl: hfModel.url ?? '',
+    progress: 0,
+    filename: modelFile.rfilename,
+    //fullPath: '',
+    isLocal: false,
+    origin: ModelOrigin.HF,
+    defaultChatTemplate: _defaultChatTemplate,
+    chatTemplate: _.cloneDeep(_defaultChatTemplate),
+    defaultCompletionSettings: _defaultCompletionParams,
+    completionSettings: {..._defaultCompletionParams},
+    hfModelFile: modelFile,
+    hfModel: hfModel,
+  };
+
+  return _model;
+}
 export const randId = () => Math.random().toString(36).substring(2, 11);

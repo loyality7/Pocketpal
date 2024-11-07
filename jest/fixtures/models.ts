@@ -55,6 +55,7 @@ export const mockChatTemplate = {
 export const mockBasicModel: Model = {
   id: 'model-1',
   name: 'Test Model 1',
+  author: 'test-author',
   type: 'Test Model Type',
   size: 2 * 10 ** 9,
   params: 2 * 10 ** 9,
