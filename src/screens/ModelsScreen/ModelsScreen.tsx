@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useContext, useRef} from 'react';
+import React, {useState, useMemo, useContext} from 'react';
 import {View, FlatList, RefreshControl, Platform, Alert} from 'react-native';
 
 import {toJS} from 'mobx';
@@ -35,9 +35,10 @@ export const ModelsScreen: React.FC = observer(() => {
   const [isExtended, setIsExtended] = useState(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [resetDialogVisible, setResetDialogVisible] = useState(false);
+  const [hfSearchVisible, setHFSearchVisible] = useState(false);
   const [_, setTrigger] = useState<boolean>(false);
   const {colors} = useTheme();
-  const modelSearchRef = useRef<any>(null);
+  //const modelSearchRef = useRef<any>(null);
 
   const filters = uiStore.pageStates.modelsScreen.filters;
   const setFilters = (value: string[]) => {
@@ -53,10 +54,10 @@ export const ModelsScreen: React.FC = observer(() => {
     setRefreshing(false);
   };
 
-  const handleAddHFModel = () => {
+  /*const handleAddHFModel = () => {
     console.log('handleAddHFModel');
     modelSearchRef.current?.showSearch();
-  };
+  };*/
 
   const handleAddLocalModel = async () => {
     DocumentPicker.pick({
@@ -319,14 +320,17 @@ export const ModelsScreen: React.FC = observer(() => {
         }
       />
 
-      <HFModelSearch ref={modelSearchRef} />
+      <HFModelSearch
+        visible={hfSearchVisible}
+        onDismiss={() => setHFSearchVisible(false)}
+      />
       <SafeAreaView style={styles.safeArea} edges={['bottom']}>
         <AnimatedFAB
           testID="add-hf-model-fab"
           icon={'plus'}
           label={l10n.hfModel}
           extended={isExtended}
-          onPress={handleAddHFModel}
+          onPress={() => setHFSearchVisible(true)}
           animateFrom={'right'}
           style={[styles.fab, styles.fabHF]}
         />

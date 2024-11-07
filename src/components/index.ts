@@ -1,6 +1,7 @@
 export * from './AppleStyleSwipeableRow';
 export * from './AttachmentButton';
 export * from './Avatar';
+export * from './BottomSheet';
 export * from './Bubble';
 export * from './ChatView';
 export * from './CircularActivityIndicator';
