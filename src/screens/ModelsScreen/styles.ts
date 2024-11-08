@@ -11,14 +11,20 @@ export const styles = StyleSheet.create({
   listContainer: {
     paddingBottom: 150,
   },
-  filterContainer: {
-    marginVertical: 15,
-    marginHorizontal: 15,
-  },
   paragraph: {
     marginBottom: 8,
   },
   bold: {
     fontWeight: 'bold',
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    padding: 4,
+    gap: 1,
+    justifyContent: 'flex-end',
+  },
+  filterIcon: {
+    borderRadius: 8,
+    marginHorizontal: 2,
   },
 });

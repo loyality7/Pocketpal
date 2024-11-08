@@ -57,6 +57,9 @@ export const l10n = {
     darkModeDescription: 'Toggle dark mode on or off.',
     displayMemoryUsage: 'Display Memory Usage',
     displayMemoryUsageDescription: 'Display memory usage in the chat page.',
+    tooltipGroupByType: 'Group by model type',
+    tooltipDownloaded: 'Show downloaded only',
+    tooltipHf: 'Show HuggingFace-sourced models',
   },
   es: {
     attachmentButtonAccessibilityLabel: 'Enviar multimedia',
@@ -120,6 +123,9 @@ export const l10n = {
     displayMemoryUsage: 'Mostrar uso de memoria',
     displayMemoryUsageDescription:
       'Mostrar uso de memoria en la página de chat.',
+    tooltipGroupByType: 'Agrupar por tipo de modelo',
+    tooltipDownloaded: 'Mostrar solo descargados',
+    tooltipHf: 'Mostrar modelos de HuggingFace',
   },
   ko: {
     attachmentButtonAccessibilityLabel: '미디어 보내기',
@@ -179,6 +185,9 @@ export const l10n = {
     displayMemoryUsage: '메모리 사용량 표시',
     displayMemoryUsageDescription:
       '채팅 페이지에서 메모리 사용량을 표시합니다.',
+    tooltipGroupByType: '모델 유형별로 그룹화',
+    tooltipDownloaded: '다운로드된 항목만 표시',
+    tooltipHf: 'HuggingFace 소스 모델 표시',
   },
   pl: {
     attachmentButtonAccessibilityLabel: 'Wyślij multimedia',
@@ -238,6 +247,9 @@ export const l10n = {
     darkModeDescription: 'Włącz lub wyłącz tryb ciemny.',
     displayMemoryUsage: 'Pokaż użycie pamięci',
     displayMemoryUsageDescription: 'Pokaż użycie pamięci na stronie czatu.',
+    tooltipGroupByType: 'Grupuj według typu modelu',
+    tooltipDownloaded: 'Pokaż tylko pobrane',
+    tooltipHf: 'Pokaż modele z HuggingFace',
   },
   pt: {
     attachmentButtonAccessibilityLabel: 'Envia mídia',
@@ -297,6 +309,9 @@ export const l10n = {
     darkModeDescription: 'Włącz lub wyłącz tryb ciemny.',
     displayMemoryUsage: 'Pokaż użycie pamięci',
     displayMemoryUsageDescription: 'Pokaż użycie pamięci na stronie czatu.',
+    tooltipGroupByType: 'Agrupar por tipo de modelo',
+    tooltipDownloaded: 'Mostrar apenas baixados',
+    tooltipHf: 'Mostrar modelos do HuggingFace',
   },
   ru: {
     attachmentButtonAccessibilityLabel: 'Отправить медиа',
@@ -360,6 +375,9 @@ export const l10n = {
     displayMemoryUsage: 'Показать использование памяти',
     displayMemoryUsageDescription:
       'Показать использование памяти на странице чата.',
+    tooltipGroupByType: 'Группировать по типу модели',
+    tooltipDownloaded: 'Показать только загруженные',
+    tooltipHf: 'Показать модели из HuggingFace',
   },
   tr: {
     attachmentButtonAccessibilityLabel: 'Medya gönder',
@@ -419,6 +437,9 @@ export const l10n = {
     darkModeDescription: 'Włącz lub wyłącz tryb ciemny.',
     displayMemoryUsage: 'Pokaż użycie pamięci',
     displayMemoryUsageDescription: 'Pokaż użycie pamięci na stronie czatu.',
+    tooltipGroupByType: 'Model türüne göre grupla',
+    tooltipDownloaded: 'Sadece indirilenleri göster',
+    tooltipHf: 'HuggingFace kaynaklı modelleri göster',
   },
   uk: {
     attachmentButtonAccessibilityLabel: 'Надіслати медіа',
@@ -482,6 +503,9 @@ export const l10n = {
     displayMemoryUsage: 'Показать использование памяти',
     displayMemoryUsageDescription:
       'Показать использование памяти на странице чата.',
+    tooltipGroupByType: 'Групувати за типом моделі',
+    tooltipDownloaded: 'Показати лише завантажені',
+    tooltipHf: 'Показати моделі з HuggingFace',
   },
   ca: {
     attachmentButtonAccessibilityLabel: 'Enviar multimèdia',
@@ -544,5 +568,8 @@ export const l10n = {
     darkModeDescription: 'Activa o desactiva el mode fosc.',
     displayMemoryUsage: 'Mostrar ús de memòria',
     displayMemoryUsageDescription: 'Mostrar ús de memòria a la pàgina de xat.',
+    tooltipGroupByType: 'Agrupar per tipus de model',
+    tooltipDownloaded: 'Mostrar només descarregats',
+    tooltipHf: 'Mostrar models de HuggingFace',
   },
 };

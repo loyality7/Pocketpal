@@ -1,33 +1,43 @@
 import React, {useState, useMemo, useContext} from 'react';
-import {View, FlatList, RefreshControl, Platform, Alert} from 'react-native';
+import {
+  View,
+  FlatList,
+  RefreshControl,
+  Platform,
+  Alert,
+  Image,
+} from 'react-native';
 
 import {toJS} from 'mobx';
-import 'react-native-get-random-values'; // Polyfill for uuid
 import {v4 as uuidv4} from 'uuid';
 import RNFS from 'react-native-fs';
+import 'react-native-get-random-values';
 import {observer} from 'mobx-react-lite';
 import DocumentPicker from 'react-native-document-picker';
 import {
   Button,
   Dialog,
+  IconButton,
   Paragraph,
   Portal,
-  SegmentedButtons,
   Text,
+  Tooltip,
 } from 'react-native-paper';
+
+import iconHF from '../../assets/icon-hf.png';
 
 import {useTheme} from '../../hooks';
 
 import {styles} from './styles';
+import {FABGroup} from './FABGroup';
 import {ModelCard} from './ModelCard';
+import {HFModelSearch} from './HFModelSearch';
 import {ModelAccordion} from './ModelAccordion';
 
 import {uiStore, modelStore} from '../../store';
 
-import {Model} from '../../utils/types';
 import {L10nContext} from '../../utils';
-import {HFModelSearch} from './HFModelSearch';
-import {FABGroup} from './FABGroup';
+import {Model, ModelOrigin} from '../../utils/types';
 
 export const ModelsScreen: React.FC = observer(() => {
   const l10n = useContext(L10nContext);
@@ -36,12 +46,48 @@ export const ModelsScreen: React.FC = observer(() => {
   const [hfSearchVisible, setHFSearchVisible] = useState(false);
   const [_, setTrigger] = useState<boolean>(false);
   const {colors} = useTheme();
-  //const modelSearchRef = useRef<any>(null);
 
   const filters = uiStore.pageStates.modelsScreen.filters;
   const setFilters = (value: string[]) => {
     uiStore.setValue('modelsScreen', 'filters', value);
   };
+  const FILTER_CONFIG = [
+    {
+      value: 'hf',
+      icon: ({size, color}) => (
+        <Image
+          source={iconHF}
+          style={{
+            width: size,
+            height: size,
+            tintColor: color,
+          }}
+        />
+      ),
+      activeIcon: ({size}) => (
+        <Image
+          source={iconHF}
+          style={{
+            width: size,
+            height: size,
+          }}
+        />
+      ),
+      tooltip: l10n.tooltipHf,
+    },
+    {
+      value: 'downloaded',
+      icon: 'download',
+      activeIcon: 'download-circle',
+      tooltip: l10n.tooltipDownloaded,
+    },
+    {
+      value: 'grouped',
+      icon: 'layers-outline',
+      activeIcon: 'layers',
+      tooltip: l10n.tooltipGroupByType,
+    },
+  ] as const;
 
   const expandedGroups = uiStore.pageStates.modelsScreen.expandedGroups;
 
@@ -143,6 +189,9 @@ export const ModelsScreen: React.FC = observer(() => {
         return 0;
       });
     }
+    if (filters.includes('hf')) {
+      result = result.filter(model => model.origin === ModelOrigin.HF);
+    }
     return result;
   }, [models, filters]);
 
@@ -214,6 +263,34 @@ export const ModelsScreen: React.FC = observer(() => {
     }
   };
 
+  const renderFilterIcon = ({
+    value,
+    icon,
+    activeIcon,
+    tooltip,
+  }: (typeof FILTER_CONFIG)[number]) => {
+    const isSelected = filters.includes(value);
+    return (
+      <Tooltip key={value} title={tooltip}>
+        <IconButton
+          key={value}
+          icon={isSelected ? activeIcon : icon}
+          selected={isSelected}
+          onPress={() => {
+            const newFilters = isSelected
+              ? filters.filter(f => f !== value)
+              : [...filters, value];
+            setFilters(newFilters);
+          }}
+          mode={isSelected ? 'contained-tonal' : undefined}
+          size={24}
+          iconColor={isSelected ? colors.primary : colors.onSurfaceVariant}
+          style={styles.filterIcon}
+        />
+      </Tooltip>
+    );
+  };
+
   return (
     <View style={[styles.container, {backgroundColor: colors.surface}]}>
       <Portal>
@@ -255,25 +332,9 @@ export const ModelsScreen: React.FC = observer(() => {
         </Dialog>
       </Portal>
 
-      <SegmentedButtons
-        value={filters}
-        onValueChange={setFilters}
-        multiSelect
-        density="small"
-        style={styles.filterContainer}
-        buttons={[
-          {
-            value: 'downloaded',
-            label: l10n.downloaded,
-            icon: filters.includes('downloaded') ? 'check' : undefined,
-          },
-          {
-            value: 'grouped',
-            label: l10n.grouped,
-            icon: filters.includes('grouped') ? 'check' : undefined,
-          },
-        ]}
-      />
+      <View style={styles.filterContainer}>
+        {FILTER_CONFIG.map(renderFilterIcon)}
+      </View>
 
       <FlatList
         testID="flat-list"
