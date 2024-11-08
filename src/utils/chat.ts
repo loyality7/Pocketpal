@@ -21,6 +21,19 @@ export function convertToChatMessages(
     .reverse();
 }
 
+/**
+ * Formats chat messages using the appropriate template based on the model or context.
+ *
+ * @param messages - Array of OAI compatible chat messages
+ * @param model - The model configuration, which may contain a custom chat template
+ * @param context - The LlamaContext instance, which may contain a chat template
+ * @returns A formatted prompt
+ *
+ * Priority of template selection:
+ * 1. Model's custom chat template (if available)
+ * 2. Context's model-specific template (if available)
+ * 3. Default chat template as fallback
+ */
 export async function applyChatTemplate(
   messages: ChatMessage[],
   model: Model | null,
@@ -34,16 +47,19 @@ export async function applyChatTemplate(
   let formattedChat: string | undefined;
 
   try {
+    // Model's custom chat template. This uses chat-formatter, which is based on Nunjucks (as opposed to Jinja2).
     if (modelChatTemplate?.chatTemplate) {
       formattedChat = applyTemplate(messages, {
         customTemplate: modelChatTemplate,
         addGenerationPrompt: modelChatTemplate.addGenerationPrompt,
       }) as string;
     } else if (contextChatTemplate) {
+      // Context's model-specific chat template. This uses llama.cpp's getFormattedChat.
       formattedChat = await context?.getFormattedChat(messages);
     }
 
     if (!formattedChat) {
+      // Default chat template
       formattedChat = applyTemplate(messages, {
         customTemplate: chatTemplates.default,
         addGenerationPrompt: chatTemplates.default.addGenerationPrompt,
@@ -57,6 +73,13 @@ export async function applyChatTemplate(
 }
 
 export const chatTemplates: Record<string, ChatTemplateConfig> = {
+  custom: {
+    name: 'custom',
+    addGenerationPrompt: true,
+    bosToken: '',
+    eosToken: '',
+    chatTemplate: '',
+  },
   danube3: {
     ...Templates.templates.danube2,
     name: 'danube3',

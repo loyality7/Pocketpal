@@ -149,19 +149,17 @@ export const ModelFileCard: FC<ModelFileCardProps> = observer(
 
     return (
       <View style={styles.fileCardContainer}>
-        {isDownloading && (
-          <LinearGradient
-            colors={[theme.dark ? HF_YELLOW + '90' : HF_YELLOW, 'transparent']} // Adding transparency to yellow
-            locations={[1, 1]}
-            start={{x: 0, y: 0}}
-            end={{x: 1, y: 0}}
-            style={[
-              StyleSheet.absoluteFill,
-              {width: `${downloadProgress}%`},
-              styles.gradientBackground,
-            ]}
-          />
-        )}
+        <LinearGradient
+          colors={[theme.dark ? HF_YELLOW + '90' : HF_YELLOW, 'transparent']} // Adding transparency to yellow
+          locations={[1, 1]}
+          start={{x: 0, y: 0}}
+          end={{x: 1, y: 0}}
+          style={[
+            StyleSheet.absoluteFill,
+            {width: `${downloadProgress}%`},
+            styles.gradientBackground,
+          ]}
+        />
         <View style={styles.fileContent}>
           <View style={styles.fileInfo}>
             <Tooltip title={modelFile.rfilename}>

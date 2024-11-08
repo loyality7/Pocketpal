@@ -469,9 +469,10 @@ export function hfAsModel(
     addEosToken: false, // It is expected that chat templates will take care of this
     bosToken: hfModel.specs?.gguf?.bos_token ?? '',
     eosToken: hfModel.specs?.gguf?.eos_token ?? '',
-    chatTemplate: hfModel.specs?.gguf?.chat_template ?? '',
+    //chatTemplate: hfModel.specs?.gguf?.chat_template ?? '',
+    chatTemplate: '', // At the moment chatTemplate needs to be nunjucks, not jinja2. So by using empty string we force the use of gguf's chat template.
     addGenerationPrompt: true,
-    name: 'hf-gguf',
+    name: 'custom',
   };
 
   const _defaultCompletionParams = {

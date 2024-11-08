@@ -80,6 +80,7 @@ class ModelStore {
   mergeModelLists = () => {
     const mergedModels = [...this.models]; // Start with persisted models
 
+    // Handle PRESET models using defaultModels as reference
     defaultModels.forEach(defaultModel => {
       const existingModelIndex = mergedModels.findIndex(
         m => m.id === defaultModel.id,
@@ -88,6 +89,11 @@ class ModelStore {
       if (existingModelIndex !== -1) {
         // Merge existing model with new defaults
         const existingModel = mergedModels[existingModelIndex];
+
+        // For PRESET models, directly use defaultModel's default settings
+        existingModel.defaultChatTemplate = defaultModel.defaultChatTemplate;
+        existingModel.defaultCompletionSettings =
+          defaultModel.defaultCompletionSettings;
 
         // Deep merge chatTemplate and completionSettings
         existingModel.chatTemplate = deepMerge(
@@ -105,6 +111,28 @@ class ModelStore {
       } else {
         // Add new model if it doesn't exist
         mergedModels.push(defaultModel);
+      }
+    });
+
+    // Handle HF and LOCAL models
+    mergedModels.forEach(model => {
+      if (
+        model.origin === ModelOrigin.HF ||
+        model.origin === ModelOrigin.LOCAL
+      ) {
+        // Update default settings
+        model.defaultChatTemplate = {...chatTemplates.custom};
+        model.defaultCompletionSettings = {...defaultCompletionParams};
+
+        // Update current settings while preserving any customizations
+        model.chatTemplate = deepMerge(
+          model.chatTemplate || {},
+          chatTemplates.custom,
+        );
+        model.completionSettings = deepMerge(
+          model.completionSettings || {},
+          defaultCompletionParams,
+        );
       }
     });
 
@@ -580,7 +608,7 @@ class ModelStore {
       throw new Error('Invalid local file path');
     }
 
-    const defaultChatTemplate = chatTemplates.chatML;
+    const defaultChatTemplate = chatTemplates.custom;
 
     const model: Model = {
       id: uuidv4(), // Generate a unique ID
@@ -636,14 +664,21 @@ class ModelStore {
     const localModels = this.models.filter(
       model => model.isLocal || model.origin === ModelOrigin.LOCAL,
     );
+    localModels.forEach(model => this.resetCompletionSettings(model.id));
+    localModels.forEach(model => this.resetModelChatTemplate(model.id));
+
+    const hfModels = this.models.filter(
+      model => model.origin === ModelOrigin.HF,
+    );
+    hfModels.forEach(model => this.resetCompletionSettings(model.id));
+    hfModels.forEach(model => this.resetModelChatTemplate(model.id));
 
     runInAction(() => {
       this.models = [];
       this.version = 0;
       this.mergeModelLists();
 
-      // Add back the local models
-      this.models = [...this.models, ...localModels];
+      this.models = [...this.models, ...localModels, ...hfModels];
     });
   };
 
@@ -651,7 +686,13 @@ class ModelStore {
     const model = this.models.find(m => m.id === modelId);
     if (model) {
       runInAction(() => {
-        model.chatTemplate = {...model.defaultChatTemplate};
+        if (model.origin === ModelOrigin.LOCAL) {
+          model.chatTemplate = {...chatTemplates.custom};
+        } else if (model.origin === ModelOrigin.HF) {
+          model.chatTemplate = {...chatTemplates.custom};
+        } else {
+          model.chatTemplate = {...model.defaultChatTemplate};
+        }
       });
     }
   };
@@ -660,7 +701,13 @@ class ModelStore {
     const model = this.models.find(m => m.id === modelId);
     if (model) {
       runInAction(() => {
-        model.completionSettings = {...model.defaultCompletionSettings};
+        if (model.origin === ModelOrigin.LOCAL) {
+          model.completionSettings = {...defaultCompletionParams};
+        } else if (model.origin === ModelOrigin.HF) {
+          model.completionSettings = {...defaultCompletionParams};
+        } else {
+          model.completionSettings = {...model.defaultCompletionSettings};
+        }
       });
     }
   };
