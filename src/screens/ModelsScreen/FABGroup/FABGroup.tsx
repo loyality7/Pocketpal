@@ -1,7 +1,7 @@
 import {Image} from 'react-native';
 import React, {useContext, useMemo, useState} from 'react';
 
-import {FAB, Portal} from 'react-native-paper';
+import {FAB} from 'react-native-paper';
 
 import {L10nContext} from '../../../utils';
 import {styles} from './styles';
@@ -58,23 +58,21 @@ export const FABGroup: React.FC<FABGroupProps> = ({
   );
 
   return (
-    <Portal>
-      <FAB.Group
-        open={open}
-        visible={true}
-        icon={open ? 'close' : 'chevron-up'}
-        actions={actions}
-        onStateChange={onStateChange}
-        onPress={() => {
-          if (open) {
-            console.log('FAB Group closed');
-          } else {
-            console.log('FAB Group opened');
-          }
-        }}
-        fabStyle={styles.fab}
-        accessibilityLabel={open ? 'Close menu' : 'Open menu'}
-      />
-    </Portal>
+    <FAB.Group
+      open={open}
+      visible={true}
+      icon={open ? 'close' : 'chevron-up'}
+      actions={actions}
+      onStateChange={onStateChange}
+      onPress={() => {
+        if (open) {
+          console.log('FAB Group closed');
+        } else {
+          console.log('FAB Group opened');
+        }
+      }}
+      fabStyle={styles.fab}
+      accessibilityLabel={open ? 'Close menu' : 'Open menu'}
+    />
   );
 };
