@@ -1,19 +1,21 @@
 import {AppState, AppStateStatus} from 'react-native';
 
 import _ from 'lodash';
-import 'react-native-get-random-values'; // Polyfill for uuid
 import {v4 as uuidv4} from 'uuid';
 import RNFS from 'react-native-fs';
+import 'react-native-get-random-values';
 import {makePersistable} from 'mobx-persist-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {computed, makeAutoObservable, ObservableMap, runInAction} from 'mobx';
 import {CompletionParams, LlamaContext, initLlama} from '@pocketpalai/llama.rn';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {deepMerge, formatBytes, hasEnoughSpace, hfAsModel} from '../utils';
 import {defaultModels, MODEL_LIST_VERSION} from './defaultModels';
+import {deepMerge, formatBytes, hasEnoughSpace, hfAsModel} from '../utils';
 
-import {chatTemplates} from '../utils/chat';
-import {defaultCompletionParams} from '../utils/chat';
+import {
+  getHFDefaultSettings,
+  getLocalModelDefaultSettings,
+} from '../utils/chat';
 import {
   ChatTemplateConfig,
   HuggingFaceModel,
@@ -120,18 +122,31 @@ class ModelStore {
         model.origin === ModelOrigin.HF ||
         model.origin === ModelOrigin.LOCAL
       ) {
-        // Update default settings
-        model.defaultChatTemplate = {...chatTemplates.custom};
-        model.defaultCompletionSettings = {...defaultCompletionParams};
+        // Reset default settings
+        if (model.origin === ModelOrigin.LOCAL) {
+          const defaultSettings = getLocalModelDefaultSettings();
+          model.defaultChatTemplate = {...defaultSettings.chatTemplate};
+          model.defaultCompletionSettings = {
+            ...defaultSettings.completionParams,
+          };
+        } else if (model.origin === ModelOrigin.HF) {
+          const defaultSettings = getHFDefaultSettings(
+            model.hfModel as HuggingFaceModel,
+          );
+          model.defaultChatTemplate = {...defaultSettings.chatTemplate};
+          model.defaultCompletionSettings = {
+            ...defaultSettings.completionParams,
+          };
+        }
 
         // Update current settings while preserving any customizations
         model.chatTemplate = deepMerge(
           model.chatTemplate || {},
-          chatTemplates.custom,
+          model.defaultChatTemplate,
         );
         model.completionSettings = deepMerge(
           model.completionSettings || {},
-          defaultCompletionParams,
+          model.defaultCompletionSettings,
         );
       }
     });
@@ -608,7 +623,7 @@ class ModelStore {
       throw new Error('Invalid local file path');
     }
 
-    const defaultChatTemplate = chatTemplates.custom;
+    const defaultSettings = getLocalModelDefaultSettings();
 
     const model: Model = {
       id: uuidv4(), // Generate a unique ID
@@ -624,10 +639,10 @@ class ModelStore {
       fullPath: localFilePath,
       isLocal: true,
       origin: ModelOrigin.LOCAL,
-      defaultChatTemplate: {...defaultChatTemplate},
-      chatTemplate: defaultChatTemplate,
-      defaultCompletionSettings: {...defaultCompletionParams},
-      completionSettings: {...defaultCompletionParams},
+      defaultChatTemplate: {...defaultSettings.chatTemplate},
+      chatTemplate: {...defaultSettings.chatTemplate},
+      defaultCompletionSettings: {...defaultSettings.completionParams},
+      completionSettings: {...defaultSettings.completionParams},
     };
 
     runInAction(() => {
@@ -664,14 +679,28 @@ class ModelStore {
     const localModels = this.models.filter(
       model => model.isLocal || model.origin === ModelOrigin.LOCAL,
     );
-    localModels.forEach(model => this.resetCompletionSettings(model.id));
-    localModels.forEach(model => this.resetModelChatTemplate(model.id));
+    localModels.forEach(model => {
+      const defaultSettings = getLocalModelDefaultSettings();
+      // We change the default settings as well, in case the app introduces new settings.
+      model.defaultChatTemplate = {...defaultSettings.chatTemplate};
+      model.defaultCompletionSettings = {...defaultSettings.completionParams};
+      model.chatTemplate = {...defaultSettings.chatTemplate};
+      model.completionSettings = {...defaultSettings.completionParams};
+    });
 
     const hfModels = this.models.filter(
       model => model.origin === ModelOrigin.HF,
     );
-    hfModels.forEach(model => this.resetCompletionSettings(model.id));
-    hfModels.forEach(model => this.resetModelChatTemplate(model.id));
+    hfModels.forEach(model => {
+      const defaultSettings = getHFDefaultSettings(
+        model.hfModel as HuggingFaceModel,
+      );
+      // We change the default settings as well, in case the app introduces new settings.
+      model.defaultChatTemplate = {...defaultSettings.chatTemplate};
+      model.defaultCompletionSettings = {...defaultSettings.completionParams};
+      model.chatTemplate = {...defaultSettings.chatTemplate};
+      model.completionSettings = {...defaultSettings.completionParams};
+    });
 
     runInAction(() => {
       this.models = [];
@@ -686,13 +715,7 @@ class ModelStore {
     const model = this.models.find(m => m.id === modelId);
     if (model) {
       runInAction(() => {
-        if (model.origin === ModelOrigin.LOCAL) {
-          model.chatTemplate = {...chatTemplates.custom};
-        } else if (model.origin === ModelOrigin.HF) {
-          model.chatTemplate = {...chatTemplates.custom};
-        } else {
-          model.chatTemplate = {...model.defaultChatTemplate};
-        }
+        model.chatTemplate = {...model.defaultChatTemplate};
       });
     }
   };
@@ -701,13 +724,7 @@ class ModelStore {
     const model = this.models.find(m => m.id === modelId);
     if (model) {
       runInAction(() => {
-        if (model.origin === ModelOrigin.LOCAL) {
-          model.completionSettings = {...defaultCompletionParams};
-        } else if (model.origin === ModelOrigin.HF) {
-          model.completionSettings = {...defaultCompletionParams};
-        } else {
-          model.completionSettings = {...model.defaultCompletionSettings};
-        }
+        model.completionSettings = {...model.defaultCompletionSettings};
       });
     }
   };

@@ -1,6 +1,13 @@
 import {applyTemplate, Templates} from 'chat-formatter';
-import {ChatMessage, ChatTemplateConfig, MessageType, Model} from './types';
 import {CompletionParams, LlamaContext} from '@pocketpalai/llama.rn';
+
+import {
+  ChatMessage,
+  ChatTemplateConfig,
+  HuggingFaceModel,
+  MessageType,
+  Model,
+} from './types';
 
 export const userId = 'y9d7f8pgn';
 export const assistantId = 'h3o3lc5xj';
@@ -166,6 +173,42 @@ export const chatTemplates: Record<string, ChatTemplateConfig> = {
     chatTemplate: '',
   },
 };
+
+export function getLocalModelDefaultSettings(): {
+  chatTemplate: ChatTemplateConfig;
+  completionParams: CompletionParams;
+} {
+  return {
+    chatTemplate: chatTemplates.custom,
+    completionParams: defaultCompletionParams,
+  };
+}
+
+export function getHFDefaultSettings(hfModel: HuggingFaceModel): {
+  chatTemplate: ChatTemplateConfig;
+  completionParams: CompletionParams;
+} {
+  const _defaultChatTemplate = {
+    addBosToken: false, // It is expected that chat templates will take care of this
+    addEosToken: false, // It is expected that chat templates will take care of this
+    bosToken: hfModel.specs?.gguf?.bos_token ?? '',
+    eosToken: hfModel.specs?.gguf?.eos_token ?? '',
+    //chatTemplate: hfModel.specs?.gguf?.chat_template ?? '',
+    chatTemplate: '', // At the moment chatTemplate needs to be nunjucks, not jinja2. So by using empty string we force the use of gguf's chat template.
+    addGenerationPrompt: true,
+    name: 'custom',
+  };
+
+  const _defaultCompletionParams = {
+    ...defaultCompletionParams,
+    stop: _defaultChatTemplate.eosToken ? [_defaultChatTemplate.eosToken] : [],
+  };
+
+  return {
+    chatTemplate: _defaultChatTemplate,
+    completionParams: _defaultCompletionParams,
+  };
+}
 
 export const defaultCompletionParams: CompletionParams = {
   prompt: '',

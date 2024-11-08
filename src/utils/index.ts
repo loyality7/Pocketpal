@@ -8,7 +8,7 @@ import DeviceInfo from 'react-native-device-info';
 import Blob from 'react-native/Libraries/Blob/Blob';
 
 import {l10n} from './l10n';
-import {defaultCompletionParams} from './chat';
+import {getHFDefaultSettings} from './chat';
 import {
   HuggingFaceModel,
   MessageType,
@@ -464,21 +464,7 @@ export function hfAsModel(
   hfModel: HuggingFaceModel,
   modelFile: ModelFile,
 ): Model {
-  const _defaultChatTemplate = {
-    addBosToken: false, // It is expected that chat templates will take care of this
-    addEosToken: false, // It is expected that chat templates will take care of this
-    bosToken: hfModel.specs?.gguf?.bos_token ?? '',
-    eosToken: hfModel.specs?.gguf?.eos_token ?? '',
-    //chatTemplate: hfModel.specs?.gguf?.chat_template ?? '',
-    chatTemplate: '', // At the moment chatTemplate needs to be nunjucks, not jinja2. So by using empty string we force the use of gguf's chat template.
-    addGenerationPrompt: true,
-    name: 'custom',
-  };
-
-  const _defaultCompletionParams = {
-    ...defaultCompletionParams,
-    stop: _defaultChatTemplate.bosToken ? [_defaultChatTemplate.bosToken] : [],
-  };
+  const defaultSettings = getHFDefaultSettings(hfModel);
 
   const _model: Model = {
     id: hfModel.id + '/' + modelFile.rfilename,
@@ -495,10 +481,10 @@ export function hfAsModel(
     //fullPath: '',
     isLocal: false,
     origin: ModelOrigin.HF,
-    defaultChatTemplate: _defaultChatTemplate,
-    chatTemplate: _.cloneDeep(_defaultChatTemplate),
-    defaultCompletionSettings: _defaultCompletionParams,
-    completionSettings: {..._defaultCompletionParams},
+    defaultChatTemplate: defaultSettings.chatTemplate,
+    chatTemplate: _.cloneDeep(defaultSettings.chatTemplate),
+    defaultCompletionSettings: defaultSettings.completionParams,
+    completionSettings: {...defaultSettings.completionParams},
     hfModelFile: modelFile,
     hfModel: hfModel,
   };
