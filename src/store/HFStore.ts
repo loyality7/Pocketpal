@@ -27,12 +27,12 @@ class HFStore {
   // such as number of parameters, context length, chat template, etc.
   async fetchAndSetGGUFSpecs(modelId: string) {
     try {
-      console.log('Fetching GGUF specs for', modelId);
       const specs = await fetchGGUFSpecs(modelId);
-      console.log('GGUF specs:', specs);
       const model = this.models.find(m => m.id === modelId);
       if (model) {
-        model.specs = specs;
+        runInAction(() => {
+          model.specs = specs;
+        });
       }
     } catch (error) {
       console.error('Failed to fetch GGUF specs:', error);

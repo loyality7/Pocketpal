@@ -1,8 +1,9 @@
 import React, {FC} from 'react';
-import {Alert, View} from 'react-native';
+import {Alert, StyleSheet, View} from 'react-native';
 
 import {computed} from 'mobx';
 import {observer} from 'mobx-react';
+import LinearGradient from 'react-native-linear-gradient';
 import {IconButton, Text, Tooltip} from 'react-native-paper';
 
 import {useTheme} from '../../../../../hooks';
@@ -28,6 +29,7 @@ export const ModelFileCard: FC<ModelFileCardProps> = observer(
   ({modelFile, hfModel}) => {
     const theme = useTheme();
     const styles = createStyles(theme);
+    const HF_YELLOW = '#FFD21E';
 
     // Find the model in the store if exitst
     const modelId = hfAsModel(hfModel, modelFile).id;
@@ -146,7 +148,20 @@ export const ModelFileCard: FC<ModelFileCardProps> = observer(
       : 'download-off-outline';
 
     return (
-      <View style={styles.fileCard}>
+      <View style={styles.fileCardContainer}>
+        {isDownloading && (
+          <LinearGradient
+            colors={[theme.dark ? HF_YELLOW + '90' : HF_YELLOW, 'transparent']} // Adding transparency to yellow
+            locations={[1, 1]}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 0}}
+            style={[
+              StyleSheet.absoluteFill,
+              {width: `${downloadProgress}%`},
+              styles.gradientBackground,
+            ]}
+          />
+        )}
         <View style={styles.fileContent}>
           <View style={styles.fileInfo}>
             <Tooltip title={modelFile.rfilename}>
@@ -157,11 +172,19 @@ export const ModelFileCard: FC<ModelFileCardProps> = observer(
                 {modelFile.rfilename}
               </Text>
             </Tooltip>
-            {modelFile.size && (
-              <Text style={styles.fileSize}>
-                {formatBytes(modelFile.size, 2, false, true)}
-              </Text>
-            )}
+            <View style={styles.fileMetaInfo}>
+              {modelFile.size && (
+                <Text style={styles.fileSize}>
+                  {formatBytes(modelFile.size, 2, false, true)}
+                </Text>
+              )}
+              {isDownloading && (
+                <>
+                  <Text style={styles.fileSizeSeparator}>•</Text>
+                  <Text style={styles.downloadSpeed}>{downloadSpeed}</Text>
+                </>
+              )}
+            </View>
           </View>
           <View style={styles.fileActions}>
             <IconButton
@@ -169,27 +192,31 @@ export const ModelFileCard: FC<ModelFileCardProps> = observer(
               onPress={toggleBookmark}
               size={20}
             />
-            <Tooltip
-              title={
-                !modelFile.canFitInStorage
-                  ? 'Not enough storage space available'
-                  : ''
-              }>
-              <View>
-                <IconButton
-                  icon={downloadIcon}
-                  onPress={
-                    isDownloaded
-                      ? handleDelete
-                      : isDownloading
-                      ? handleCancel
-                      : handleDownload
-                  }
-                  size={20}
-                  disabled={!isDownloaded && !modelFile.canFitInStorage}
-                />
-              </View>
-            </Tooltip>
+            {isDownloading ? (
+              <IconButton icon="close" onPress={handleCancel} size={20} />
+            ) : (
+              <Tooltip
+                title={
+                  !modelFile.canFitInStorage
+                    ? 'Not enough storage space available'
+                    : ''
+                }>
+                <View>
+                  <IconButton
+                    icon={downloadIcon}
+                    onPress={
+                      isDownloaded
+                        ? handleDelete
+                        : isDownloading
+                        ? handleCancel
+                        : handleDownload
+                    }
+                    size={20}
+                    disabled={!isDownloaded && !modelFile.canFitInStorage}
+                  />
+                </View>
+              </Tooltip>
+            )}
           </View>
         </View>
       </View>
