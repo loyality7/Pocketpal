@@ -254,6 +254,8 @@ class ModelStore {
 
   checkSpaceAndDownload = async (modelId: string) => {
     const model = this.models.find(m => m.id === modelId);
+    // Skip if model is undefined, local or doesn't have a download URL
+    // TODO: we need a better way to handle this. Why this could ever happen?
     if (
       !model ||
       model.isLocal ||
@@ -272,7 +274,7 @@ class ModelStore {
     }
   };
 
-  downloadModel = async (model: Model) => {
+  private downloadModel = async (model: Model) => {
     if (model.isLocal || model.origin === ModelOrigin.LOCAL) {
       return;
     } // Skip downloading for local models
@@ -543,12 +545,28 @@ class ModelStore {
   }
 
   downloadHFModel = async (hfModel: HuggingFaceModel, modelFile: ModelFile) => {
-    const newModel = await this.addHFModel(hfModel, modelFile);
-    await this.checkSpaceAndDownload(newModel.id);
+    try {
+      const newModel = await this.addHFModel(hfModel, modelFile);
+      await this.checkSpaceAndDownload(newModel.id);
+    } catch (error) {
+      console.error('Failed to download HF model:', error);
+      throw error;
+    }
   };
 
+  /**
+   * Adds a new HF model to the models list, only if it doesn't exist yet.
+   * @param hfModel - The Hugging Face model to add.
+   * @param modelFile - The model file to add.
+   * @returns The new model that was added.
+   */
   addHFModel = async (hfModel: HuggingFaceModel, modelFile: ModelFile) => {
     const newModel = hfAsModel(hfModel, modelFile);
+    const storeModel = this.models.find(m => m.id === newModel.id);
+    if (storeModel) {
+      // Model already exists, return the existing model
+      return storeModel;
+    }
     runInAction(() => {
       this.models.push(newModel);
     });
