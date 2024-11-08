@@ -255,6 +255,7 @@ export interface ModelFile {
   size?: number;
   url?: string;
   oid?: string;
+  canFitInStorage?: boolean;
 }
 
 export interface HuggingFaceModel {

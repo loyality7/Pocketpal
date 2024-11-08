@@ -7,15 +7,9 @@ import {BottomSheet} from '../../../components';
 import {SearchView} from './SearchView';
 import {DetailsView} from './DetailsView';
 
-import {hfStore, modelStore} from '../../../store';
+import {hfStore} from '../../../store';
 
-import {
-  HuggingFaceModel,
-  Model,
-  ModelFile,
-  ModelOrigin,
-} from '../../../utils/types';
-import {Alert} from 'react-native';
+import {HuggingFaceModel} from '../../../utils/types';
 
 interface HFModelSearchProps {
   visible: boolean;
@@ -24,13 +18,11 @@ interface HFModelSearchProps {
 
 export const HFModelSearch: React.FC<HFModelSearchProps> = observer(
   ({visible, onDismiss}) => {
-    // const [searchVisible, setSearchVisible] = useState(false);
     const [detailsVisible, setDetailsVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedModel, setSelectedModel] = useState<HuggingFaceModel | null>(
       null,
     );
-    // const searchInputRef = useRef<any>(null);
 
     // Clear state when closed
     useEffect(() => {
@@ -67,99 +59,6 @@ export const HFModelSearch: React.FC<HFModelSearchProps> = observer(
       }
     };
 
-    const handleModelUnbookmark = (modelFile: ModelFile) => {
-      if (isModelBookmarked(modelFile)) {
-        const model = modelStore.models.find(
-          (m: Model) => m.hfModelFile?.oid === modelFile.oid,
-        );
-        if (model && model.isDownloaded) {
-          Alert.alert(
-            'Cannot Remove',
-            'The model is downloaded. Please delete the file first.',
-          );
-        } else if (model) {
-          Alert.alert(
-            'Remove Model',
-            'Are you sure you want to remove this model from the list?',
-            [
-              {text: 'Cancel', style: 'cancel'},
-              {
-                text: 'Remove',
-                onPress: () => {
-                  const removed = modelStore.removeModelFromList(model);
-                  if (!removed) {
-                    Alert.alert('Error', 'Failed to remove the model.');
-                  }
-                },
-              },
-            ],
-          );
-        }
-      }
-    };
-
-    // Add model to list
-    const handleModelBookmark = (
-      hfModel: HuggingFaceModel,
-      modelFile: ModelFile,
-    ) => {
-      if (!isModelBookmarked(modelFile)) {
-        modelStore.addHFModel(hfModel, modelFile);
-      }
-    };
-
-    const isModelBookmarked = (modelFile: ModelFile) => {
-      return modelStore.models.some(
-        model =>
-          model.origin === ModelOrigin.HF &&
-          model.hfModelFile?.oid === modelFile.oid,
-      );
-    };
-
-    const handleModelDelete = (modelFile: ModelFile) => {
-      const model = modelStore.models.find(
-        m => m.hfModelFile?.oid === modelFile.oid,
-      );
-      if (model && model.isDownloaded) {
-        Alert.alert(
-          'Delete Model',
-          'Are you sure you want to delete this downloaded model?',
-          [
-            {text: 'Cancel', style: 'cancel'},
-            {
-              text: 'Delete',
-              onPress: async () => {
-                await modelStore.deleteModel(model);
-              },
-            },
-          ],
-        );
-      }
-    };
-
-    const handleModelDownload = (
-      hfModel: HuggingFaceModel,
-      modelFile: ModelFile,
-    ) => {
-      if (isModelDownloaded(modelFile)) {
-        Alert.alert(
-          'Model Already Downloaded',
-          'The model is already downloaded.',
-        );
-      } else {
-        modelStore.downloadHFModel(hfModel, modelFile);
-      }
-    };
-
-    const isModelDownloaded = (modelFile: ModelFile) => {
-      return modelStore.models.some(
-        model =>
-          model.origin === ModelOrigin.HF &&
-          model.hfModelFile?.oid === modelFile.oid &&
-          model.isDownloaded,
-      );
-    };
-
     return (
       <>
         <BottomSheet
@@ -170,7 +69,6 @@ export const HFModelSearch: React.FC<HFModelSearchProps> = observer(
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             onModelSelect={handleModelSelect}
-            //searchInputRef={searchInputRef}
           />
         </BottomSheet>
 
@@ -178,18 +76,7 @@ export const HFModelSearch: React.FC<HFModelSearchProps> = observer(
           visible={detailsVisible}
           onDismiss={() => setDetailsVisible(false)}
           snapPoints={['90%']}>
-          {selectedModel && (
-            <DetailsView
-              model={selectedModel}
-              //onClose={() => setDetailsVisible(false)}
-              onModelBookmark={handleModelBookmark}
-              onModelUnbookmark={handleModelUnbookmark}
-              isModelBookmarked={isModelBookmarked}
-              onModelDownload={handleModelDownload}
-              onModelDelete={handleModelDelete}
-              isModelDownloaded={isModelDownloaded}
-            />
-          )}
+          {selectedModel && <DetailsView hfModel={selectedModel} />}
         </BottomSheet>
       </>
     );

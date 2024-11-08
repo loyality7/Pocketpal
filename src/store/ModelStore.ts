@@ -9,7 +9,7 @@ import {computed, makeAutoObservable, ObservableMap, runInAction} from 'mobx';
 import {CompletionParams, LlamaContext, initLlama} from '@pocketpalai/llama.rn';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {deepMerge, formatBytes, hasEnoughSpace, hfAsAppModel} from '../utils';
+import {deepMerge, formatBytes, hasEnoughSpace, hfAsModel} from '../utils';
 import {defaultModels, MODEL_LIST_VERSION} from './defaultModels';
 
 import {chatTemplates} from '../utils/chat';
@@ -543,15 +543,17 @@ class ModelStore {
   }
 
   downloadHFModel = async (hfModel: HuggingFaceModel, modelFile: ModelFile) => {
-    await this.addHFModel(hfModel, modelFile);
-    await this.downloadModel(this.models.find(m => m.id === hfModel.id)!);
+    const newModel = await this.addHFModel(hfModel, modelFile);
+    await this.checkSpaceAndDownload(newModel.id);
   };
 
   addHFModel = async (hfModel: HuggingFaceModel, modelFile: ModelFile) => {
+    const newModel = hfAsModel(hfModel, modelFile);
     runInAction(() => {
-      this.models.push(hfAsAppModel(hfModel, modelFile));
-      this.refreshDownloadStatuses();
+      this.models.push(newModel);
     });
+    await this.refreshDownloadStatuses();
+    return newModel;
   };
 
   addLocalModel = async (localFilePath: string) => {

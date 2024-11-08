@@ -460,7 +460,7 @@ export function extractHFModelTitle(modelId: string): string {
   return match ? match[2] : 'Unknown';
 }
 
-export function hfAsAppModel(
+export function hfAsModel(
   hfModel: HuggingFaceModel,
   modelFile: ModelFile,
 ): Model {

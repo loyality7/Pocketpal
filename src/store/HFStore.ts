@@ -3,6 +3,7 @@ import {makeAutoObservable, runInAction} from 'mobx';
 import {fetchGGUFSpecs, fetchModelFilesDetails, fetchModels} from '../api/hf';
 
 import {HuggingFaceModel} from '../utils/types';
+import {hasEnoughSpace, hfAsModel} from '../utils';
 
 class HFStore {
   models: HuggingFaceModel[] = [];
@@ -38,25 +39,51 @@ class HFStore {
     }
   }
 
+  private async updateSiblingsWithFileDetails(
+    model: HuggingFaceModel,
+    fileDetails: any[],
+  ) {
+    return Promise.all(
+      model.siblings.map(async file => {
+        const details = fileDetails.find(
+          detail => detail.path === file.rfilename,
+        );
+        if (!details) {
+          return {...file};
+        }
+
+        const enrichedFile = {
+          ...file,
+          size: details.size,
+          oid: details.oid,
+        };
+
+        return {
+          ...enrichedFile,
+          canFitInStorage: await hasEnoughSpace(hfAsModel(model, enrichedFile)),
+        };
+      }),
+    );
+  }
+
   // Fetch the sizes of the model files
   async fetchModelFileSizes(modelId: string) {
     try {
       console.log('Fetching model file sizes for', modelId);
       const fileDetails = await fetchModelFilesDetails(modelId);
+      const model = this.models.find(m => m.id === modelId);
+
+      if (!model) {
+        return;
+      }
+
+      const updatedSiblings = await this.updateSiblingsWithFileDetails(
+        model,
+        fileDetails,
+      );
+
       runInAction(() => {
-        const model = this.models.find(m => m.id === modelId);
-        if (model) {
-          model.siblings = model.siblings.map(file => {
-            const details = fileDetails.find(
-              detail => detail.path === file.rfilename,
-            );
-            return {
-              ...file,
-              size: details ? details.size : undefined,
-              oid: details ? details.oid : undefined,
-            };
-          });
-        }
+        model.siblings = updatedSiblings;
       });
     } catch (error) {
       console.error('Error fetching model file sizes:', error);
