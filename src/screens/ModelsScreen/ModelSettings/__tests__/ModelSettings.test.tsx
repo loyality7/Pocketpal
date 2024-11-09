@@ -114,7 +114,7 @@ describe('ModelSettings', () => {
         timeout: 10000,
       },
     );
-  }, 15000); 
+  }, 15000);
 
   it('saves template changes', async () => {
     const {getByText, getByPlaceholderText} = render(

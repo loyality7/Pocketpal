@@ -1,8 +1,11 @@
-import React, {useEffect, useRef} from 'react';
 import {View, Animated} from 'react-native';
+import React, {useEffect, useRef} from 'react';
+
 import {useTheme} from '../../hooks';
-import {Theme} from '../../utils/types';
+
 import {styles} from './styles';
+
+import {Theme} from '../../utils/types';
 
 interface LoadingDotProps {
   delay: number;

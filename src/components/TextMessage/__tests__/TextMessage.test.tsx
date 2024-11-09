@@ -46,6 +46,7 @@ describe('text message', () => {
     openUrlMock.mockRestore();
   });
 
+  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('renders preview image without https and handles link press', async () => {
     expect.assertions(2);
     const link = 'github.com/flyerhq/';
