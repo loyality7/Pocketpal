@@ -23,15 +23,13 @@ const renderBubble = ({
   child: ReactNode;
   message: MessageType.Any;
   nextMessageInGroup: boolean;
-}) => {
-  return (
-    <Bubble
-      child={child}
-      message={message}
-      nextMessageInGroup={nextMessageInGroup}
-    />
-  );
-};
+}) => (
+  <Bubble
+    child={child}
+    message={message}
+    nextMessageInGroup={nextMessageInGroup}
+  />
+);
 
 export const ChatScreen: React.FC = observer(() => {
   const context = modelStore.context;
