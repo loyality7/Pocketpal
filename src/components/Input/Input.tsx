@@ -87,15 +87,11 @@ export const Input = ({
     }
   };
 
-  const shouldShowSendButton = () => {
-    if (isStreaming || isStopVisible) {
-      return false;
-    }
-    if (sendButtonVisibilityMode === 'always') {
-      return true;
-    }
-    return sendButtonVisibilityMode === 'editing' && user && value.trim();
-  };
+  const isSendButtonVisible =
+    !isStreaming &&
+    !isStopVisible &&
+    user &&
+    (sendButtonVisibilityMode === 'always' || value.trim());
 
   return (
     <View style={container}>
@@ -127,7 +123,7 @@ export const Input = ({
         onChangeText={handleChangeText}
         value={value}
       />
-      {shouldShowSendButton() ? <SendButton onPress={handleSend} /> : null}
+      {isSendButtonVisible ? <SendButton onPress={handleSend} /> : null}
       {isStopVisible && <StopButton onPress={onStopPress} />}
     </View>
   );
