@@ -5,6 +5,8 @@ import {
   Platform,
   View,
   StatusBar,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 
 import {observer} from 'mobx-react';
@@ -56,57 +58,59 @@ export const SearchView = observer(
           style={styles.keyboardAvoidingView}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           keyboardVerticalOffset={keyboardOffset}>
-          <View style={styles.contentContainer}>
-            <View style={styles.scrollContainer}>
-              <ScrollView
-                keyboardShouldPersistTaps="handled"
-                contentContainerStyle={styles.scrollContent}>
-                {hfStore.isLoading ? (
-                  <Text style={styles.loadingText}>Loading...</Text>
-                ) : hfStore.models.length === 0 ? (
-                  <Text style={styles.noResultsText}>No models found</Text>
-                ) : (
-                  hfStore.models.map(model => (
-                    <TouchableOpacity
-                      key={model.id}
-                      onPress={() => onModelSelect(model)}
-                      style={styles.modelItem}>
-                      <Text style={styles.modelName}>{model.id}</Text>
-                    </TouchableOpacity>
-                  ))
-                )}
-              </ScrollView>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.contentContainer}>
+              <View style={styles.scrollContainer}>
+                <ScrollView
+                  keyboardShouldPersistTaps="handled"
+                  contentContainerStyle={styles.scrollContent}>
+                  {hfStore.isLoading ? (
+                    <Text style={styles.loadingText}>Loading...</Text>
+                  ) : hfStore.models.length === 0 ? (
+                    <Text style={styles.noResultsText}>No models found</Text>
+                  ) : (
+                    hfStore.models.map(model => (
+                      <TouchableOpacity
+                        key={model.id}
+                        onPress={() => onModelSelect(model)}
+                        style={styles.modelItem}>
+                        <Text style={styles.modelName}>{model.id}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+              <View style={styles.searchBarContainer}>
+                <Searchbar
+                  placeholder="Search HuggingFace models"
+                  placeholderTextColor={theme.colors.onSurfaceVariant}
+                  onChangeText={onSearchChange}
+                  value={searchQuery}
+                  inputStyle={styles.searchBarInput}
+                  style={styles.searchBar}
+                  icon={() => (
+                    <Icon
+                      name="magnify"
+                      size={24}
+                      color={theme.colors.onSurfaceVariant}
+                    />
+                  )}
+                  clearIcon={
+                    searchQuery.length > 0
+                      ? () => (
+                          <Icon
+                            name="close"
+                            size={24}
+                            color={theme.colors.onSurfaceVariant}
+                          />
+                        )
+                      : undefined
+                  }
+                  ref={searchInputRef}
+                />
+              </View>
             </View>
-            <View style={styles.searchBarContainer}>
-              <Searchbar
-                placeholder="Search HuggingFace models"
-                placeholderTextColor={theme.colors.onSurfaceVariant}
-                onChangeText={onSearchChange}
-                value={searchQuery}
-                inputStyle={styles.searchBarInput}
-                style={styles.searchBar}
-                icon={() => (
-                  <Icon
-                    name="magnify"
-                    size={24}
-                    color={theme.colors.onSurfaceVariant}
-                  />
-                )}
-                clearIcon={
-                  searchQuery.length > 0
-                    ? () => (
-                        <Icon
-                          name="close"
-                          size={24}
-                          color={theme.colors.onSurfaceVariant}
-                        />
-                      )
-                    : undefined
-                }
-                ref={searchInputRef}
-              />
-            </View>
-          </View>
+          </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
       </SafeAreaView>
     );
