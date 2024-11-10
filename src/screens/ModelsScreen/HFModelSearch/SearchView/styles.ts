@@ -3,9 +3,27 @@ import {Theme} from '../../../../utils/types';
 
 export const createStyles = (theme: Theme) =>
   StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    keyboardAvoidingView: {
+      flex: 1,
+    },
+    contentContainer: {
+      flex: 1,
+      justifyContent: 'space-between',
+    },
+    scrollContainer: {
+      flex: 1,
+    },
+    scrollContent: {
+      padding: 16,
+    },
+    searchBarContainer: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+    },
     searchBar: {
-      marginHorizontal: 16,
-      marginVertical: 8,
       backgroundColor: theme.dark
         ? theme.colors.searchBarBackground
         : theme.colors.searchBarBackground,
@@ -21,10 +39,6 @@ export const createStyles = (theme: Theme) =>
       minHeight: 40,
       height: 40,
       padding: 0,
-    },
-    searchResults: {
-      flex: 1,
-      paddingHorizontal: 16,
     },
     modelItem: {
       paddingVertical: 12,
