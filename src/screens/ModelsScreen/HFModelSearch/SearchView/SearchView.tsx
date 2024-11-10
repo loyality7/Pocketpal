@@ -53,16 +53,26 @@ export const SearchView = observer(
         <SafeAreaView edges={['bottom']}>
           <Searchbar
             placeholder="Search HuggingFace models"
+            placeholderTextColor={theme.colors.onSurfaceVariant}
             onChangeText={onSearchChange}
             value={searchQuery}
+            inputStyle={styles.searchBarInput}
             style={styles.searchBar}
             icon={() => (
-              <Icon name="magnify" size={24} color={theme.colors.primary} />
+              <Icon
+                name="magnify"
+                size={24}
+                color={theme.colors.onSurfaceVariant}
+              />
             )}
             clearIcon={
               searchQuery.length > 0
                 ? () => (
-                    <Icon name="close" size={24} color={theme.colors.primary} />
+                    <Icon
+                      name="close"
+                      size={24}
+                      color={theme.colors.onSurfaceVariant}
+                    />
                   )
                 : undefined
             }

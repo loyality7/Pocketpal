@@ -5,8 +5,22 @@ export const createStyles = (theme: Theme) =>
   StyleSheet.create({
     searchBar: {
       marginHorizontal: 16,
-      elevation: 0,
-      backgroundColor: theme.colors.surfaceVariant,
+      marginVertical: 8,
+      backgroundColor: theme.dark
+        ? theme.colors.searchBarBackground
+        : theme.colors.searchBarBackground,
+      borderRadius: 16,
+      height: 40,
+      paddingVertical: 0,
+      paddingHorizontal: 8,
+    },
+    searchBarInput: {
+      color: theme.colors.onSurface,
+      fontSize: 17,
+      maxHeight: 40,
+      minHeight: 40,
+      height: 40,
+      padding: 0,
     },
     searchResults: {
       flex: 1,

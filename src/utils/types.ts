@@ -138,6 +138,7 @@ export interface Colors extends MD3Colors {
   sentMessageDocumentIcon: string;
   userAvatarImageBackground: string;
   userAvatarNameColors: ColorValue[];
+  searchBarBackground: string;
 }
 
 export interface Typescale extends MD3Typescale {
