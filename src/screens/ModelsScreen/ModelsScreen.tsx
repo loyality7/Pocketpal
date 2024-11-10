@@ -25,6 +25,7 @@ import {
 } from 'react-native-paper';
 
 import iconHF from '../../assets/icon-hf.png';
+import iconHFLight from '../../assets/icon-hf-light.png';
 
 import {useTheme} from '../../hooks';
 
@@ -54,13 +55,12 @@ export const ModelsScreen: React.FC = observer(() => {
   const FILTER_CONFIG = [
     {
       value: 'hf',
-      icon: ({size, color}) => (
+      icon: ({size}) => (
         <Image
-          source={iconHF}
+          source={iconHFLight}
           style={{
             width: size,
             height: size,
-            tintColor: color,
           }}
         />
       ),
