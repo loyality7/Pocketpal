@@ -273,6 +273,7 @@ export const ModelsScreen: React.FC = observer(() => {
     return (
       <Tooltip key={value} title={tooltip}>
         <IconButton
+          testID={`${value}-filter-button`}
           key={value}
           icon={isSelected ? activeIcon : icon}
           selected={isSelected}

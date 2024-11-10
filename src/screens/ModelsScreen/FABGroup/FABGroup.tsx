@@ -33,6 +33,7 @@ export const FABGroup: React.FC<FABGroupProps> = ({
   const actions = useMemo(
     () => [
       {
+        testID: 'hf-fab',
         icon: HFIcon,
         label: l10n.hfFABLabel,
         onPress: () => {
@@ -40,6 +41,7 @@ export const FABGroup: React.FC<FABGroupProps> = ({
         },
       },
       {
+        testID: 'local-fab',
         icon: 'folder-plus',
         label: l10n.localFABLabel,
         onPress: () => {
@@ -47,6 +49,7 @@ export const FABGroup: React.FC<FABGroupProps> = ({
         },
       },
       {
+        testID: 'reset-fab',
         icon: 'refresh',
         label: l10n.resetFABLabel,
         onPress: () => {
@@ -59,6 +62,7 @@ export const FABGroup: React.FC<FABGroupProps> = ({
 
   return (
     <FAB.Group
+      testID="fab-group"
       open={open}
       visible={true}
       icon={open ? 'close' : 'chevron-up'}

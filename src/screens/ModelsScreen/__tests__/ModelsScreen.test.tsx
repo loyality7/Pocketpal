@@ -18,13 +18,14 @@ describe('ModelsScreen', () => {
   });
 
   it('renders correctly', async () => {
-    const {getByText, getByTestId} = render(<ModelsScreen />, {
+    const {getByTestId} = render(<ModelsScreen />, {
       withNavigation: true,
     });
-    expect(getByText('Downloaded')).toBeTruthy();
-    expect(getByText('Grouped')).toBeTruthy();
-    expect(getByTestId('add-local-model-fab')).toBeTruthy();
-    expect(getByTestId('reset-models-fab')).toBeTruthy();
+    expect(getByTestId('downloaded-filter-button')).toBeTruthy();
+    expect(getByTestId('grouped-filter-button')).toBeTruthy();
+    expect(getByTestId('hf-filter-button')).toBeTruthy();
+    expect(getByTestId('flat-list')).toBeTruthy();
+    expect(getByTestId('fab-group')).toBeTruthy();
   });
 
   it('refreshes models on pull-to-refresh', async () => {
@@ -41,6 +42,31 @@ describe('ModelsScreen', () => {
     expect(modelStore.refreshDownloadStatuses).toHaveBeenCalled();
   });
 
+  it('opens HF model search when the HF FAB is pressed', async () => {
+    const {getByTestId} = render(<ModelsScreen />, {
+      withNavigation: true,
+    });
+
+    // Open the FAB group
+    const fabGroup = getByTestId('fab-group');
+    fireEvent.press(fabGroup);
+
+    // Wait for the FAB group to open and its children to be accessible
+    await waitFor(() => {
+      const hfFab = getByTestId('hf-fab', {includeHiddenElements: true});
+      expect(hfFab).toBeTruthy();
+    });
+    const hfFab = getByTestId('hf-fab', {includeHiddenElements: true});
+
+    await act(async () => {
+      fireEvent.press(hfFab);
+    });
+
+    // Verify HFModelSearch is rendered
+    const hfModelSearch = getByTestId('hf-model-search');
+    expect(hfModelSearch).toBeTruthy();
+  });
+
   it('adds a local model when the plus FAB is pressed', async () => {
     (DocumentPicker.pick as jest.Mock).mockResolvedValue([
       {
@@ -52,20 +78,34 @@ describe('ModelsScreen', () => {
     const {getByTestId} = render(<ModelsScreen />, {
       withNavigation: true,
     });
-    const addLocalModelButton = getByTestId('add-local-model-fab');
+
+    // Open the FAB group
+    const fabGroup = getByTestId('fab-group');
+    fireEvent.press(fabGroup);
+
+    // Wait for the FAB group to open and its children to be accessible
+    await waitFor(() => {
+      const localFab = getByTestId('local-fab', {includeHiddenElements: true});
+      expect(localFab).toBeTruthy();
+    });
+    const addLocalModelButton = getByTestId('local-fab', {
+      includeHiddenElements: true,
+    });
 
     await act(async () => {
-      fireEvent.press(addLocalModelButton);
+      if (addLocalModelButton) {
+        fireEvent.press(addLocalModelButton);
+      }
     });
 
     await waitFor(() => {
       expect(DocumentPicker.pick).toHaveBeenCalled();
       expect(RNFS.copyFile).toHaveBeenCalledWith(
         '/mock/file/path',
-        '/path/to/documents/models/mockModelFile.bin',
+        '/path/to/documents/models/local/mockModelFile.bin',
       );
       expect(modelStore.addLocalModel).toHaveBeenCalledWith(
-        '/path/to/documents/models/mockModelFile.bin',
+        '/path/to/documents/models/local/mockModelFile.bin',
       );
     });
   });
@@ -86,7 +126,19 @@ describe('ModelsScreen', () => {
     const {getByTestId} = render(<ModelsScreen />, {
       withNavigation: true,
     });
-    const addLocalModelButton = getByTestId('add-local-model-fab');
+
+    // Open the FAB group
+    const fabGroup = getByTestId('fab-group');
+    fireEvent.press(fabGroup);
+
+    // Wait for the FAB group to open and its children to be accessible
+    await waitFor(() => {
+      const localFab = getByTestId('local-fab', {includeHiddenElements: true});
+      expect(localFab).toBeTruthy();
+    });
+    const addLocalModelButton = getByTestId('local-fab', {
+      includeHiddenElements: true,
+    });
 
     await act(async () => {
       fireEvent.press(addLocalModelButton);
@@ -95,7 +147,7 @@ describe('ModelsScreen', () => {
     await waitFor(() => {
       expect(Alert.alert).toHaveBeenCalled();
       expect(RNFS.unlink).toHaveBeenCalledWith(
-        '/path/to/documents/models/mockModelFile.bin',
+        '/path/to/documents/models/local/mockModelFile.bin',
       );
       expect(RNFS.copyFile).toHaveBeenCalled();
       expect(modelStore.addLocalModel).toHaveBeenCalled();
@@ -119,7 +171,18 @@ describe('ModelsScreen', () => {
     const {getByTestId} = render(<ModelsScreen />, {
       withNavigation: true,
     });
-    const addLocalModelButton = getByTestId('add-local-model-fab');
+    // Open the FAB group
+    const fabGroup = getByTestId('fab-group');
+    fireEvent.press(fabGroup);
+
+    // Wait for the FAB group to open and its children to be accessible
+    await waitFor(() => {
+      const localFab = getByTestId('local-fab', {includeHiddenElements: true});
+      expect(localFab).toBeTruthy();
+    });
+    const addLocalModelButton = getByTestId('local-fab', {
+      includeHiddenElements: true,
+    });
 
     await act(async () => {
       fireEvent.press(addLocalModelButton);
@@ -158,7 +221,19 @@ describe('ModelsScreen', () => {
     const {getByTestId} = render(<ModelsScreen />, {
       withNavigation: true,
     });
-    const addLocalModelButton = getByTestId('add-local-model-fab');
+
+    // Open the FAB group
+    const fabGroup = getByTestId('fab-group');
+    fireEvent.press(fabGroup);
+
+    // Wait for the FAB group to open and its children to be accessible
+    await waitFor(() => {
+      const localFab = getByTestId('local-fab', {includeHiddenElements: true});
+      expect(localFab).toBeTruthy();
+    });
+    const addLocalModelButton = getByTestId('local-fab', {
+      includeHiddenElements: true,
+    });
 
     await act(async () => {
       fireEvent.press(addLocalModelButton);
@@ -169,19 +244,19 @@ describe('ModelsScreen', () => {
       expect(RNFS.unlink).not.toHaveBeenCalled(); // Original file should not be deleted
       expect(RNFS.copyFile).toHaveBeenCalledWith(
         '/mock/file/path',
-        `/path/to/documents/models/mockModelFile_${counter}.bin`,
+        `/path/to/documents/models/local/mockModelFile_${counter}.bin`,
       );
       expect(modelStore.addLocalModel).toHaveBeenCalledWith(
-        `/path/to/documents/models/mockModelFile_${counter}.bin`,
+        `/path/to/documents/models/local/mockModelFile_${counter}.bin`,
       );
     });
   });
 
   it('filters models correctly when segmented buttons are toggled', async () => {
-    const {getByText} = render(<ModelsScreen />, {
+    const {getByTestId} = render(<ModelsScreen />, {
       withNavigation: true,
     });
-    const downloadedFilter = getByText('Downloaded');
+    const downloadedFilter = getByTestId('downloaded-filter-button');
 
     await act(async () => {
       fireEvent.press(downloadedFilter);
@@ -199,9 +274,21 @@ describe('ModelsScreen', () => {
       withNavigation: true,
     });
 
-    const resetFab = getByTestId('reset-models-fab');
+    // Open the FAB group
+    const fabGroup = getByTestId('fab-group');
+    fireEvent.press(fabGroup);
+
+    // Wait for the FAB group to open and its children to be accessible
+    await waitFor(() => {
+      const resetFab = getByTestId('reset-fab', {includeHiddenElements: true});
+      expect(resetFab).toBeTruthy();
+    });
+    const resetFab = getByTestId('reset-fab', {includeHiddenElements: true});
+
     await act(async () => {
-      fireEvent.press(resetFab);
+      if (resetFab) {
+        fireEvent.press(resetFab);
+      }
     });
 
     const proceedButton = getByTestId('proceed-reset-button');
@@ -212,12 +299,23 @@ describe('ModelsScreen', () => {
     expect(modelStore.resetModels).toHaveBeenCalled();
   });
 
+  // TODO: fix this test
+  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('hides reset dialog on cancel', async () => {
     const {getByTestId, queryByTestId} = render(<ModelsScreen />, {
       withNavigation: true,
     });
 
-    const resetFab = getByTestId('reset-models-fab');
+    // Open the FAB group
+    const fabGroup = getByTestId('fab-group');
+    fireEvent.press(fabGroup);
+
+    // Wait for the FAB group to open and its children to be accessible
+    await waitFor(() => {
+      const resetFab = getByTestId('reset-fab', {includeHiddenElements: true});
+      expect(resetFab).toBeTruthy();
+    });
+    const resetFab = getByTestId('reset-fab', {includeHiddenElements: true});
     await act(async () => {
       fireEvent.press(resetFab);
     });

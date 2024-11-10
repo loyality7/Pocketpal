@@ -11,6 +11,7 @@ import {useTheme} from '../../hooks';
 import {createStyles} from './styles';
 
 export interface BottomSheetProps {
+  testID?: string;
   visible: boolean;
   onDismiss: () => void;
   children: React.ReactNode;
@@ -21,6 +22,7 @@ export interface BottomSheetProps {
 }
 
 export const BottomSheet: React.FC<BottomSheetProps> = ({
+  testID,
   visible,
   onDismiss,
   children,
@@ -89,7 +91,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         keyboardBlurBehavior="restore"
         android_keyboardInputMode="adjustResize"
         enableDynamicSizing={enableDynamicSizing}>
-        <BottomSheetView style={styles.contentContainer}>
+        <BottomSheetView testID={`${testID}`} style={styles.contentContainer}>
           {children}
         </BottomSheetView>
       </GorhomBottomSheet>

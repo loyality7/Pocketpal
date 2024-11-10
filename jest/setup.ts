@@ -1,10 +1,11 @@
-import {mockModelStore} from '../__mocks__/stores/modelStore';
+import 'react-native-gesture-handler/jestSetup';
+import mockClipboard from '@react-native-clipboard/clipboard/jest/clipboard-mock.js';
+
 import {mockUiStore} from '../__mocks__/stores/uiStore';
+import {mockHFStore} from '../__mocks__/stores/hfStore';
+import {mockModelStore} from '../__mocks__/stores/modelStore';
 import {mockChatSessionStore} from '../__mocks__/stores/chatSessionStore';
 
-import 'react-native-gesture-handler/jestSetup';
-
-import mockClipboard from '@react-native-clipboard/clipboard/jest/clipboard-mock.js';
 jest.mock('@react-native-clipboard/clipboard', () => mockClipboard);
 
 jest.mock('react-native/Libraries/EventEmitter/NativeEventEmitter');
@@ -24,6 +25,7 @@ jest.mock('../src/store', () => ({
   modelStore: mockModelStore,
   uiStore: mockUiStore,
   chatSessionStore: mockChatSessionStore,
+  hfStore: mockHFStore,
 }));
 
 jest.mock('../src/hooks/useTheme', () => {

@@ -62,6 +62,7 @@ export const HFModelSearch: React.FC<HFModelSearchProps> = observer(
     return (
       <>
         <BottomSheet
+          testID="hf-model-search"
           visible={visible}
           onDismiss={onDismiss}
           snapPoints={['94%']}>
@@ -73,6 +74,7 @@ export const HFModelSearch: React.FC<HFModelSearchProps> = observer(
         </BottomSheet>
 
         <BottomSheet
+          testID="hf-model-details"
           visible={detailsVisible}
           onDismiss={() => setDetailsVisible(false)}
           snapPoints={['90%']}>
