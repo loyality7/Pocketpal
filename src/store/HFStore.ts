@@ -2,8 +2,14 @@ import {makeAutoObservable, runInAction} from 'mobx';
 
 import {fetchGGUFSpecs, fetchModelFilesDetails, fetchModels} from '../api/hf';
 
-import {HuggingFaceModel} from '../utils/types';
+import {urls} from '../config';
+
 import {hasEnoughSpace, hfAsModel} from '../utils';
+
+import {HuggingFaceModel} from '../utils/types';
+
+const RE_GGUF_SHARD_FILE =
+  /^(?<prefix>.*?)-(?<shard>\d{5})-of-(?<total>\d{5})\.gguf$/;
 
 class HFStore {
   models: HuggingFaceModel[] = [];
@@ -103,23 +109,36 @@ class HFStore {
     }
   }
 
-  // Process the models to add the URL and filter our non-gguf files from the siblings
-  private processModels(models: HuggingFaceModel[]) {
-    return models.map(model => {
-      const filteredSiblings =
-        model.siblings?.filter(
-          sibling => sibling.rfilename.toLowerCase().endsWith('.gguf'), // Filter for .gguf files
-        ) || [];
+  /** Filters out non-GGUF and sharded GGUF files from model siblings */
+  private filterGGUFFiles(siblings: any[]) {
+    return (
+      siblings?.filter(sibling => {
+        const filename = sibling.rfilename.toLowerCase();
+        return filename.endsWith('.gguf') && !RE_GGUF_SHARD_FILE.test(filename);
+      }) || []
+    );
+  }
 
-      // Add download URL to each sibling
-      const siblingsWithUrl = filteredSiblings.map(sibling => ({
-        ...sibling,
-        url: `https://huggingface.co/${model.id}/resolve/main/${sibling.rfilename}`,
-      }));
+  /** Adds download URLs to model files based on modelId */
+  private addDownloadUrls(modelId: string, siblings: any[]) {
+    return siblings.map(sibling => ({
+      ...sibling,
+      url: urls.modelDownloadFile(modelId, sibling.rfilename),
+    }));
+  }
+
+  // Process the hf search results to:
+  // - add the URL
+  // - filter out non-gguf files from the siblings
+  // - filter out sharded gguf files from the siblings
+  private processSearchResults(models: HuggingFaceModel[]) {
+    return models.map(model => {
+      const filteredSiblings = this.filterGGUFFiles(model.siblings);
+      const siblingsWithUrl = this.addDownloadUrls(model.id, filteredSiblings);
 
       return {
         ...model,
-        url: `https://huggingface.co/${model.id}`,
+        url: urls.modelWebPage(model.id),
         siblings: siblingsWithUrl,
       };
     });
@@ -141,7 +160,7 @@ class HFStore {
         config: this.queryConfig,
       });
 
-      const modelsWithUrl = this.processModels(models);
+      const modelsWithUrl = this.processSearchResults(models);
 
       runInAction(() => {
         this.models = modelsWithUrl;
@@ -178,7 +197,7 @@ class HFStore {
         config: this.queryConfig,
       });
 
-      const modelsWithUrl = this.processModels(models);
+      const modelsWithUrl = this.processSearchResults(models);
 
       runInAction(() => {
         this.models = [...this.models, ...modelsWithUrl];

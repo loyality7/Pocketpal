@@ -1,5 +1,6 @@
-// api/hf.ts
 import axios from 'axios';
+
+import {urls} from '../config';
 
 import {
   GGUFSpecs,
@@ -7,8 +8,6 @@ import {
   HuggingFaceModelsResponse,
   ModelFileDetails,
 } from '../utils/types';
-
-const BASE_URL = 'https://huggingface.co/api/models';
 
 /**
  * Get information from all models in the Hub.
@@ -53,7 +52,7 @@ export async function fetchModels({
     console.log('limit', limit);
     console.log('full', full);
     console.log('config', config);
-    const response = await axios.get(BASE_URL, {
+    const response = await axios.get(urls.modelsList(), {
       params: {
         search,
         author,
@@ -84,7 +83,7 @@ export async function fetchModels({
 export const fetchModelFilesDetails = async (
   modelId: string,
 ): Promise<ModelFileDetails[]> => {
-  const url = `https://huggingface.co/api/models/${modelId}/tree/main?recursive=true`;
+  const url = `${urls.modelTree(modelId)}?recursive=true`;
 
   try {
     const response = await fetch(url);
@@ -107,7 +106,7 @@ export const fetchModelFilesDetails = async (
  * @returns The GGUF specs.
  */
 export const fetchGGUFSpecs = async (modelId: string): Promise<GGUFSpecs> => {
-  const url = `https://huggingface.co/api/models/${modelId}?expand[]=gguf`;
+  const url = `${urls.modelSpecs(modelId)}?expand[]=gguf`;
 
   try {
     const response = await fetch(url);
