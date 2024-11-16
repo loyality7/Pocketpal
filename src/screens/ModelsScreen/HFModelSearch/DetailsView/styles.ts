@@ -7,6 +7,15 @@ export const createStyles = (theme: Theme) =>
     container: {
       flex: 1,
     },
+    scrollView: {
+      flex: 1,
+      width: '100%',
+      height: '100%',
+      padding: 16,
+    },
+    scrollContent: {
+      flexGrow: 1,
+    },
     content: {
       padding: 16,
     },
@@ -14,10 +23,8 @@ export const createStyles = (theme: Theme) =>
       marginBottom: 8,
     },
     modelTitle: {
-      //fontSize: 28,
       fontWeight: 'bold',
       marginBottom: 16,
-      //color: theme.colors.onSurface,
     },
     modelStats: {
       flexDirection: 'row',

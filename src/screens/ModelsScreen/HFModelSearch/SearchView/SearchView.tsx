@@ -1,20 +1,14 @@
-import React from 'react';
-import {
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  View,
-  StatusBar,
-  TouchableWithoutFeedback,
-  Keyboard,
-} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Keyboard, Platform} from 'react-native';
 
 import {observer} from 'mobx-react';
-import {Searchbar, Text} from 'react-native-paper';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {Text} from 'react-native-paper';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {BottomSheetFlatList, BottomSheetView} from '@gorhom/bottom-sheet';
+
+import {BottomSheetSearchbar} from '../../../../components';
 
 import {useTheme} from '../../../../hooks';
 
@@ -25,94 +19,91 @@ import {hfStore} from '../../../../store';
 import {HuggingFaceModel} from '../../../../utils/types';
 
 interface SearchViewProps {
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
   onModelSelect: (model: HuggingFaceModel) => void;
-  searchInputRef?: React.RefObject<any>;
+  onChangeSearchQuery: (query: string) => void;
 }
 
 export const SearchView = observer(
-  ({
-    searchQuery,
-    onSearchChange,
-    onModelSelect,
-    searchInputRef,
-  }: SearchViewProps) => {
+  ({onModelSelect, onChangeSearchQuery}: SearchViewProps) => {
     const theme = useTheme();
-    const styles = createStyles(theme);
     const insets = useSafeAreaInsets();
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
 
-    // Calculate proper offset based on platform and UI elements
-    const keyboardOffset = Platform.select({
-      ios:
-        (StatusBar.currentHeight || 0) + // Status bar height
-        (insets.bottom || 0) + // Bottom safe area
-        44 + // Standard iOS navigation bar height
-        16,
-      android: 0,
-    });
+    useEffect(() => {
+      const keyboardWillShow = Keyboard.addListener(
+        Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+        () => setKeyboardVisible(true),
+      );
+      const keyboardWillHide = Keyboard.addListener(
+        Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+        () => setKeyboardVisible(false),
+      );
+
+      return () => {
+        keyboardWillShow.remove();
+        keyboardWillHide.remove();
+      };
+    }, []);
+
+    const styles = createStyles(theme, keyboardVisible ? 1 : insets.bottom);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const handleSearchChange = (query: string) => {
+      setSearchQuery(query);
+      onChangeSearchQuery(query);
+    };
+
+    const renderItem = ({item}: {item: HuggingFaceModel}) => (
+      <TouchableOpacity
+        key={item.id}
+        onPress={() => onModelSelect(item)}
+        style={styles.modelItem}>
+        <Text style={styles.modelName}>{item.id}</Text>
+      </TouchableOpacity>
+    );
 
     return (
-      <SafeAreaView style={styles.container} edges={['bottom']}>
-        <KeyboardAvoidingView
-          style={styles.keyboardAvoidingView}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          keyboardVerticalOffset={keyboardOffset}>
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View style={styles.contentContainer}>
-              <View style={styles.scrollContainer}>
-                <ScrollView
-                  keyboardShouldPersistTaps="handled"
-                  contentContainerStyle={styles.scrollContent}>
-                  {hfStore.isLoading ? (
-                    <Text style={styles.loadingText}>Loading...</Text>
-                  ) : hfStore.models.length === 0 ? (
-                    <Text style={styles.noResultsText}>No models found</Text>
-                  ) : (
-                    hfStore.models.map(model => (
-                      <TouchableOpacity
-                        key={model.id}
-                        onPress={() => onModelSelect(model)}
-                        style={styles.modelItem}>
-                        <Text style={styles.modelName}>{model.id}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-              <View style={styles.searchBarContainer}>
-                <Searchbar
-                  placeholder="Search HuggingFace models"
-                  placeholderTextColor={theme.colors.onSurfaceVariant}
-                  onChangeText={onSearchChange}
-                  value={searchQuery}
-                  inputStyle={styles.searchBarInput}
-                  style={styles.searchBar}
-                  icon={() => (
+      <BottomSheetView style={styles.contentContainer}>
+        {hfStore.isLoading ? (
+          <Text style={styles.loadingText}>Loading...</Text>
+        ) : hfStore.models.length === 0 ? (
+          <Text style={styles.noResultsText}>No models found</Text>
+        ) : (
+          <BottomSheetFlatList
+            data={hfStore.models}
+            keyExtractor={(item: HuggingFaceModel) => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={styles.list}
+          />
+        )}
+        <View style={styles.searchbarContainer}>
+          <BottomSheetSearchbar
+            placeholder="Search Hugging Face models"
+            onChangeText={handleSearchChange}
+            value={searchQuery}
+            inputStyle={styles.searchbarInput}
+            style={styles.searchbar}
+            icon={() => (
+              <Icon
+                name="magnify"
+                size={24}
+                color={theme.colors.onSurfaceVariant}
+              />
+            )}
+            clearIcon={
+              hfStore.searchQuery.length > 0
+                ? () => (
                     <Icon
-                      name="magnify"
+                      name="close"
                       size={24}
                       color={theme.colors.onSurfaceVariant}
                     />
-                  )}
-                  clearIcon={
-                    searchQuery.length > 0
-                      ? () => (
-                          <Icon
-                            name="close"
-                            size={24}
-                            color={theme.colors.onSurfaceVariant}
-                          />
-                        )
-                      : undefined
-                  }
-                  ref={searchInputRef}
-                />
-              </View>
-            </View>
-          </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
+                  )
+                : undefined
+            }
+          />
+        </View>
+      </BottomSheetView>
     );
   },
 );
