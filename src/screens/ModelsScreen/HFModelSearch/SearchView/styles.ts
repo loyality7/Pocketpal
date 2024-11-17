@@ -3,16 +3,9 @@ import {Theme} from '../../../../utils/types';
 
 export const createStyles = (theme: Theme, bottomInset: number) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-    },
     contentContainer: {
       flex: 1,
       justifyContent: 'space-between',
-    },
-    listContainer: {
-      flex: 1,
-      padding: 16,
     },
     list: {
       padding: 16,
@@ -44,17 +37,47 @@ export const createStyles = (theme: Theme, bottomInset: number) =>
       bottom: bottomInset,
       left: 0,
       right: 0,
-      padding: 16,
-      //backgroundColor: theme.colors.searchBarBackground,
+      paddingHorizontal: 20,
+      paddingTop: 12,
+      paddingBottom: 16,
+      height: 70,
+    },
+    blurView: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
     },
     searchbar: {
-      height: 40,
+      height: 44,
+      borderRadius: 16,
+      backgroundColor: theme.dark
+        ? theme.colors.surfaceVariant + '80'
+        : theme.colors.surface + '90',
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: theme.dark
+        ? theme.colors.outline + '50'
+        : theme.colors.outline + '30',
+      shadowColor: theme.dark ? '#000' : 'rgba(0, 0, 0, 0.15)',
+      shadowOffset: {
+        width: 0,
+        height: 1,
+      },
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
+      elevation: 2,
+      zIndex: 1, // Ensure searchbar stays above the blur
     },
     searchbarInput: {
-      fontSize: 17,
-      maxHeight: 40,
-      minHeight: 40,
-      height: 40,
+      fontSize: 16,
+      maxHeight: 44,
+      minHeight: 44,
+      height: 44,
       padding: 0,
+      marginLeft: 8,
+      color: theme.colors.onSurface,
+      fontWeight: '400', // Slightly bolder
+      letterSpacing: 0.25,
     },
   });

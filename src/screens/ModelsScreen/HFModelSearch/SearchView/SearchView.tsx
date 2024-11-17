@@ -1,9 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {View, Keyboard, Platform} from 'react-native';
+import {View, Keyboard, Platform, StyleSheet} from 'react-native';
 
 import {observer} from 'mobx-react';
 import {Text} from 'react-native-paper';
+import {BlurView} from '@react-native-community/blur';
+import LinearGradient from 'react-native-linear-gradient';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import MaskedView from '@react-native-masked-view/masked-view';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {BottomSheetFlatList, BottomSheetView} from '@gorhom/bottom-sheet';
@@ -45,7 +48,7 @@ export const SearchView = observer(
       };
     }, []);
 
-    const styles = createStyles(theme, keyboardVisible ? 1 : insets.bottom);
+    const styles = createStyles(theme, keyboardVisible ? 0 : insets.bottom);
     const [searchQuery, setSearchQuery] = useState('');
 
     const handleSearchChange = (query: string) => {
@@ -77,6 +80,25 @@ export const SearchView = observer(
           />
         )}
         <View style={styles.searchbarContainer}>
+          <MaskedView
+            style={StyleSheet.absoluteFill}
+            maskElement={
+              <LinearGradient
+                style={StyleSheet.absoluteFill}
+                colors={['transparent', 'black', 'black']}
+                locations={[0, 0.15, 1]}
+                pointerEvents="none"
+              />
+            }>
+            <BlurView
+              style={styles.blurView}
+              blurType={theme.dark ? 'dark' : 'light'}
+              blurAmount={3}
+              /*reducedTransparencyFallbackColor={
+              theme.dark ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.85)'
+            }*/
+            />
+          </MaskedView>
           <BottomSheetSearchbar
             placeholder="Search Hugging Face models"
             onChangeText={handleSearchChange}
