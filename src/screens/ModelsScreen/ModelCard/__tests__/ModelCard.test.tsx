@@ -39,7 +39,7 @@ jest.mock('@react-navigation/native', () => ({
 
 const customRender = (ui, {...renderOptions} = {}) => {
   return render(
-    <Drawer.Navigator>
+    <Drawer.Navigator useLegacyImplementation={false}>
       <Drawer.Screen name="Chat" component={() => ui} />
     </Drawer.Navigator>,
     {...renderOptions, withNavigation: true},

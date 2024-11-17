@@ -18,12 +18,13 @@ import {hfStore} from '../../../../store';
 import {HuggingFaceModel} from '../../../../utils/types';
 
 interface SearchViewProps {
+  testID?: string;
   onModelSelect: (model: HuggingFaceModel) => void;
   onChangeSearchQuery: (query: string) => void;
 }
 
 export const SearchView = observer(
-  ({onModelSelect, onChangeSearchQuery}: SearchViewProps) => {
+  ({testID, onModelSelect, onChangeSearchQuery}: SearchViewProps) => {
     const theme = useTheme();
     const insets = useSafeAreaInsets();
     const [keyboardVisible, setKeyboardVisible] = useState(false);
@@ -62,7 +63,7 @@ export const SearchView = observer(
     );
 
     return (
-      <BottomSheetView style={styles.contentContainer}>
+      <BottomSheetView style={styles.contentContainer} testID={testID}>
         {hfStore.isLoading ? (
           <Text style={styles.loadingText}>Loading...</Text>
         ) : hfStore.models.length === 0 ? (

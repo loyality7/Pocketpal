@@ -110,6 +110,7 @@ export const HFModelSearch: React.FC<HFModelSearchProps> = observer(
           android_keyboardInputMode="adjustResize"
           backdropComponent={renderBackdrop}>
           <SearchView
+            testID="hf-model-search-view"
             onModelSelect={handleModelSelect}
             onChangeSearchQuery={handleSearchChange}
           />

@@ -43,6 +43,7 @@ const App = observer(() => {
           <PaperProvider theme={theme}>
             <NavigationContainer>
               <Drawer.Navigator
+                useLegacyImplementation={false}
                 screenOptions={{
                   drawerStyle: {
                     width: screenWidth * 0.8,

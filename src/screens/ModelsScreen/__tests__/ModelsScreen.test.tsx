@@ -63,8 +63,10 @@ describe('ModelsScreen', () => {
     });
 
     // Verify HFModelSearch is rendered
-    const hfModelSearch = getByTestId('hf-model-search');
-    expect(hfModelSearch).toBeTruthy();
+    await waitFor(() => {
+      const hfModelSearch = getByTestId('hf-model-search-view');
+      expect(hfModelSearch).toBeTruthy();
+    });
   });
 
   it('adds a local model when the plus FAB is pressed', async () => {
