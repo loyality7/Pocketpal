@@ -12,6 +12,7 @@ export * from './Input';
 export * from './KeyboardAccessoryView';
 export * from './MarkdownView';
 export * from './Message';
+export * from './Searchbar';
 export * from './SendButton';
 export * from './StopButton';
 export * from './SidebarContent';

@@ -1,17 +1,13 @@
+import {Keyboard, Platform} from 'react-native';
 import React, {useState, useEffect} from 'react';
-import {View, Keyboard, Platform, StyleSheet} from 'react-native';
 
 import {observer} from 'mobx-react';
 import {Text} from 'react-native-paper';
-import {BlurView} from '@react-native-community/blur';
-import LinearGradient from 'react-native-linear-gradient';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import MaskedView from '@react-native-masked-view/masked-view';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {BottomSheetFlatList, BottomSheetView} from '@gorhom/bottom-sheet';
 
-import {BottomSheetSearchbar} from '../../../../components';
+import {Searchbar} from '../../../../components';
 
 import {useTheme} from '../../../../hooks';
 
@@ -79,52 +75,12 @@ export const SearchView = observer(
             contentContainerStyle={styles.list}
           />
         )}
-        <View style={styles.searchbarContainer}>
-          <MaskedView
-            style={StyleSheet.absoluteFill}
-            maskElement={
-              <LinearGradient
-                style={StyleSheet.absoluteFill}
-                colors={['transparent', 'black', 'black']}
-                locations={[0, 0.15, 1]}
-                pointerEvents="none"
-              />
-            }>
-            <BlurView
-              style={styles.blurView}
-              blurType={theme.dark ? 'dark' : 'light'}
-              blurAmount={3}
-              /*reducedTransparencyFallbackColor={
-              theme.dark ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.85)'
-            }*/
-            />
-          </MaskedView>
-          <BottomSheetSearchbar
-            placeholder="Search Hugging Face models"
-            onChangeText={handleSearchChange}
-            value={searchQuery}
-            inputStyle={styles.searchbarInput}
-            style={styles.searchbar}
-            icon={() => (
-              <Icon
-                name="magnify"
-                size={24}
-                color={theme.colors.onSurfaceVariant}
-              />
-            )}
-            clearIcon={
-              hfStore.searchQuery.length > 0
-                ? () => (
-                    <Icon
-                      name="close"
-                      size={24}
-                      color={theme.colors.onSurfaceVariant}
-                    />
-                  )
-                : undefined
-            }
-          />
-        </View>
+        <Searchbar
+          value={searchQuery}
+          onChangeText={handleSearchChange}
+          placeholder="Search Hugging Face models"
+          containerStyle={styles.searchbarContainer}
+        />
       </BottomSheetView>
     );
   },
