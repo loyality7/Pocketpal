@@ -17,7 +17,7 @@ class HFStore {
   error = '';
   nextPageLink: string | null = null;
   searchQuery = '';
-  queryFilter = 'gguf';
+  queryFilter = 'gguf,conversational';
   queryFull = true;
   queryConfig = true;
 
