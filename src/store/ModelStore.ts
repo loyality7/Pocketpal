@@ -524,7 +524,7 @@ class ModelStore {
               this.releaseContext();
             }
           });
-          console.log('models: ', this.models);
+          //console.log('models: ', this.models);
         } else {
           console.error("Failed to delete, file doesn't exist: ", filePath);
         }
@@ -557,7 +557,39 @@ class ModelStore {
         n_ctx: this.n_context,
         n_gpu_layers: this.useMetal ? this.n_gpu_layers : 0, // Set as needed, 0 for no GPU // TODO ggml-metal.metal
       });
-      console.log('ctx: ', ctx);
+
+      // Get stop token from the model and add to the list of stop tokens.
+      const eos_token_id = (ctx.model as any)?.metadata?.[
+        'tokenizer.ggml.eos_token_id'
+      ];
+
+      if (eos_token_id) {
+        const detokenized = await ctx.detokenize([eos_token_id]);
+        const storeModel = this.models.find(m => m.id === model.id);
+        if (detokenized && storeModel) {
+          runInAction(() => {
+            // Helper function to check and update stop tokens
+            const updateStopTokens = (settings: CompletionParams) => {
+              if (!settings.stop) {
+                settings.stop = [detokenized];
+              } else if (!settings.stop.includes(detokenized)) {
+                settings.stop = [...settings.stop, detokenized];
+              }
+              // Create new object reference to ensure MobX picks up the change
+              return {...settings};
+            };
+
+            // Update both default and current completion settings
+            storeModel.defaultCompletionSettings = updateStopTokens(
+              storeModel.defaultCompletionSettings,
+            );
+            storeModel.completionSettings = updateStopTokens(
+              storeModel.completionSettings,
+            );
+          });
+        }
+      }
+
       runInAction(() => {
         this.context = ctx;
         this.setActiveModel(model.id);

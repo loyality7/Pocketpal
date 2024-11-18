@@ -111,7 +111,6 @@ export const fetchGGUFSpecs = async (modelId: string): Promise<GGUFSpecs> => {
   try {
     const response = await fetch(url);
 
-    console.log('fetchGGUFSpecs response: ', response);
     if (!response.ok) {
       throw new Error(`Error fetching GGUF specs: ${response.statusText}`);
     }
