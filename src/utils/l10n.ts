@@ -60,6 +60,7 @@ export const l10n = {
     tooltipGroupByType: 'Group by model type',
     tooltipDownloaded: 'Show downloaded only',
     tooltipHf: 'Show HuggingFace-sourced models',
+    unknownGroup: 'Unknown',
   },
   es: {
     attachmentButtonAccessibilityLabel: 'Enviar multimedia',
@@ -126,6 +127,7 @@ export const l10n = {
     tooltipGroupByType: 'Agrupar por tipo de modelo',
     tooltipDownloaded: 'Mostrar solo descargados',
     tooltipHf: 'Mostrar modelos de HuggingFace',
+    unknownGroup: 'Desconocido',
   },
   ko: {
     attachmentButtonAccessibilityLabel: '미디어 보내기',
@@ -188,6 +190,7 @@ export const l10n = {
     tooltipGroupByType: '모델 유형별로 그룹화',
     tooltipDownloaded: '다운로드된 항목만 표시',
     tooltipHf: 'HuggingFace 소스 모델 표시',
+    unknownGroup: '알 수 없음',
   },
   pl: {
     attachmentButtonAccessibilityLabel: 'Wyślij multimedia',
@@ -250,6 +253,7 @@ export const l10n = {
     tooltipGroupByType: 'Grupuj według typu modelu',
     tooltipDownloaded: 'Pokaż tylko pobrane',
     tooltipHf: 'Pokaż modele z HuggingFace',
+    unknownGroup: 'Nieznany',
   },
   pt: {
     attachmentButtonAccessibilityLabel: 'Envia mídia',
@@ -312,6 +316,7 @@ export const l10n = {
     tooltipGroupByType: 'Agrupar por tipo de modelo',
     tooltipDownloaded: 'Mostrar apenas baixados',
     tooltipHf: 'Mostrar modelos do HuggingFace',
+    unknownGroup: 'Desconocido',
   },
   ru: {
     attachmentButtonAccessibilityLabel: 'Отправить медиа',
@@ -378,6 +383,7 @@ export const l10n = {
     tooltipGroupByType: 'Группировать по типу модели',
     tooltipDownloaded: 'Показать только загруженные',
     tooltipHf: 'Показать модели из HuggingFace',
+    unknownGroup: 'Неизвестный',
   },
   tr: {
     attachmentButtonAccessibilityLabel: 'Medya gönder',
@@ -440,6 +446,7 @@ export const l10n = {
     tooltipGroupByType: 'Model türüne göre grupla',
     tooltipDownloaded: 'Sadece indirilenleri göster',
     tooltipHf: 'HuggingFace kaynaklı modelleri göster',
+    unknownGroup: 'Bilinmeyen',
   },
   uk: {
     attachmentButtonAccessibilityLabel: 'Надіслати медіа',
@@ -506,6 +513,7 @@ export const l10n = {
     tooltipGroupByType: 'Групувати за типом моделі',
     tooltipDownloaded: 'Показати лише завантажені',
     tooltipHf: 'Показати моделі з HuggingFace',
+    unknownGroup: 'Неизвестный',
   },
   ca: {
     attachmentButtonAccessibilityLabel: 'Enviar multimèdia',
@@ -571,5 +579,6 @@ export const l10n = {
     tooltipGroupByType: 'Agrupar per tipus de model',
     tooltipDownloaded: 'Mostrar només descarregats',
     tooltipHf: 'Mostrar models de HuggingFace',
+    unknownGroup: 'Desconegut',
   },
 };

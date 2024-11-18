@@ -108,6 +108,25 @@ class ModelStore {
           defaultModel.completionSettings || {},
         );
 
+        // **Merge other attributes from defaultModel**
+
+        const {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          id,
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          defaultChatTemplate,
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          defaultCompletionSettings,
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          chatTemplate,
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          completionSettings,
+          ...attributesToMerge
+        } = defaultModel;
+
+        // Merge remaining attributes
+        Object.assign(existingModel, attributesToMerge);
+
         // Merge other properties
         mergedModels[existingModelIndex] = existingModel;
       } else {
@@ -120,10 +139,11 @@ class ModelStore {
     mergedModels.forEach(model => {
       if (
         model.origin === ModelOrigin.HF ||
-        model.origin === ModelOrigin.LOCAL
+        model.origin === ModelOrigin.LOCAL ||
+        model.isLocal
       ) {
         // Reset default settings
-        if (model.origin === ModelOrigin.LOCAL) {
+        if (model.origin === ModelOrigin.LOCAL || model.isLocal) {
           const defaultSettings = getLocalModelDefaultSettings();
           model.defaultChatTemplate = {...defaultSettings.chatTemplate};
           model.defaultCompletionSettings = {
@@ -289,7 +309,7 @@ class ModelStore {
           // Keep all non-local models (preset and HF)
           !(model.isLocal || model.origin === ModelOrigin.LOCAL) ||
           // This condition ensures that we keep models that are downloaded.
-          // For local models, being downloaded is a requirement for them to be considered valid.
+          // For local models, isDownloaded==true means the file exists, otherwise it's invalid.
           model.isDownloaded,
       );
     });
@@ -355,7 +375,7 @@ class ModelStore {
       const etaSeconds = speedBps > 0 ? remainingBytes / speedBps : 0;
       const etaMinutes = Math.ceil(etaSeconds / 60);
       const etaText =
-        etaMinutes > 0 ? `${etaMinutes} min` : `${etaSeconds} sec`;
+        etaSeconds >= 60 ? `${etaMinutes} min` : `${Math.ceil(etaSeconds)} sec`;
 
       runInAction(() => {
         model.progress = newProgress;

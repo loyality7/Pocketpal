@@ -40,37 +40,6 @@ class ChatSessionStore {
     }
   }
 
-  /*async saveSession(
-    context: any,
-    sessionData: string,
-    title: string,
-  ): Promise<void> {
-    const id = new Date().toISOString();
-    const sessionFile = `${FileSystem.DocumentDirectoryPath}/${id}.llama-session.bin`;
-    const metaData: SessionMetaData = {id, title, date: id, messages};
-
-    try {
-      await context.saveSession(sessionFile); // Using context method
-      this.sessions.push(metaData);
-      await FileSystem.writeFile(
-        `${FileSystem.DocumentDirectoryPath}/session-metadata.json`,
-        JSON.stringify(this.sessions),
-      );
-    } catch (error) {
-      console.error('Failed to save session:', error);
-    }
-  }
-
-  async loadSession(context: any, id: string): Promise<string> {
-    const sessionFile = `${FileSystem.DocumentDirectoryPath}/${id}.llama-session.bin`;
-    try {
-      await context.loadSession(sessionFile); // Using context method
-      return `Session ${id} loaded successfully.`;
-    } catch (error) {
-      return `Failed to load session: ${error}`;
-    }
-  }*/
-
   async deleteSession(id: string): Promise<void> {
     try {
       const sessionFile = `${RNFS.DocumentDirectoryPath}/${id}.llama-session.bin`;

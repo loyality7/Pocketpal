@@ -201,14 +201,18 @@ export const ModelsScreen: React.FC = observer(() => {
     }
 
     return filteredAndSortedModels.reduce((acc, item) => {
-      const type = item.type || l10n.localModel;
-      if (!acc[type]) {
-        acc[type] = [];
+      const groupKey =
+        item.origin === ModelOrigin.LOCAL || item.isLocal
+          ? l10n.localModel
+          : item.type || l10n.unknownGroup;
+
+      if (!acc[groupKey]) {
+        acc[groupKey] = [];
       }
-      acc[type].push(item);
+      acc[groupKey].push(item);
       return acc;
     }, {} as Record<string, Model[]>);
-  }, [filteredAndSortedModels, filters, l10n.localModel]);
+  }, [filteredAndSortedModels, filters, l10n.localModel, l10n.unknownGroup]);
 
   const toggleGroup = (type: string) => {
     const currentExpandedGroups =

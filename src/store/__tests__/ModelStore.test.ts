@@ -76,5 +76,22 @@ describe('ModelStore', () => {
         }),
       );
     });
+
+    it('should merge value of default to exisiting for top level variables', () => {
+      const newDefaultModel = defaultModels[0];
+
+      const existingModel = {
+        ...newDefaultModel,
+        params: 101010,
+      };
+
+      modelStore.models[0] = existingModel;
+
+      runInAction(() => {
+        modelStore.mergeModelLists();
+      });
+
+      expect(modelStore.models[0].params).toEqual(newDefaultModel.params);
+    });
   });
 });
