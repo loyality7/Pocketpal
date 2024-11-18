@@ -61,6 +61,8 @@ export const l10n = {
     tooltipDownloaded: 'Show downloaded only',
     tooltipHf: 'Show HuggingFace-sourced models',
     unknownGroup: 'Unknown',
+    filterTitleHf: 'Hugging Face',
+    filterTitleDownloaded: 'Downloaded',
   },
   es: {
     attachmentButtonAccessibilityLabel: 'Enviar multimedia',
@@ -128,6 +130,8 @@ export const l10n = {
     tooltipDownloaded: 'Mostrar solo descargados',
     tooltipHf: 'Mostrar modelos de HuggingFace',
     unknownGroup: 'Desconocido',
+    filterTitleHf: 'Hugging Face',
+    filterTitleDownloaded: 'Descargados',
   },
   ko: {
     attachmentButtonAccessibilityLabel: '미디어 보내기',
@@ -191,6 +195,8 @@ export const l10n = {
     tooltipDownloaded: '다운로드된 항목만 표시',
     tooltipHf: 'HuggingFace 소스 모델 표시',
     unknownGroup: '알 수 없음',
+    filterTitleHf: 'Hugging Face',
+    filterTitleDownloaded: '다운로드됨',
   },
   pl: {
     attachmentButtonAccessibilityLabel: 'Wyślij multimedia',
@@ -254,6 +260,8 @@ export const l10n = {
     tooltipDownloaded: 'Pokaż tylko pobrane',
     tooltipHf: 'Pokaż modele z HuggingFace',
     unknownGroup: 'Nieznany',
+    filterTitleHf: 'Hugging Face',
+    filterTitleDownloaded: 'Pobrany',
   },
   pt: {
     attachmentButtonAccessibilityLabel: 'Envia mídia',
@@ -317,6 +325,8 @@ export const l10n = {
     tooltipDownloaded: 'Mostrar apenas baixados',
     tooltipHf: 'Mostrar modelos do HuggingFace',
     unknownGroup: 'Desconocido',
+    filterTitleHf: 'Hugging Face',
+    filterTitleDownloaded: 'Pobrany',
   },
   ru: {
     attachmentButtonAccessibilityLabel: 'Отправить медиа',
@@ -384,6 +394,8 @@ export const l10n = {
     tooltipDownloaded: 'Показать только загруженные',
     tooltipHf: 'Показать модели из HuggingFace',
     unknownGroup: 'Неизвестный',
+    filterTitleHf: 'Hugging Face',
+    filterTitleDownloaded: 'Скачано',
   },
   tr: {
     attachmentButtonAccessibilityLabel: 'Medya gönder',
@@ -447,6 +459,8 @@ export const l10n = {
     tooltipDownloaded: 'Sadece indirilenleri göster',
     tooltipHf: 'HuggingFace kaynaklı modelleri göster',
     unknownGroup: 'Bilinmeyen',
+    filterTitleHf: 'Hugging Face',
+    filterTitleDownloaded: 'Pobrany',
   },
   uk: {
     attachmentButtonAccessibilityLabel: 'Надіслати медіа',
@@ -514,6 +528,8 @@ export const l10n = {
     tooltipDownloaded: 'Показати лише завантажені',
     tooltipHf: 'Показати моделі з HuggingFace',
     unknownGroup: 'Неизвестный',
+    filterTitleHf: 'Hugging Face',
+    filterTitleDownloaded: 'Скачано',
   },
   ca: {
     attachmentButtonAccessibilityLabel: 'Enviar multimèdia',
@@ -580,5 +596,7 @@ export const l10n = {
     tooltipDownloaded: 'Mostrar només descarregats',
     tooltipHf: 'Mostrar models de HuggingFace',
     unknownGroup: 'Desconegut',
+    filterTitleHf: 'Hugging Face',
+    filterTitleDownloaded: 'Descarregat',
   },
 };

@@ -1,12 +1,5 @@
 import React, {useState, useMemo, useContext} from 'react';
-import {
-  View,
-  FlatList,
-  RefreshControl,
-  Platform,
-  Alert,
-  Image,
-} from 'react-native';
+import {View, FlatList, RefreshControl, Platform, Alert} from 'react-native';
 
 import {toJS} from 'mobx';
 import {v4 as uuidv4} from 'uuid';
@@ -14,18 +7,7 @@ import RNFS from 'react-native-fs';
 import 'react-native-get-random-values';
 import {observer} from 'mobx-react-lite';
 import DocumentPicker from 'react-native-document-picker';
-import {
-  Button,
-  Dialog,
-  IconButton,
-  Paragraph,
-  Portal,
-  Text,
-  Tooltip,
-} from 'react-native-paper';
-
-import iconHF from '../../assets/icon-hf.png';
-import iconHFLight from '../../assets/icon-hf-light.png';
+import {Button, Dialog, Paragraph, Portal, Text} from 'react-native-paper';
 
 import {useTheme} from '../../hooks';
 
@@ -49,46 +31,6 @@ export const ModelsScreen: React.FC = observer(() => {
   const {colors} = useTheme();
 
   const filters = uiStore.pageStates.modelsScreen.filters;
-  const setFilters = (value: string[]) => {
-    uiStore.setValue('modelsScreen', 'filters', value);
-  };
-  const FILTER_CONFIG = [
-    {
-      value: 'hf',
-      icon: ({size}) => (
-        <Image
-          source={iconHFLight}
-          style={{
-            width: size,
-            height: size,
-          }}
-        />
-      ),
-      activeIcon: ({size}) => (
-        <Image
-          source={iconHF}
-          style={{
-            width: size,
-            height: size,
-          }}
-        />
-      ),
-      tooltip: l10n.tooltipHf,
-    },
-    {
-      value: 'downloaded',
-      icon: 'download',
-      activeIcon: 'download-circle',
-      tooltip: l10n.tooltipDownloaded,
-    },
-    {
-      value: 'grouped',
-      icon: 'layers-outline',
-      activeIcon: 'layers',
-      tooltip: l10n.tooltipGroupByType,
-    },
-  ] as const;
-
   const expandedGroups = uiStore.pageStates.modelsScreen.expandedGroups;
 
   const onRefresh = async () => {
@@ -267,35 +209,6 @@ export const ModelsScreen: React.FC = observer(() => {
     }
   };
 
-  const renderFilterIcon = ({
-    value,
-    icon,
-    activeIcon,
-    tooltip,
-  }: (typeof FILTER_CONFIG)[number]) => {
-    const isSelected = filters.includes(value);
-    return (
-      <Tooltip key={value} title={tooltip}>
-        <IconButton
-          testID={`${value}-filter-button`}
-          key={value}
-          icon={isSelected ? activeIcon : icon}
-          selected={isSelected}
-          onPress={() => {
-            const newFilters = isSelected
-              ? filters.filter(f => f !== value)
-              : [...filters, value];
-            setFilters(newFilters);
-          }}
-          mode={isSelected ? 'contained-tonal' : undefined}
-          size={24}
-          iconColor={isSelected ? colors.primary : colors.onSurfaceVariant}
-          style={styles.filterIcon}
-        />
-      </Tooltip>
-    );
-  };
-
   return (
     <View style={[styles.container, {backgroundColor: colors.surface}]}>
       <Portal>
@@ -336,10 +249,6 @@ export const ModelsScreen: React.FC = observer(() => {
           </Dialog.Actions>
         </Dialog>
       </Portal>
-
-      <View style={styles.filterContainer}>
-        {FILTER_CONFIG.map(renderFilterIcon)}
-      </View>
 
       <FlatList
         testID="flat-list"

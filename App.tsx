@@ -17,6 +17,7 @@ import {useTheme} from './src/hooks';
 import {modelStore} from './src/store';
 import {HeaderRight, SidebarContent} from './src/components';
 import {ChatScreen, ModelsScreen, SettingsScreen} from './src/screens';
+import {ModelsHeaderRight} from './src/components';
 
 const Drawer = createDrawerNavigator();
 
@@ -65,6 +66,9 @@ const App = observer(() => {
                 <Drawer.Screen
                   name="Models"
                   component={gestureHandlerRootHOC(ModelsScreen)}
+                  options={({}) => ({
+                    headerRight: () => <ModelsHeaderRight />,
+                  })}
                 />
                 <Drawer.Screen
                   name="Settings"
