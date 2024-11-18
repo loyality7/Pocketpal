@@ -2,35 +2,33 @@ import {Image, View} from 'react-native';
 import React, {useContext, useState} from 'react';
 
 import {observer} from 'mobx-react';
-import {Menu, IconButton} from 'react-native-paper';
+import {Menu, IconButton, Divider} from 'react-native-paper';
 
 import iconHF from '../../assets/icon-hf.png';
 import iconHFLight from '../../assets/icon-hf-light.png';
 
 import {useTheme} from '../../hooks';
 
-import {styles} from './styles';
+import {createStyles} from './styles';
+import {ModelsResetDialog} from '../ModelsResetDialog';
 
 import {modelStore, uiStore} from '../../store';
 
 import {L10nContext} from '../../utils';
 
-import {ModelsResetDialog} from '..';
-
 export const ModelsHeaderRight = observer(() => {
-  const [filterMenuVisible, setFilterMenuVisible] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const [resetDialogVisible, setResetDialogVisible] = useState(false);
   const [_, setTrigger] = useState<boolean>(false);
 
-  const {colors} = useTheme();
-
   const l10n = useContext(L10nContext);
+
+  const theme = useTheme();
+  const styles = createStyles(theme);
 
   const filters = uiStore.pageStates.modelsScreen.filters;
   const setFilters = (value: string[]) => {
     uiStore.setValue('modelsScreen', 'filters', value);
-    setFilterMenuVisible(false);
   };
 
   const showResetDialog = () => setResetDialogVisible(true);
@@ -62,19 +60,19 @@ export const ModelsHeaderRight = observer(() => {
         onReset={handleReset}
       />
       <Menu
-        visible={filterMenuVisible}
-        onDismiss={() => setFilterMenuVisible(false)}
+        visible={menuVisible}
+        onDismiss={() => setMenuVisible(false)}
+        contentStyle={styles.menuContent}
         anchor={
           <IconButton
-            icon="filter"
+            icon="tune-vertical"
             size={24}
             style={styles.iconButton}
-            onPress={() => setFilterMenuVisible(true)}
-            iconColor={
-              filters.length > 0 ? colors.primary : colors.onBackground
-            }
+            onPress={() => setMenuVisible(true)}
           />
         }>
+        {/* Filter section */}
+        <Menu.Item title="Filters" disabled titleStyle={styles.menuSection} />
         <Menu.Item
           leadingIcon={({size}) => (
             <Image
@@ -83,7 +81,8 @@ export const ModelsHeaderRight = observer(() => {
             />
           )}
           onPress={() => toggleFilter('hf')}
-          title={l10n.filterTitleHf}
+          title={l10n.menuTitleHf}
+          titleStyle={styles.menuItem}
           trailingIcon={filters.includes('hf') ? 'check' : undefined}
         />
         <Menu.Item
@@ -91,41 +90,33 @@ export const ModelsHeaderRight = observer(() => {
             filters.includes('downloaded') ? 'download-circle' : 'download'
           }
           onPress={() => toggleFilter('downloaded')}
-          title={l10n.filterTitleDownloaded}
+          title={l10n.menuTitleDownloaded}
+          titleStyle={styles.menuItem}
           trailingIcon={filters.includes('downloaded') ? 'check' : undefined}
         />
-      </Menu>
 
-      {/* Grouping icon */}
-      <IconButton
-        icon={filters.includes('grouped') ? 'layers' : 'layers-outline'}
-        size={24}
-        style={styles.iconButton}
-        onPress={() => toggleFilter('grouped')}
-        iconColor={
-          filters.includes('grouped') ? colors.primary : colors.onBackground
-        }
-      />
+        {/* View section */}
+        <Menu.Item title="View" disabled titleStyle={styles.menuSection} />
+        <Menu.Item
+          leadingIcon={
+            filters.includes('grouped') ? 'layers' : 'layers-outline'
+          }
+          onPress={() => toggleFilter('grouped')}
+          title={l10n.menuTitleGrouped}
+          titleStyle={styles.menuItem}
+          trailingIcon={filters.includes('grouped') ? 'check' : undefined}
+        />
 
-      {/* New overflow menu */}
-      <Menu
-        visible={menuVisible}
-        onDismiss={() => setMenuVisible(false)}
-        anchor={
-          <IconButton
-            icon="dots-vertical"
-            size={24}
-            style={styles.iconButton}
-            onPress={() => setMenuVisible(true)}
-          />
-        }>
+        {/* Actions section */}
+        <Divider style={styles.divider} />
         <Menu.Item
           leadingIcon="refresh"
           onPress={() => {
             setMenuVisible(false);
             showResetDialog();
           }}
-          title="Reset Models"
+          title="Reset Models List"
+          titleStyle={styles.menuItem}
         />
       </Menu>
     </View>
