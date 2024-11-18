@@ -115,7 +115,7 @@ export const ModelsHeaderRight = observer(() => {
             setMenuVisible(false);
             showResetDialog();
           }}
-          title="Reset Models List"
+          title={l10n.menuTitleReset}
           titleStyle={styles.menuItem}
         />
       </Menu>
