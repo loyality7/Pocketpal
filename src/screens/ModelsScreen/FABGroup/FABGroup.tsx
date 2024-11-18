@@ -9,7 +9,6 @@ import {styles} from './styles';
 interface FABGroupProps {
   onAddHFModel: () => void;
   onAddLocalModel: () => void;
-  onResetModels: () => void;
 }
 
 const HFIcon: React.FC<any> = props => (
@@ -23,7 +22,6 @@ const HFIcon: React.FC<any> = props => (
 export const FABGroup: React.FC<FABGroupProps> = ({
   onAddHFModel,
   onAddLocalModel,
-  onResetModels,
 }) => {
   const [open, setOpen] = useState(false);
   const l10n = useContext(L10nContext);
@@ -48,16 +46,8 @@ export const FABGroup: React.FC<FABGroupProps> = ({
           onAddLocalModel();
         },
       },
-      {
-        testID: 'reset-fab',
-        icon: 'refresh',
-        label: l10n.resetFABLabel,
-        onPress: () => {
-          onResetModels();
-        },
-      },
     ],
-    [l10n, onAddHFModel, onAddLocalModel, onResetModels],
+    [l10n, onAddHFModel, onAddLocalModel],
   );
 
   return (
@@ -65,7 +55,7 @@ export const FABGroup: React.FC<FABGroupProps> = ({
       testID="fab-group"
       open={open}
       visible={true}
-      icon={open ? 'close' : 'chevron-up'}
+      icon={open ? 'close' : 'plus'}
       actions={actions}
       onStateChange={onStateChange}
       onPress={() => {

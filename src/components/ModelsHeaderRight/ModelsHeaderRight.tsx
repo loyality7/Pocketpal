@@ -11,12 +11,18 @@ import {useTheme} from '../../hooks';
 
 import {styles} from './styles';
 
-import {uiStore} from '../../store';
+import {modelStore, uiStore} from '../../store';
 
 import {L10nContext} from '../../utils';
 
+import {ModelsResetDialog} from '..';
+
 export const ModelsHeaderRight = observer(() => {
   const [filterMenuVisible, setFilterMenuVisible] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [resetDialogVisible, setResetDialogVisible] = useState(false);
+  const [_, setTrigger] = useState<boolean>(false);
+
   const {colors} = useTheme();
 
   const l10n = useContext(L10nContext);
@@ -25,6 +31,20 @@ export const ModelsHeaderRight = observer(() => {
   const setFilters = (value: string[]) => {
     uiStore.setValue('modelsScreen', 'filters', value);
     setFilterMenuVisible(false);
+  };
+
+  const showResetDialog = () => setResetDialogVisible(true);
+  const hideResetDialog = () => setResetDialogVisible(false);
+
+  const handleReset = async () => {
+    try {
+      modelStore.resetModels();
+      setTrigger(prev => !prev); // Trigger UI refresh
+    } catch (error) {
+      console.error('Error resetting models:', error);
+    } finally {
+      hideResetDialog();
+    }
   };
 
   const toggleFilter = (filterName: string) => {
@@ -36,6 +56,11 @@ export const ModelsHeaderRight = observer(() => {
 
   return (
     <View style={styles.container}>
+      <ModelsResetDialog
+        visible={resetDialogVisible}
+        onDismiss={hideResetDialog}
+        onReset={handleReset}
+      />
       <Menu
         visible={filterMenuVisible}
         onDismiss={() => setFilterMenuVisible(false)}
@@ -70,6 +95,8 @@ export const ModelsHeaderRight = observer(() => {
           trailingIcon={filters.includes('downloaded') ? 'check' : undefined}
         />
       </Menu>
+
+      {/* Grouping icon */}
       <IconButton
         icon={filters.includes('grouped') ? 'layers' : 'layers-outline'}
         size={24}
@@ -79,6 +106,28 @@ export const ModelsHeaderRight = observer(() => {
           filters.includes('grouped') ? colors.primary : colors.onBackground
         }
       />
+
+      {/* New overflow menu */}
+      <Menu
+        visible={menuVisible}
+        onDismiss={() => setMenuVisible(false)}
+        anchor={
+          <IconButton
+            icon="dots-vertical"
+            size={24}
+            style={styles.iconButton}
+            onPress={() => setMenuVisible(true)}
+          />
+        }>
+        <Menu.Item
+          leadingIcon="refresh"
+          onPress={() => {
+            setMenuVisible(false);
+            showResetDialog();
+          }}
+          title="Reset Models"
+        />
+      </Menu>
     </View>
   );
 });

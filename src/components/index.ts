@@ -13,6 +13,7 @@ export * from './KeyboardAccessoryView';
 export * from './MarkdownView';
 export * from './Message';
 export * from './ModelsHeaderRight';
+export * from './ModelsResetDialog';
 export * from './Searchbar';
 export * from './SendButton';
 export * from './StopButton';

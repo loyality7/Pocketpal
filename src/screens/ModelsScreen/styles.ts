@@ -11,12 +11,6 @@ export const styles = StyleSheet.create({
   listContainer: {
     paddingBottom: 150,
   },
-  paragraph: {
-    marginBottom: 8,
-  },
-  bold: {
-    fontWeight: 'bold',
-  },
   filterContainer: {
     flexDirection: 'row',
     padding: 4,

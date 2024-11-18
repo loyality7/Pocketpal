@@ -7,7 +7,6 @@ import RNFS from 'react-native-fs';
 import 'react-native-get-random-values';
 import {observer} from 'mobx-react-lite';
 import DocumentPicker from 'react-native-document-picker';
-import {Button, Dialog, Paragraph, Portal, Text} from 'react-native-paper';
 
 import {useTheme} from '../../hooks';
 
@@ -25,7 +24,6 @@ import {Model, ModelOrigin} from '../../utils/types';
 export const ModelsScreen: React.FC = observer(() => {
   const l10n = useContext(L10nContext);
   const [refreshing, setRefreshing] = useState<boolean>(false);
-  const [resetDialogVisible, setResetDialogVisible] = useState(false);
   const [hfSearchVisible, setHFSearchVisible] = useState(false);
   const [_, setTrigger] = useState<boolean>(false);
   const {colors} = useTheme();
@@ -195,61 +193,8 @@ export const ModelsScreen: React.FC = observer(() => {
     }))
     .filter(group => group.items.length > 0);
 
-  const showResetDialog = () => setResetDialogVisible(true);
-  const hideResetDialog = () => setResetDialogVisible(false);
-
-  const handleReset = async () => {
-    try {
-      modelStore.resetModels();
-      setTrigger(prev => !prev); // Trigger UI refresh
-    } catch (error) {
-      console.error('Error resetting models:', error);
-    } finally {
-      hideResetDialog();
-    }
-  };
-
   return (
     <View style={[styles.container, {backgroundColor: colors.surface}]}>
-      <Portal>
-        <Dialog
-          testID="reset-dialog"
-          visible={resetDialogVisible}
-          onDismiss={hideResetDialog}>
-          <Dialog.Title>{l10n.confirmReset}</Dialog.Title>
-          <Dialog.Content>
-            <Paragraph style={styles.paragraph}>
-              This will reset model settings (
-              <Text variant="labelMedium">
-                'system prompt', 'chat template', 'temperature',
-              </Text>
-              etc.) to their default configuration.
-            </Paragraph>
-
-            <Paragraph style={styles.paragraph}>
-              - Your downloaded models will <Text style={styles.bold}>not</Text>{' '}
-              be removed.
-            </Paragraph>
-
-            <Paragraph style={styles.paragraph}>
-              - Your 'Local Models' will remain intact.
-            </Paragraph>
-
-            {/*<Paragraph style={styles.paragraph}>
-              - This action is <Text style={styles.bold}>irreversible.</Text>
-            </Paragraph>*/}
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button testID="cancel-reset-button" onPress={hideResetDialog}>
-              {l10n.cancel}
-            </Button>
-            <Button testID="proceed-reset-button" onPress={handleReset}>
-              {l10n.proceedWithReset}
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
-
       <FlatList
         testID="flat-list"
         contentContainerStyle={styles.listContainer} // Ensure padding for last card
@@ -279,7 +224,6 @@ export const ModelsScreen: React.FC = observer(() => {
       <FABGroup
         onAddHFModel={() => setHFSearchVisible(true)}
         onAddLocalModel={handleAddLocalModel}
-        onResetModels={showResetDialog}
       />
     </View>
   );
