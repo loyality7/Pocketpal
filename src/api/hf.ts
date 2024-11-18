@@ -44,14 +44,6 @@ export async function fetchModels({
   config?: boolean;
 }): Promise<HuggingFaceModelsResponse> {
   try {
-    console.log('search', search);
-    console.log('author', author);
-    console.log('filter', filter);
-    console.log('sort', sort);
-    console.log('direction', direction);
-    console.log('limit', limit);
-    console.log('full', full);
-    console.log('config', config);
     const response = await axios.get(urls.modelsList(), {
       params: {
         search,

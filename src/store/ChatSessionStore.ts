@@ -78,12 +78,10 @@ class ChatSessionStore {
   }
 
   updateSessionTitle(session: SessionMetaData) {
-    console.log('updateSessionTitle');
     if (session.messages.length > 0) {
       const message = session.messages[session.messages.length - 1];
       if (session.title === NEW_SESSION_TITLE && message.type === 'text') {
         runInAction(() => {
-          console.log('updating session title: ', message.text);
           session.title =
             message.text.length > TITLE_LIMIT
               ? `${message.text.substring(0, TITLE_LIMIT)}...`
@@ -133,7 +131,6 @@ class ChatSessionStore {
     title: string,
     initialMessages: MessageType.Any[] = [],
   ): Promise<void> {
-    console.log('createNewSession');
     const id = new Date().toISOString();
     const metaData: SessionMetaData = {
       id,
