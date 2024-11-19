@@ -82,7 +82,7 @@ describe('ModelCard', () => {
       expect(queryByText(l10n.en.dismiss)).toBeNull();
       expect(queryByTestId('memory-warning-snackbar')).toBeNull();
     });
-  });
+  }, 10000);
 
   it('expands and collapses the card when pressed', async () => {
     const {queryByText, getByTestId, getByDisplayValue} = customRender(

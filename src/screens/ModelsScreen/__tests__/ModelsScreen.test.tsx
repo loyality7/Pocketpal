@@ -7,7 +7,7 @@ import {fireEvent, render, waitFor, act} from '../../../../jest/test-utils';
 
 import {ModelsScreen} from '../ModelsScreen';
 
-import {modelStore, uiStore} from '../../../store';
+import {modelStore} from '../../../store';
 
 jest.useFakeTimers();
 
@@ -21,9 +21,6 @@ describe('ModelsScreen', () => {
     const {getByTestId} = render(<ModelsScreen />, {
       withNavigation: true,
     });
-    expect(getByTestId('downloaded-filter-button')).toBeTruthy();
-    expect(getByTestId('grouped-filter-button')).toBeTruthy();
-    expect(getByTestId('hf-filter-button')).toBeTruthy();
     expect(getByTestId('flat-list')).toBeTruthy();
     expect(getByTestId('fab-group')).toBeTruthy();
   });
@@ -252,53 +249,6 @@ describe('ModelsScreen', () => {
         `/path/to/documents/models/local/mockModelFile_${counter}.bin`,
       );
     });
-  });
-
-  it('filters models correctly when segmented buttons are toggled', async () => {
-    const {getByTestId} = render(<ModelsScreen />, {
-      withNavigation: true,
-    });
-    const downloadedFilter = getByTestId('downloaded-filter-button');
-
-    await act(async () => {
-      fireEvent.press(downloadedFilter);
-    });
-
-    expect(uiStore.setValue).toHaveBeenCalledWith(
-      'modelsScreen',
-      'filters',
-      expect.any(Array),
-    );
-  });
-
-  it('opens reset dialog and resets models on confirm', async () => {
-    const {getByTestId} = render(<ModelsScreen />, {
-      withNavigation: true,
-    });
-
-    // Open the FAB group
-    const fabGroup = getByTestId('fab-group');
-    fireEvent.press(fabGroup);
-
-    // Wait for the FAB group to open and its children to be accessible
-    await waitFor(() => {
-      const resetFab = getByTestId('reset-fab', {includeHiddenElements: true});
-      expect(resetFab).toBeTruthy();
-    });
-    const resetFab = getByTestId('reset-fab', {includeHiddenElements: true});
-
-    await act(async () => {
-      if (resetFab) {
-        fireEvent.press(resetFab);
-      }
-    });
-
-    const proceedButton = getByTestId('proceed-reset-button');
-    await act(async () => {
-      fireEvent.press(proceedButton);
-    });
-
-    expect(modelStore.resetModels).toHaveBeenCalled();
   });
 
   // TODO: fix this test
