@@ -522,6 +522,7 @@ class ModelStore {
             _model.progress = 0;
             if (this.activeModelId === _model.id) {
               this.releaseContext();
+              this.activeModelId = undefined;
             }
           });
           //console.log('models: ', this.models);
@@ -613,7 +614,7 @@ class ModelStore {
     console.log('released');
     runInAction(() => {
       this.context = undefined;
-      //this.activeModelId = undefined;
+      //this.activeModelId = undefined; // activeModelId is set to undefined in manualReleaseContext
     });
     return 'Context released successfully';
   };
