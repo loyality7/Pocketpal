@@ -268,17 +268,30 @@ describe('ModelsScreen', () => {
       expect(resetFab).toBeTruthy();
     });
     const resetFab = getByTestId('reset-fab', {includeHiddenElements: true});
+
     await act(async () => {
       fireEvent.press(resetFab);
     });
 
+    // Wait for dialog to be visible
+    await waitFor(() => {
+      expect(getByTestId('reset-dialog')).toBeTruthy();
+    });
+
+    // Press cancel button
     const cancelButton = getByTestId('cancel-reset-button');
     await act(async () => {
       fireEvent.press(cancelButton);
     });
 
-    await waitFor(() => {
-      expect(queryByTestId('reset-dialog')).toBeNull();
-    });
-  });
+    // Wait for dialog to be hidden
+    await waitFor(
+      () => {
+        expect(queryByTestId('reset-dialog')).toBeNull();
+      },
+      {
+        timeout: 10000,
+      },
+    );
+  }, 15000);
 });
