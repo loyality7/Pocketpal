@@ -8,17 +8,18 @@ import {styles} from './styles';
 import {L10nContext} from '../../utils';
 
 type ModelsResetDialogProps = {
+  testID?: string;
   visible: boolean;
   onDismiss: () => void;
   onReset: () => void;
 };
 
 export const ModelsResetDialog: React.FC<ModelsResetDialogProps> = observer(
-  ({visible, onDismiss, onReset}) => {
+  ({testID, visible, onDismiss, onReset}) => {
     const l10n = useContext(L10nContext);
     return (
       <Portal>
-        <Dialog testID="reset-dialog" visible={visible} onDismiss={onDismiss}>
+        <Dialog testID={testID} visible={visible} onDismiss={onDismiss}>
           <Dialog.Title>{l10n.confirmReset}</Dialog.Title>
           <Dialog.Content>
             <Paragraph style={styles.paragraph}>
