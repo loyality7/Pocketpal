@@ -58,6 +58,7 @@ export const ModelsHeaderRight = observer(() => {
         visible={resetDialogVisible}
         onDismiss={hideResetDialog}
         onReset={handleReset}
+        testID="reset-dialog"
       />
       <Menu
         visible={menuVisible}
@@ -69,6 +70,7 @@ export const ModelsHeaderRight = observer(() => {
             size={24}
             style={styles.iconButton}
             onPress={() => setMenuVisible(true)}
+            testID="models-menu-button"
           />
         }>
         {/* Filter section */}
