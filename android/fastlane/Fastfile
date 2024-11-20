@@ -1,0 +1,25 @@
+default_platform :android
+
+platform :android do
+  desc "Release Android app to Alpha track"
+  lane :release_android_alpha do
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      properties: {
+        "android.injected.signing.store.file" => "../keystore.jks",
+        "android.injected.signing.store.password" => ENV["KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias" => ENV["KEY_ALIAS"],
+        "android.injected.signing.key.password" => ENV["KEY_PASSWORD"]
+      }
+    )
+
+    upload_to_play_store(
+      track: "alpha",
+      json_key_data: ENV["SUPPLY_JSON_KEY_DATA"],
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+end

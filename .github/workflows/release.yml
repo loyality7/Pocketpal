@@ -1,46 +1,129 @@
-name: Release
+name: Release Workflow
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: "Type of version bump (major, minor, patch, premajor, preminor, prepatch, prerelease)"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+          - premajor
+          - preminor
+          - prepatch
+          - prerelease
 
 jobs:
-  release:
+  # Job 1: Version Bumping and Android Build
+  build_android:
     runs-on: ubuntu-latest
+
     steps:
-      # Step 1: Check out the repository
-      - name: Check out code
+      # Step 1: Checkout the code
+      - name: Checkout code
         uses: actions/checkout@v3
 
       # Step 2: Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '20.18.0' # Use the specified Node.js version
+          cache: 'yarn'
 
-      # Step 3: Install dependencies
+      # Step 3: Install dependencies using Yarn
       - name: Install dependencies
         run: yarn install
 
-      # Step 4: Run release-please to create a release PR with version bump and changelog
-      - name: Run release-please
-        uses: google-github-actions/release-please-action@v3
+      # Step 4: Set up Ruby and Bundler
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          release-type: node
-          package-name: your-app-name
+          bundler-cache: true
 
-      # Step 5: Sync iOS and Android versions using react-native-version
-      - name: Sync iOS and Android versions
-        run: |
-          CURRENT_VERSION=$(cat package.json | grep version | head -n 1 | awk -F: '{ print $2 }' | sed 's/[",]//g')
-          yarn react-native-version --target $CURRENT_VERSION
+      # Step 5: Bump version using Fastlane
+      - name: Bump version
+        run: bundle exec fastlane bump_version version_type=${{ github.event.inputs.version_type }}
 
-      # Step 6: Commit the iOS and Android version bumps
-      - name: Commit version updates
+      # Step 6: Commit and push version changes
+      - name: Commit and push version changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "GitHub Actions"
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
           git add .
-          git commit -m "chore(release): sync iOS and Android versions"
-          git push origin main
+          git commit -m "Bump version to $(cat .version)"
+          git push
+
+      # Step 7: Set up Android Keystore
+      - name: Set up Android Keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/keystore.jks
+
+      # Step 8: Build and upload Android app to Alpha track
+      - name: Build and upload Android app
+        working-directory: android
+        env:
+          SUPPLY_JSON_KEY_DATA: ${{ secrets.SUPPLY_JSON_KEY_DATA }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          GRADLE_USER_HOME: ${{ runner.temp }}/.gradle
+        run: bundle exec fastlane release_android_alpha
+
+      # Step 9: Upload artifacts for iOS job
+      - name: Upload code for iOS build
+        uses: actions/upload-artifact@v3
+        with:
+          name: source-code
+          path: .
+          retention-days: 1
+
+  # Job 2: iOS Build and Upload (runs on macOS)
+  build_ios:
+    runs-on: macos-latest
+    needs: build_android
+
+    steps:
+      # Step 1: Download code from previous job
+      - name: Download code
+        uses: actions/download-artifact@v3
+        with:
+          name: source-code
+          path: .
+
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.18.0'
+          cache: 'yarn'
+
+      # Step 3: Install dependencies using Yarn
+      - name: Install dependencies
+        run: yarn install
+
+      # Step 4: Set up Ruby and Bundler
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      # Step 5: Install CocoaPods dependencies
+      - name: Install CocoaPods dependencies
+        working-directory: ios
+        run: pod install
+
+      # Step 6: Build and upload iOS app to TestFlight
+      - name: Build and upload iOS app
+        working-directory: ios
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+        run: bundle exec fastlane release_ios
