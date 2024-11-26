@@ -11,3 +11,4 @@ gem 'activesupport', '>= 6.1.7.5', '< 7.1.0'
 # Fastlane
 gem "fastlane"
 gem "fastlane-plugin-versioning"
+gem 'fastlane-plugin-versioning_android'

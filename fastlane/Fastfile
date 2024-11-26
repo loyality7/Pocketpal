@@ -1,17 +1,8 @@
 desc "Bump version for Android"
 lane :bump_version_android do |options|
-  # Debugging statements
-  sh("echo 'Current directory: ' $(pwd)")
-  sh("ls -la")
-  
   version_type = options[:version_type] || "patch"
   root_dir = File.expand_path('..', Dir.pwd)
   
-  # More debugging
-  UI.message("Root directory: #{root_dir}")
-  sh("echo 'Root directory contents:'")
-  sh("ls -la #{root_dir}")
-
   package_json_path = File.join(root_dir, 'package.json')
   version_file_path = File.join(root_dir, '.version')
 
@@ -24,17 +15,20 @@ lane :bump_version_android do |options|
 
   # Bump Android version
   gradle_file = File.join(root_dir, "android/app/build.gradle")
-  android_version_code = get_version_code_from_gradle(gradle_file: gradle_file).to_i + 1
   
-  update_gradle_property(
-    property: "versionCode",
-    value: android_version_code.to_s,
+  # Get current version code and increment it
+  current_version_code = android_get_version_code(
     gradle_file: gradle_file
   )
-  update_gradle_property(
-    property: "versionName",
-    value: "\"#{new_version}\"",
-    gradle_file: gradle_file
+
+  android_set_version_code(
+    gradle_file: gradle_file,
+    version_code: current_version_code + 1
+  )
+  
+  android_set_version_name(
+    gradle_file: gradle_file,
+    version_name: new_version
   )
 
   UI.message("Bumped Android version to #{new_version}")
