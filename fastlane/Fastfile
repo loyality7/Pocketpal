@@ -20,10 +20,11 @@ lane :bump_version_android do |options|
   current_version_code = android_get_version_code(
     gradle_file: gradle_file
   )
+  new_version_code = (current_version_code.to_i + 1).to_s
 
   android_set_version_code(
     gradle_file: gradle_file,
-    version_code: current_version_code + 1
+    version_code: new_version_code
   )
   
   android_set_version_name(
