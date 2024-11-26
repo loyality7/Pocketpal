@@ -1,24 +1,16 @@
-desc "Bump version for both Android and iOS"
-lane :bump_version do |options|
-  version_type = options[:version_type] || "patch" # Default to "patch" if not provided
+desc "Bump version for Android"
+lane :bump_version_android do |options|
+  version_type = options[:version_type] || "patch"
 
   # Bump version in package.json using Yarn
-  begin
-    sh("yarn version --#{version_type} --no-git-tag-version")
-    new_version = JSON.parse(File.read('package.json'))['version']
-    sh("echo #{new_version} > .version")
-  rescue => e
-    UI.user_error!("Failed to bump version: #{e.message}")
-  end
-
-  # Bump iOS version
-  increment_version_number(version_number: new_version)
-  increment_build_number
+  sh("yarn version --#{version_type} --no-git-tag-version")
+  new_version = JSON.parse(File.read('package.json'))['version']
+  sh("echo #{new_version} > .version")
 
   # Bump Android version
   gradle_file = "./android/app/build.gradle"
   android_version_code = get_version_code_from_gradle(gradle_file: gradle_file).to_i + 1
-  android_version_name = new_version
+  
   update_gradle_property(
     property: "versionCode",
     value: android_version_code.to_s,
@@ -26,9 +18,21 @@ lane :bump_version do |options|
   )
   update_gradle_property(
     property: "versionName",
-    value: "\"#{android_version_name}\"",
+    value: "\"#{new_version}\"",
     gradle_file: gradle_file
   )
 
-  UI.message("Bumped version to #{new_version}")
+  UI.message("Bumped Android version to #{new_version}")
+end
+
+desc "Bump version for iOS"
+lane :bump_version_ios do |options|
+  # Read the version from package.json
+  new_version = JSON.parse(File.read('package.json'))['version']
+
+  # Bump iOS version
+  increment_version_number(version_number: new_version)
+  increment_build_number
+
+  UI.message("Bumped iOS version to #{new_version}")
 end
