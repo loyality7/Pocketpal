@@ -58,6 +58,7 @@ jobs:
 
       # Step 5: Bump Android version
       - name: Bump Android version
+        working-directory: ${{ github.workspace }}
         run: bundle exec fastlane bump_version_android version_type:${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version_type || 'patch' }}
 
       # Step 6: Commit and push Android version changes
@@ -145,6 +146,7 @@ jobs:
 
       # Step 6: Bump iOS version
       - name: Bump iOS version
+        working-directory: ${{ github.workspace }}
         run: bundle exec fastlane bump_version_ios
 
       # Step 7: Commit, push, and tag iOS version changes
