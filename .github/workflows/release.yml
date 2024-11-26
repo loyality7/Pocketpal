@@ -58,7 +58,7 @@ jobs:
 
       # Step 5: Bump version using Fastlane
       - name: Bump version
-        run: bundle exec fastlane bump_version version_type=${{ github.event.inputs.version_type }}
+        run: bundle exec fastlane bump_version version_type=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version_type || 'patch' }}
 
       # Step 6: Commit and push version changes
       - name: Commit and push version changes
