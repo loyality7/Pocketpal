@@ -1,16 +1,16 @@
-
 desc "Bump version for both Android and iOS"
 lane :bump_version do |options|
   version_type = options[:version_type] || "patch" # Default to "patch" if not provided
 
   # Bump version in package.json using Yarn
   begin
-    new_version = sh("yarn version --#{version_type} --no-git-tag-version").strip.match(/"version": "(.*?)"/)[1]
+    output = sh("yarn version --#{version_type} --no-git-tag-version")
+    new_version = output.match(/New version: (.+)$/)[1]
+    sh("echo #{new_version} > .version")
   rescue => e
     UI.error("Failed to bump version: #{e.message}")
     raise
   end
-  sh("echo #{new_version} > .version")
 
   # Bump iOS version
   increment_version_number(version_number: new_version)
