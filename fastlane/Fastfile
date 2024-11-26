@@ -37,25 +37,26 @@ end
 
 desc "Bump version for iOS"
 lane :bump_version_ios do |options|
-  # Debugging statements
-  sh("echo 'Current directory: ' $(pwd)")
-  sh("ls -la")
-  
   root_dir = File.expand_path('..', Dir.pwd)
+  ios_dir = File.join(root_dir, 'ios')
   
-  # More debugging
-  UI.message("Root directory: #{root_dir}")
-  sh("echo 'Root directory contents:'")
-  sh("ls -la #{root_dir}")
-
   package_json_path = File.join(root_dir, 'package.json')
   
   # Read the version from package.json
   new_version = JSON.parse(File.read(package_json_path))['version']
 
-  # Bump iOS version
-  increment_version_number(version_number: new_version)
-  increment_build_number
+  # Change to iOS directory for version bumping
+  Dir.chdir(ios_dir) do
+    # Bump iOS version
+    increment_version_number_in_xcodeproj(
+      version_number: new_version,
+      xcodeproj: File.join(ios_dir, "PocketPal.xcodeproj")
+    )
+    increment_build_number_in_xcodeproj(
+      build_number: Time.now.strftime("%Y%m%d%H%M"),
+      xcodeproj: File.join(ios_dir, "PocketPal.xcodeproj")
+    )
+  end
 
   UI.message("Bumped iOS version to #{new_version}")
 end
