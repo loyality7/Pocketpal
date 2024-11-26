@@ -1,11 +1,13 @@
-desc "Bump version for Android"
-lane :bump_version_android do |options|
+desc "Bump version for both Android and iOS"
+lane :bump_version do |options|
   version_type = options[:version_type] || "patch"
   root_dir = File.expand_path('..', Dir.pwd)
   
+  # Common paths
   package_json_path = File.join(root_dir, 'package.json')
   version_file_path = File.join(root_dir, '.version')
 
+  # Bump version in package.json
   Dir.chdir(root_dir) do
     sh("yarn version --#{version_type} --no-git-tag-version")
   end
@@ -13,18 +15,14 @@ lane :bump_version_android do |options|
   new_version = JSON.parse(File.read(package_json_path))['version']
   sh("echo #{new_version} > #{version_file_path}")
 
+  # Generate common build number based on timestamp
+  build_number = Time.now.strftime("%Y%m%d%H%M")
+
   # Bump Android version
   gradle_file = File.join(root_dir, "android/app/build.gradle")
-  
-  # Get current version code and increment it
-  current_version_code = android_get_version_code(
-    gradle_file: gradle_file
-  )
-  new_version_code = (current_version_code.to_i + 1).to_s
-
   android_set_version_code(
     gradle_file: gradle_file,
-    version_code: new_version_code
+    version_code: build_number
   )
   
   android_set_version_name(
@@ -32,31 +30,18 @@ lane :bump_version_android do |options|
     version_name: new_version
   )
 
-  UI.message("Bumped Android version to #{new_version}")
-end
-
-desc "Bump version for iOS"
-lane :bump_version_ios do |options|
-  root_dir = File.expand_path('..', Dir.pwd)
+  # Bump iOS version
   ios_dir = File.join(root_dir, 'ios')
-  
-  package_json_path = File.join(root_dir, 'package.json')
-  
-  # Read the version from package.json
-  new_version = JSON.parse(File.read(package_json_path))['version']
-
-  # Change to iOS directory for version bumping
   Dir.chdir(ios_dir) do
-    # Bump iOS version
     increment_version_number_in_xcodeproj(
       version_number: new_version,
       xcodeproj: File.join(ios_dir, "PocketPal.xcodeproj")
     )
     increment_build_number_in_xcodeproj(
-      build_number: Time.now.strftime("%Y%m%d%H%M"),
+      build_number: build_number,
       xcodeproj: File.join(ios_dir, "PocketPal.xcodeproj")
     )
   end
 
-  UI.message("Bumped iOS version to #{new_version}")
+  UI.message("Bumped Android and iOS versions to #{new_version}")
 end
