@@ -53,6 +53,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
+          ruby-version: '3.2.3'  # Specify a Ruby version
           bundler-cache: true
 
       # Step 5: Bump version using Fastlane
@@ -128,6 +129,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
+          ruby-version: '3.2.3'  # Specify a Ruby version
           bundler-cache: true
 
       # Step 5: Install CocoaPods dependencies
