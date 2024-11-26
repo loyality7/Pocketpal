@@ -21,6 +21,9 @@ jobs:
   # Job 1: Version Bumping and Android Build
   build_android:
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read' # Allows workflow to checkout repository code
+      id-token: 'write' # Required for Google Cloud Workload Identity Federation authentication (OIDC token generation)
 
     steps:
       # Step 1: Checkout the code
@@ -64,18 +67,24 @@ jobs:
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/keystore.jks
 
-      # Step 8: Build and upload Android app to Alpha track
+      # Step 8: Authenticate to Google Cloud
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      # Step 9: Build and upload Android app to Alpha track
       - name: Build and upload Android app
         working-directory: android
         env:
-          SUPPLY_JSON_KEY_DATA: ${{ secrets.SUPPLY_JSON_KEY_DATA }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           GRADLE_USER_HOME: ${{ runner.temp }}/.gradle
         run: bundle exec fastlane release_android_alpha
 
-      # Step 9: Upload artifacts for iOS job
+      # Step 10: Upload the entire project directory for use in the iOS job
       - name: Upload code for iOS build
         uses: actions/upload-artifact@v3
         with:
