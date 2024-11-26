@@ -4,12 +4,11 @@ lane :bump_version do |options|
 
   # Bump version in package.json using Yarn
   begin
-    output = sh("yarn version --#{version_type} --no-git-tag-version")
-    new_version = output.match(/New version: (.+)$/)[1]
+    sh("yarn version --#{version_type} --no-git-tag-version")
+    new_version = JSON.parse(File.read('package.json'))['version']
     sh("echo #{new_version} > .version")
   rescue => e
-    UI.error("Failed to bump version: #{e.message}")
-    raise
+    UI.user_error!("Failed to bump version: #{e.message}")
   end
 
   # Bump iOS version
