@@ -15,14 +15,15 @@ lane :bump_version do |options|
   new_version = JSON.parse(File.read(package_json_path))['version']
   sh("echo #{new_version} > #{version_file_path}")
 
-  # Generate common build number based on timestamp
-  build_number = Time.now.strftime("%Y%m%d%H%M")
-
-  # Bump Android version
+  # For Android: Read current version code and increment it
   gradle_file = File.join(root_dir, "android/app/build.gradle")
+  current_version_code = android_get_version_code(gradle_file: gradle_file).to_i
+  new_version_code = current_version_code + 1
+
+  # Update Android version
   android_set_version_code(
     gradle_file: gradle_file,
-    version_code: build_number
+    version_code: new_version_code
   )
   
   android_set_version_name(
@@ -30,7 +31,7 @@ lane :bump_version do |options|
     version_name: new_version
   )
 
-  # Bump iOS version
+  # For iOS: Bump version and build number
   ios_dir = File.join(root_dir, 'ios')
   Dir.chdir(ios_dir) do
     increment_version_number_in_xcodeproj(
@@ -38,10 +39,12 @@ lane :bump_version do |options|
       xcodeproj: File.join(ios_dir, "PocketPal.xcodeproj")
     )
     increment_build_number_in_xcodeproj(
-      build_number: build_number,
       xcodeproj: File.join(ios_dir, "PocketPal.xcodeproj")
     )
   end
 
-  UI.message("Bumped Android and iOS versions to #{new_version}")
+  UI.message("Bumped versions:")
+  UI.message("- Version name: #{new_version}")
+  UI.message("- Android version code: #{new_version_code}")
+  UI.message("- iOS build number: #{get_build_number_from_xcodeproj(xcodeproj: File.join(ios_dir, 'PocketPal.xcodeproj'))}")
 end
