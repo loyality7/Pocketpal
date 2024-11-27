@@ -84,7 +84,7 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-          workload_identity_provider: "${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}"
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
 
       # Step 9: Build and upload Android app to Alpha track
       - name: Build and upload Android app
