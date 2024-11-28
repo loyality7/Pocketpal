@@ -150,7 +150,10 @@ jobs:
         working-directory: ios
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GITHUB_TOKEN: ${{ secrets.MATCH_GITHUB_TOKEN }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+          APP_STORE_CONNECT_USER_ID: ${{ secrets.APP_STORE_CONNECT_USER_ID }}
         run: bundle exec fastlane release_ios

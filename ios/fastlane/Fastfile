@@ -12,10 +12,11 @@ platform :ios do
 
     match(
       type: "appstore",
-      readonly: false,
+      readonly: true,
       api_key: api_key,
       git_branch: "master",
-      password: ENV['MATCH_PASSWORD']
+      password: ENV['MATCH_PASSWORD'],
+      git_basic_authorization: ENV['MATCH_GITHUB_TOKEN']
     )
 
     build_ios_app(
