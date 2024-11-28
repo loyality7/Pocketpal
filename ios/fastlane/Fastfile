@@ -15,7 +15,7 @@ platform :ios do
       readonly: true,
       api_key: api_key,
       git_branch: "master",
-      password: ENV['MATCH_PASSWORD'],
+      #password: ENV['MATCH_PASSWORD'], # will be picked up from environment variables
       git_basic_authorization: ENV['MATCH_GITHUB_TOKEN']
     )
 
