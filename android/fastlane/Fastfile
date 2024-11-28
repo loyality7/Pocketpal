@@ -17,7 +17,7 @@ platform :android do
 
     upload_to_play_store(
       track: "alpha",
-      package_name: "ai.pocketpal.app",
+      package_name: "com.pocketpalai",
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
