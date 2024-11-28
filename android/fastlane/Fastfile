@@ -3,11 +3,12 @@ default_platform :android
 platform :android do
   desc "Release Android app to Alpha track"
   lane :release_android_alpha do
+    android_dir = Dir.pwd # working-directory in workflow should be set to android for this to work
     gradle(
       task: "bundle",
       build_type: "Release",
       properties: {
-        "android.injected.signing.store.file" => "../keystore.jks",
+        "android.injected.signing.store.file" => File.join(android_dir, "keystore.jks"),
         "android.injected.signing.store.password" => ENV["KEYSTORE_PASSWORD"],
         "android.injected.signing.key.alias" => ENV["KEY_ALIAS"],
         "android.injected.signing.key.password" => ENV["KEY_PASSWORD"]
