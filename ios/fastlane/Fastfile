@@ -37,7 +37,13 @@ platform :ios do
       scheme: "PocketPal",
       export_method: "app-store",
       output_directory: "./build",
-      clean: true
+      clean: true,
+      export_options: {
+        provisioningProfiles: {
+          "ai.pocketpal" => "match AppStore ai.pocketpal"
+        },
+        signingStyle: "manual"
+      }
     )
 
     upload_to_testflight(
