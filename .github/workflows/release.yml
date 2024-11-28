@@ -105,7 +105,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           GRADLE_USER_HOME: ${{ runner.temp }}/.gradle
-          # GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }} # This is not supported by fastlane, we need to replace it with PLAY_STORE_JSON_KEY in the future.
+          #  GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }} # This is not supported by fastlane, we need to replace it with PLAY_STORE_JSON_KEY in the future.
           PLAY_STORE_JSON_KEY: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
         run: |
           echo "$PLAY_STORE_JSON_KEY" > play-store-key.json
