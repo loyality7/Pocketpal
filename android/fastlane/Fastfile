@@ -20,7 +20,7 @@ platform :android do
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
-      json_key: ENV["GOOGLE_APPLICATION_CREDENTIALS"]
+      json_key: File.join(android_dir, "play-store-key.json")
     )
   end
 end
