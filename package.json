@@ -1,6 +1,6 @@
 {
   "name": "PocketPal",
-  "version": "1.5.16",
+  "version": "1.5.17",
   "private": true,
   "scripts": {
     "prepare": "husky",
