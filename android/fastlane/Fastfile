@@ -3,7 +3,7 @@ default_platform :android
 platform :android do
   desc "Release Android app to Alpha track"
   lane :release_android_alpha do
-    android_dir = Dir.pwd # working-directory in workflow should be set to android for this to work
+    android_dir = File.expand_path('..', Dir.pwd)
     gradle(
       task: "bundle",
       build_type: "Release",
