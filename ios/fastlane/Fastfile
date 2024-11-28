@@ -17,12 +17,20 @@ platform :ios do
     end
 
     match(
+      type: "development",
+      readonly: true,
+      api_key: api_key,
+      git_branch: "master",
+      git_basic_authorization: encoded_github_token
+    )
+
+    match(
       type: "appstore",
       readonly: true,
       api_key: api_key,
       git_branch: "master",
       #password: ENV['MATCH_PASSWORD'], # will be picked up from environment variables
-        git_basic_authorization: encoded_github_token
+      git_basic_authorization: encoded_github_token
     )
 
     build_ios_app(
