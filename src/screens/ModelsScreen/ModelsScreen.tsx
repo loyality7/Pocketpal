@@ -1,5 +1,11 @@
 import React, {useState, useMemo, useContext} from 'react';
-import {View, FlatList, RefreshControl, Platform, Alert} from 'react-native';
+import {
+  FlatList,
+  RefreshControl,
+  Platform,
+  Alert,
+  KeyboardAvoidingView,
+} from 'react-native';
 
 import {toJS} from 'mobx';
 import {v4 as uuidv4} from 'uuid';
@@ -194,10 +200,15 @@ export const ModelsScreen: React.FC = observer(() => {
     .filter(group => group.items.length > 0);
 
   return (
-    <View style={[styles.container, {backgroundColor: colors.surface}]}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 80}
+      style={[styles.container, {backgroundColor: colors.surface}]}>
       <FlatList
         testID="flat-list"
-        contentContainerStyle={styles.listContainer} // Ensure padding for last card
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={styles.listContainer}
         data={
           filters.includes('grouped') ? flatListModels : filteredAndSortedModels
         }
@@ -225,6 +236,6 @@ export const ModelsScreen: React.FC = observer(() => {
         onAddHFModel={() => setHFSearchVisible(true)}
         onAddLocalModel={handleAddLocalModel}
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 });

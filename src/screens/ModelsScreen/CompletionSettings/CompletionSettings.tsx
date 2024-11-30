@@ -89,8 +89,7 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
   );
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.card}>
+      <View>
         <Card.Content>
           {renderIntegerInput('n_predict', 0, 2048)}
           {renderSlider('temperature', 0, 1)}
@@ -146,6 +145,5 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
           </View>
         </Card.Content>
       </View>
-    </ScrollView>
   );
 };

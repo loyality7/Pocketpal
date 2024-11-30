@@ -48,7 +48,7 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
     chatTemplate.chatTemplate,
   );
   const [localSystemPrompt, setLocalSystemPrompt] = useState(
-    chatTemplate.systemPrompt,
+    chatTemplate.systemPrompt ?? '',
   );
   const [selectedTemplateName, setSelectedTemplateName] = useState(
     chatTemplate.name,
@@ -73,7 +73,7 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
   }, [localChatTemplate]);
 
   useEffect(() => {
-    setLocalSystemPrompt(chatTemplate.systemPrompt);
+    setLocalSystemPrompt(chatTemplate.systemPrompt ?? '');
   }, [chatTemplate.systemPrompt]);
 
   useEffect(() => {
@@ -176,20 +176,17 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
           </Button>
         </View>
         <View>
-          {chatTemplate.systemPrompt !== undefined &&
-            chatTemplate.systemPrompt !== null && (
-              <TextInput
-                testID="system-prompt-input"
-                ref={systemPromptTextInputRef}
-                defaultValue={localSystemPrompt}
-                onChangeText={text => setLocalSystemPrompt(text)}
-                onBlur={() => handleSaveSystemPrompt()}
-                multiline
-                numberOfLines={3}
-                style={styles.textArea}
-                label={'System prompt'}
-              />
-            )}
+          <TextInput
+            testID="system-prompt-input"
+            ref={systemPromptTextInputRef}
+            defaultValue={localSystemPrompt}
+            onChangeText={text => setLocalSystemPrompt(text)}
+            onBlur={() => handleSaveSystemPrompt()}
+            multiline
+            numberOfLines={3}
+            style={styles.textArea}
+            label={'System prompt'}
+          />
         </View>
         {/** Completion Settings */}
         <List.Accordion
