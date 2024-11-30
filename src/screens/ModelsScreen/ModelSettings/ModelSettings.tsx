@@ -34,6 +34,7 @@ interface ModelSettingsProps {
   isActive: boolean;
   onChange: (name: string, value: any) => void;
   onCompletionSettingsChange: (name: string, value: any) => void;
+  onFocus?: () => void;
 }
 
 export const ModelSettings: React.FC<ModelSettingsProps> = ({
@@ -42,6 +43,7 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
   isActive,
   onChange,
   onCompletionSettingsChange,
+  onFocus,
 }) => {
   const [isDialogVisible, setDialogVisible] = useState<boolean>(false);
   const [localChatTemplate, setLocalChatTemplate] = useState(
@@ -186,6 +188,9 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
             numberOfLines={3}
             style={styles.textArea}
             label={'System prompt'}
+            onFocus={() => {
+              onFocus && onFocus();
+            }}
           />
         </View>
         {/** Completion Settings */}
