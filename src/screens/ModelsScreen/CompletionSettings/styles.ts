@@ -48,4 +48,14 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     marginRight: 8,
   },
+  stopWordsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 8,
+  },
+  stopChip: {
+    marginRight: 4,
+    marginBottom: 4,
+  },
 });

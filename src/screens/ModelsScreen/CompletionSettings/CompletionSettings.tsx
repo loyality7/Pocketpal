@@ -16,6 +16,7 @@ interface Props {
 
 export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
   const [localSliderValues, setLocalSliderValues] = useState({});
+  const [newStopWord, setNewStopWord] = useState('');
   const {colors} = useTheme();
 
   const handleOnChange = (name, value) => {
@@ -88,6 +89,46 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
     </View>
   );
 
+  const renderStopWords = () => (
+    <View style={styles.settingItem}>
+      <View style={styles.stopLabel}>
+        <Text style={styles.settingLabel}>stop</Text>
+      </View>
+
+      {/* Display existing stop words as chips */}
+      <View style={styles.stopWordsContainer}>
+        {(settings.stop ?? []).map((word, index) => (
+          <Chip
+            key={index}
+            onClose={() => {
+              const newStops = (settings.stop ?? []).filter(
+                (_, i) => i !== index,
+              );
+              onChange('stop', newStops);
+            }}
+            style={styles.stopChip}>
+            {word}
+          </Chip>
+        ))}
+      </View>
+
+      {/* Input for new stop words */}
+      <TextInput
+        value={newStopWord}
+        placeholder="Add new stop word"
+        onChangeText={setNewStopWord}
+        onSubmitEditing={() => {
+          if (newStopWord.trim()) {
+            onChange('stop', [...(settings.stop ?? []), newStopWord.trim()]);
+            setNewStopWord('');
+          }
+        }}
+        style={styles.textInput}
+        testID="stop-input"
+      />
+    </View>
+  );
+
   return (
     <View>
       <Card.Content>
@@ -123,26 +164,7 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
         {renderSwitch('penalize_nl')}
         {renderIntegerInput('seed', 0, Number.MAX_SAFE_INTEGER)}
         {renderIntegerInput('n_probs', 0, 100)}
-        <View style={styles.settingItem}>
-          <View style={styles.stopLabel}>
-            <Text style={styles.settingLabel}>stop</Text>
-            <Text>(comma separated)</Text>
-          </View>
-          <TextInput
-            value={settings.stop?.join(', ')}
-            onChangeText={value =>
-              onChange(
-                'stop',
-                value
-                  .split(',')
-                  .map(s => s.trim())
-                  .filter(s => s.length > 0),
-              )
-            }
-            style={styles.textInput}
-            testID="stop-input"
-          />
-        </View>
+        {renderStopWords()}
       </Card.Content>
     </View>
   );
