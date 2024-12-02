@@ -1,6 +1,5 @@
-import {AppState, AppStateStatus} from 'react-native';
+import {AppState, AppStateStatus, Platform} from 'react-native';
 
-import _ from 'lodash';
 import {v4 as uuidv4} from 'uuid';
 import RNFS from 'react-native-fs';
 import 'react-native-get-random-values';
@@ -358,20 +357,20 @@ class ModelStore {
     let lastBytesWritten = 0;
     let lastUpdateTime = Date.now();
 
-    const throttledProgress = _.throttle(data => {
+    const progressHandler = (data: RNFS.DownloadProgressCallbackResultT) => {
       if (!this.downloadJobs.has(model.id)) {
         return;
-      } // Ensure the model is still being downloaded
-      const newProgress = (data.bytesWritten / data.contentLength) * 100; // Update progress
+      }
 
-      // Calculate download speed
+      const newProgress = (data.bytesWritten / data.contentLength) * 100;
+
+      // Calculate speed and ETA
       const currentTime = Date.now();
-      const timeDiff = (currentTime - lastUpdateTime) / 1000; // Convert to seconds
+      const timeDiff = (currentTime - lastUpdateTime) / 1000 || 1; // '|| 1' to avoid division by zero
       const bytesDiff = data.bytesWritten - lastBytesWritten;
       const speedBps = bytesDiff / timeDiff;
       const speedMBps = (speedBps / (1024 * 1024)).toFixed(2);
 
-      // Calculate ETA
       const remainingBytes = data.contentLength - data.bytesWritten;
       const etaSeconds = speedBps > 0 ? remainingBytes / speedBps : 0;
       const etaMinutes = Math.ceil(etaSeconds / 60);
@@ -388,17 +387,20 @@ class ModelStore {
 
       lastBytesWritten = data.bytesWritten;
       lastUpdateTime = currentTime;
-    }, 500); // Throttle updates to 500ms
+    };
 
     const options = {
       fromUrl: model.downloadUrl,
       toFile: downloadDest,
+      //background: true,
+      //discretionary: false,
+      progressInterval: 800, // Update every 800ms
       begin: () => {
         runInAction(() => {
-          model.progress = 0; // reset progress at the start
+          model.progress = 0;
         });
       },
-      progress: throttledProgress,
+      progress: progressHandler,
     };
 
     try {
@@ -414,6 +416,12 @@ class ModelStore {
           model.progress = 100; // Ensure progress is set to 100 upon completion
           this.refreshDownloadStatuses();
         });
+
+        if (Platform.OS === 'ios') {
+          // THIS IS REQUIRED. Without this, iOS might keep the background task running
+          // https://github.com/itinance/react-native-fs/tree/master?tab=readme-ov-file#background-downloads-tutorial-ios
+          RNFS.completeHandlerIOS(ret.jobId);
+        }
       }
     } catch (err: any) {
       if (err.message !== 'Download has been aborted') {
