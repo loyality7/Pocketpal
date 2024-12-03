@@ -1,13 +1,14 @@
 import {AppState, AppStateStatus, Platform} from 'react-native';
 
 import {v4 as uuidv4} from 'uuid';
-import RNFS, {DownloadProgressCallbackResult} from 'react-native-fs';
 import 'react-native-get-random-values';
 import {makePersistable} from 'mobx-persist-store';
+import * as RNFS from '@dr.pogodin/react-native-fs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {computed, makeAutoObservable, ObservableMap, runInAction} from 'mobx';
 import {CompletionParams, LlamaContext, initLlama} from '@pocketpalai/llama.rn';
 
+import {uiStore} from './UIStore';
 import {defaultModels, MODEL_LIST_VERSION} from './defaultModels';
 import {deepMerge, formatBytes, hasEnoughSpace, hfAsModel} from '../utils';
 
@@ -357,7 +358,7 @@ class ModelStore {
     let lastBytesWritten = 0;
     let lastUpdateTime = Date.now();
 
-    const progressHandler = (data: DownloadProgressCallbackResult) => {
+    const progressHandler = (data: RNFS.DownloadProgressCallbackResultT) => {
       if (!this.downloadJobs.has(model.id)) {
         return;
       }
@@ -392,8 +393,8 @@ class ModelStore {
     const options = {
       fromUrl: model.downloadUrl,
       toFile: downloadDest,
-      //background: true,
-      //discretionary: false,
+      background: uiStore.iOSBackgroundDownloading,
+      discretionary: false,
       progressInterval: 800, // Update every 800ms
       begin: () => {
         runInAction(() => {
