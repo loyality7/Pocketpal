@@ -1,7 +1,7 @@
 import {AppState, AppStateStatus, Platform} from 'react-native';
 
 import {v4 as uuidv4} from 'uuid';
-import RNFS from 'react-native-fs';
+import RNFS, {DownloadProgressCallbackResult} from 'react-native-fs';
 import 'react-native-get-random-values';
 import {makePersistable} from 'mobx-persist-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -357,7 +357,7 @@ class ModelStore {
     let lastBytesWritten = 0;
     let lastUpdateTime = Date.now();
 
-    const progressHandler = (data: RNFS.DownloadProgressCallbackResultT) => {
+    const progressHandler = (data: DownloadProgressCallbackResult) => {
       if (!this.downloadJobs.has(model.id)) {
         return;
       }
