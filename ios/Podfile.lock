@@ -1611,13 +1611,32 @@ PODS:
     - React-Core
   - RNCClipboard (1.15.0):
     - React-Core
-  - RNCMaskedView (0.3.1):
+  - RNCMaskedView (0.3.2):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
     - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - RNCPicker (2.10.2):
     - React-Core
-  - RNDeviceInfo (13.1.0):
+  - RNDeviceInfo (13.2.0):
     - React-Core
-  - RNGestureHandler (2.20.2):
+  - RNGestureHandler (2.21.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1747,7 +1766,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNSVG (15.9.0):
+  - RNSVG (15.10.0):
     - React-Core
   - RNVectorIcons (10.2.0):
     - DoubleConversion
@@ -2108,13 +2127,13 @@ SPEC CHECKSUMS:
   ReactCommon: b8485556b596ef2f44f59bc586113bda138fb804
   RNCAsyncStorage: c91d753ede6dc21862c4922cd13f98f7cfde578e
   RNCClipboard: dbcf25b8f666b4685c02eeb65be981d30198e505
-  RNCMaskedView: de80352547bd4f0d607bf6bab363d826822bd126
+  RNCMaskedView: e2e87cbd6366581943892b44176e7976ff988dfd
   RNCPicker: d8662eb6615e3401acb590c44b97b2af3beb1e53
-  RNDeviceInfo: 014029374ada3164b6c40fe74041dca2f98b42d6
-  RNGestureHandler: 27a63f2218affdf1a426d56682f9b174904838b3
+  RNDeviceInfo: ae26ae45db3f9937f038a284bcd0a1db8d70db96
+  RNGestureHandler: 5b24d10761754ad271b714e536c457fd89b17c54
   RNReanimated: 929c26a706dfe1af8feee9f2cf78004394e4dd04
   RNScreens: e21c8d32fe97737ecc30f1f21e7b6f69f341a1f5
-  RNSVG: bb4bfcb8ec723a6f34b074a1b7cd40ee35246fe5
+  RNSVG: 6a529f4faed8be4ebfb00f1a29e25cb046d95e61
   RNVectorIcons: 182892e7d1a2f27b52d3c627eca5d2665a22ee28
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 3deb2471faa9916c8a82dda2a22d3fba2620ad37
