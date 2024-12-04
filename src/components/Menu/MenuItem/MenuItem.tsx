@@ -1,12 +1,30 @@
-import React, {useRef, useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {View, Animated} from 'react-native';
+import React, {useRef, useState, useEffect} from 'react';
+import {StyleProp, TextStyle, ViewStyle} from 'react-native';
 
 import {Menu as PaperMenu, Icon} from 'react-native-paper';
+import {MenuItemProps as PaperMenuItemProps} from 'react-native-paper';
+import {IconSource} from 'react-native-paper/lib/typescript/components/Icon';
 
-import {useTheme} from '../../hooks';
+import {SubMenu} from '../SubMenu/SubMenu';
 
-import type {MenuItemProps} from './types';
-import {SubMenu} from './SubMenu';
+import {useTheme} from '../../../hooks';
+
+import {createStyles} from './styles';
+
+export interface MenuItemProps
+  extends Omit<PaperMenuItemProps, 'title' | 'titleStyle'> {
+  label: string;
+  labelStyle?: StyleProp<TextStyle>;
+  danger?: boolean;
+  style?: StyleProp<ViewStyle>;
+  isGroupLabel?: boolean;
+  icon?: IconSource;
+  selected?: boolean;
+  submenu?: React.ReactNode[];
+  onSubmenuOpen?: () => void;
+  onSubmenuClose?: () => void;
+}
 
 export const MenuItem: React.FC<MenuItemProps> = ({
   label,
@@ -26,45 +44,19 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
   const [submenuPosition, setSubmenuPosition] = useState({x: 0, y: 0});
   const itemRef = useRef<View>(null);
+  const fadeAnim = useRef(new Animated.Value(1)).current;
 
   const theme = useTheme();
 
-  const styles = StyleSheet.create({
-    container: {
-      height: 36,
-      backgroundColor: 'transparent',
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: 10,
-    },
-    leadingContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-    },
-    contentContainer: {
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      marginLeft: 0,
-    },
-    label: {
-      ...theme.fonts.bodySmall,
-      textAlign: 'left',
-      paddingLeft: 0,
-    },
-    trailingContainer: {
-      alignItems: 'flex-end',
-    },
-    groupLabel: {
-      paddingTop: 12,
-      opacity: 0.5,
-    },
-    activeParent: {
-      opacity: 0.5, // Gray out parent when submenu is open
-    },
-  });
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: isSubmenuOpen ? 0.6 : 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim, isSubmenuOpen]);
+
+  const styles = createStyles(theme);
 
   const renderLeadingIcon = props => (
     <View style={styles.leadingContainer}>
@@ -119,7 +111,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   };
 
   return (
-    <View ref={itemRef}>
+    <Animated.View ref={itemRef} style={{opacity: fadeAnim}}>
       <PaperMenu.Item
         {...menuItemProps}
         onPress={handlePress}
@@ -154,6 +146,6 @@ export const MenuItem: React.FC<MenuItemProps> = ({
           {submenu}
         </SubMenu>
       )}
-    </View>
+    </Animated.View>
   );
 };

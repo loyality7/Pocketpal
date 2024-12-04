@@ -39,7 +39,9 @@ const lightColors: Colors = {
   userAvatarImageBackground: 'transparent',
   userAvatarNameColors: getThemeColorsAsArray(PaperLightTheme),
   searchBarBackground: 'rgba(118, 118, 128, 0.12)', // iOS light mode searchbar
-  menuBackground: '#fcfcfc',
+  menuBackground: '#FFFFFF',
+  menuBackgroundDimmed: 'rgba(255, 255, 255, 0.8)',
+  menuBackgroundActive: 'rgba(0, 0, 0, 0.04)',
   menuBackdrop: 'rgba(255, 255, 255, 0.27)',
   menuSeparator: 'rgba(17, 17, 17, 0.5)',
   menuGroupSeparator: 'rgba(0, 0, 0, 0.08)',
@@ -173,6 +175,8 @@ const darkColors: Colors = {
   userAvatarNameColors: getThemeColorsAsArray(MD3DarkTheme),
   searchBarBackground: 'rgba(28, 28, 30, 0.92)', // iOS dark mode searchbar
   menuBackground: 'rgba(45, 45, 45, 0.39)',
+  menuBackgroundDimmed: 'rgba(45, 45, 45, 0.8)',
+  menuBackgroundActive: 'rgba(255, 255, 255, 0.08)',
   menuBackdrop: 'rgba(30, 30, 30, 0.27)',
   menuSeparator: 'rgba(255, 255, 255, 0.15)',
   menuGroupSeparator: 'rgba(255, 255, 255, 0.08)',

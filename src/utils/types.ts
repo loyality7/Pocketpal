@@ -144,6 +144,8 @@ export interface Colors extends MD3Colors {
   menuGroupSeparator: string;
   menuText: string;
   menuDangerText: string;
+  menuBackgroundDimmed: string;
+  menuBackgroundActive: string;
 }
 
 export interface Typescale extends MD3Typescale {
