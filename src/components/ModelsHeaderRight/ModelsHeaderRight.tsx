@@ -2,12 +2,10 @@ import {Image, View} from 'react-native';
 import React, {useContext, useState} from 'react';
 
 import {observer} from 'mobx-react';
-import {Menu, IconButton, Divider} from 'react-native-paper';
+import {IconButton} from 'react-native-paper';
 
 import iconHF from '../../assets/icon-hf.png';
 import iconHFLight from '../../assets/icon-hf-light.png';
-
-import {useTheme} from '../../hooks';
 
 import {createStyles} from './styles';
 import {ModelsResetDialog} from '../ModelsResetDialog';
@@ -15,6 +13,7 @@ import {ModelsResetDialog} from '../ModelsResetDialog';
 import {modelStore, uiStore} from '../../store';
 
 import {L10nContext} from '../../utils';
+import {Menu} from '../Menu';
 
 export const ModelsHeaderRight = observer(() => {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -23,8 +22,7 @@ export const ModelsHeaderRight = observer(() => {
 
   const l10n = useContext(L10nContext);
 
-  const theme = useTheme();
-  const styles = createStyles(theme);
+  const styles = createStyles();
 
   const filters = uiStore.pageStates.modelsScreen.filters;
   const setFilters = (value: string[]) => {
@@ -63,7 +61,6 @@ export const ModelsHeaderRight = observer(() => {
       <Menu
         visible={menuVisible}
         onDismiss={() => setMenuVisible(false)}
-        contentStyle={styles.menuContent}
         anchor={
           <IconButton
             icon="tune-vertical"
@@ -74,7 +71,7 @@ export const ModelsHeaderRight = observer(() => {
           />
         }>
         {/* Filter section */}
-        <Menu.Item title="Filters" disabled titleStyle={styles.menuSection} />
+        <Menu.Item label="Filters" isGroupLabel />
         <Menu.Item
           leadingIcon={({size}) => (
             <Image
@@ -83,8 +80,7 @@ export const ModelsHeaderRight = observer(() => {
             />
           )}
           onPress={() => toggleFilter('hf')}
-          title={l10n.menuTitleHf}
-          titleStyle={styles.menuItem}
+          label={l10n.menuTitleHf}
           trailingIcon={filters.includes('hf') ? 'check' : undefined}
         />
         <Menu.Item
@@ -92,33 +88,30 @@ export const ModelsHeaderRight = observer(() => {
             filters.includes('downloaded') ? 'download-circle' : 'download'
           }
           onPress={() => toggleFilter('downloaded')}
-          title={l10n.menuTitleDownloaded}
-          titleStyle={styles.menuItem}
+          label={l10n.menuTitleDownloaded}
           trailingIcon={filters.includes('downloaded') ? 'check' : undefined}
         />
 
         {/* View section */}
-        <Menu.Item title="View" disabled titleStyle={styles.menuSection} />
+        <Menu.Item label="View" isGroupLabel />
         <Menu.Item
           leadingIcon={
             filters.includes('grouped') ? 'layers' : 'layers-outline'
           }
           onPress={() => toggleFilter('grouped')}
-          title={l10n.menuTitleGrouped}
-          titleStyle={styles.menuItem}
+          label={l10n.menuTitleGrouped}
           trailingIcon={filters.includes('grouped') ? 'check' : undefined}
         />
 
         {/* Actions section */}
-        <Divider style={styles.divider} />
+        <Menu.GroupSeparator />
         <Menu.Item
           leadingIcon="refresh"
           onPress={() => {
             setMenuVisible(false);
             showResetDialog();
           }}
-          title={l10n.menuTitleReset}
-          titleStyle={styles.menuItem}
+          label={l10n.menuTitleReset}
         />
       </Menu>
     </View>
