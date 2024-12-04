@@ -11,4 +11,7 @@ export const createStyles = () =>
       margin: 0,
       marginHorizontal: 4,
     },
+    menuItem: {
+      width: 220,
+    },
   });

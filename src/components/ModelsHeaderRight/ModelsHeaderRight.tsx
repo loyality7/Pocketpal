@@ -71,9 +71,9 @@ export const ModelsHeaderRight = observer(() => {
           />
         }>
         {/* Filter section */}
-        <Menu.Item label="Filters" isGroupLabel />
+        <Menu.Item label="Filters" isGroupLabel style={styles.menuItem} />
         <Menu.Item
-          leadingIcon={({size}) => (
+          icon={({size}) => (
             <Image
               source={filters.includes('hf') ? iconHF : iconHFLight}
               style={{width: size, height: size}}
@@ -81,37 +81,37 @@ export const ModelsHeaderRight = observer(() => {
           )}
           onPress={() => toggleFilter('hf')}
           label={l10n.menuTitleHf}
-          trailingIcon={filters.includes('hf') ? 'check' : undefined}
+          selected={filters.includes('hf')}
+          style={styles.menuItem}
         />
         <Menu.Item
-          leadingIcon={
-            filters.includes('downloaded') ? 'download-circle' : 'download'
-          }
+          icon={filters.includes('downloaded') ? 'download-circle' : 'download'}
           onPress={() => toggleFilter('downloaded')}
           label={l10n.menuTitleDownloaded}
-          trailingIcon={filters.includes('downloaded') ? 'check' : undefined}
+          selected={filters.includes('downloaded')}
+          style={styles.menuItem}
         />
 
         {/* View section */}
-        <Menu.Item label="View" isGroupLabel />
+        <Menu.Item label="View" isGroupLabel style={styles.menuItem} />
         <Menu.Item
-          leadingIcon={
-            filters.includes('grouped') ? 'layers' : 'layers-outline'
-          }
+          icon={filters.includes('grouped') ? 'layers' : 'layers-outline'}
           onPress={() => toggleFilter('grouped')}
           label={l10n.menuTitleGrouped}
-          trailingIcon={filters.includes('grouped') ? 'check' : undefined}
+          selected={filters.includes('grouped')}
+          style={styles.menuItem}
         />
 
         {/* Actions section */}
         <Menu.GroupSeparator />
         <Menu.Item
-          leadingIcon="refresh"
+          icon="refresh"
           onPress={() => {
             setMenuVisible(false);
             showResetDialog();
           }}
           label={l10n.menuTitleReset}
+          style={styles.menuItem}
         />
       </Menu>
     </View>

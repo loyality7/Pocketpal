@@ -1,9 +1,13 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
+
 import {Menu as PaperMenu} from 'react-native-paper';
+
 import {useTheme} from '../../hooks';
-import type {MenuProps} from './types';
+
 import {MenuItem} from './MenuItem';
+import type {MenuProps} from './types';
+
 import type {Theme} from '../../utils/types';
 
 export const createStyles = (theme: Theme) =>
@@ -53,11 +57,7 @@ export const Menu: React.FC<MenuProps> & {
     <PaperMenu
       {...menuProps}
       anchor={anchor}
-      style={[
-        styles.menu,
-        {backgroundColor: theme.colors.menuBackground},
-        style,
-      ]}
+      style={[styles.menu, style]}
       contentStyle={styles.content}>
       {children}
     </PaperMenu>
