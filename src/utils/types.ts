@@ -132,13 +132,18 @@ export interface Size {
 }
 
 export interface Colors extends MD3Colors {
-  accent: string;
   outlineVariant: string;
   receivedMessageDocumentIcon: string;
   sentMessageDocumentIcon: string;
   userAvatarImageBackground: string;
   userAvatarNameColors: ColorValue[];
   searchBarBackground: string;
+  menuBackground: string;
+  menuBackdrop: string;
+  menuSeparator: string;
+  menuGroupSeparator: string;
+  menuText: string;
+  menuDangerText: string;
 }
 
 export interface Typescale extends MD3Typescale {
