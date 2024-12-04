@@ -105,7 +105,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   const handlePress = (e: any) => {
     if (submenu) {
       itemRef.current?.measure((x, y, width, height, pageX, pageY) => {
-        setSubmenuPosition({x: pageX + width, y: pageY});
+        setSubmenuPosition({x: pageX + width, y: pageY + height});
         setIsSubmenuOpen(!isSubmenuOpen);
         if (!isSubmenuOpen) {
           onSubmenuOpen?.();
