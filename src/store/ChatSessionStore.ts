@@ -274,6 +274,37 @@ class ChatSessionStore {
 
     return orderedGroups;
   }
+
+  /**
+   * Removes messages from the current active session starting from a specific message ID.
+   * If includeMessage is true, the message with the given ID is also removed.
+   *
+   * @param messageId - The ID of the message to start removal from.
+   * @param includeMessage - Whether to include the message with the given ID in the removal.
+   */
+  removeMessagesFromId(
+    messageId: string,
+    includeMessage: boolean = true,
+  ): void {
+    if (this.activeSessionId) {
+      const session = this.sessions.find(s => s.id === this.activeSessionId);
+      if (session) {
+        const messageIndex = session.messages.findIndex(
+          msg => msg.id === messageId,
+        );
+        if (messageIndex >= 0) {
+          runInAction(() => {
+            // Remove messages from the index (inclusive or exclusive based on includeMessage)
+            session.messages = session.messages.slice(
+              0,
+              includeMessage ? messageIndex : messageIndex + 1,
+            );
+            this.saveSessionsMetadata();
+          });
+        }
+      }
+    }
+  }
 }
 
 export const chatSessionStore = new ChatSessionStore();

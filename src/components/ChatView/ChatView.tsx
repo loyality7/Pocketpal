@@ -160,6 +160,7 @@ export const ChatView = ({
     footer,
     footerLoadingPage,
     keyboardAccessoryView,
+    menu,
   } = styles({theme});
 
   const {onLayout, size} = useComponentSize();
@@ -545,7 +546,7 @@ export const ChatView = ({
           <Menu
             visible={menuVisible}
             onDismiss={handleMenuDismiss}
-            //style={{width: 170}}
+            style={menu}
             selectable={false}
             anchor={menuPosition}>
             {menuItems.map((item, index) => (

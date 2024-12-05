@@ -43,4 +43,7 @@ export const styles = ({theme}: {theme: Theme}) =>
       borderTopLeftRadius: theme.borders.inputBorderRadius,
       borderTopRightRadius: theme.borders.inputBorderRadius,
     },
+    menu: {
+      width: 170,
+    },
   });
