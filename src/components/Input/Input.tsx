@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {TextInput, TextInputProps, View, Animated} from 'react-native';
 
+import {observer} from 'mobx-react';
 import {IconButton, Text} from 'react-native-paper';
 
 import {useTheme} from '../../hooks';
@@ -52,132 +53,141 @@ export type InputProps = InputTopLevelProps & InputAdditionalProps;
 
 /** Bottom bar input component with a text input, attachment and
  * send buttons inside. By default hides send button when text input is empty. */
-export const Input = ({
-  attachmentButtonProps,
-  attachmentCircularActivityIndicatorProps,
-  isAttachmentUploading,
-  isStreaming = false,
-  onAttachmentPress,
-  onSendPress,
-  onStopPress,
-  onCancelEdit,
-  isStopVisible,
-  sendButtonVisibilityMode,
-  textInputProps,
-}: InputProps) => {
-  const l10n = React.useContext(L10nContext);
-  const theme = useTheme();
-  const user = React.useContext(UserContext);
-  const inputRef = React.useRef<TextInput>(null);
-  const editBarHeight = React.useRef(new Animated.Value(0)).current;
+export const Input = observer(
+  ({
+    attachmentButtonProps,
+    attachmentCircularActivityIndicatorProps,
+    isAttachmentUploading,
+    isStreaming = false,
+    onAttachmentPress,
+    onSendPress,
+    onStopPress,
+    onCancelEdit,
+    isStopVisible,
+    sendButtonVisibilityMode,
+    textInputProps,
+  }: InputProps) => {
+    const l10n = React.useContext(L10nContext);
+    const theme = useTheme();
+    const user = React.useContext(UserContext);
+    const inputRef = React.useRef<TextInput>(null);
+    const editBarHeight = React.useRef(new Animated.Value(0)).current;
 
-  // Use `defaultValue` if provided
-  const [text, setText] = React.useState(textInputProps?.defaultValue ?? '');
-  const isEditMode = chatSessionStore.isEditMode;
+    // Use `defaultValue` if provided
+    const [text, setText] = React.useState(textInputProps?.defaultValue ?? '');
+    const isEditMode = chatSessionStore.isEditMode;
 
-  const styles = createStyles({theme, isEditMode});
+    const styles = createStyles({theme, isEditMode});
 
-  const value = textInputProps?.value ?? text;
+    const value = textInputProps?.value ?? text;
 
-  React.useEffect(() => {
-    if (isEditMode) {
-      // Animate edit bar height
-      Animated.spring(editBarHeight, {
-        toValue: 28,
-        useNativeDriver: false,
-        friction: 8,
-      }).start();
-      // Focus input
-      inputRef.current?.focus();
-    } else {
-      Animated.spring(editBarHeight, {
-        toValue: 0,
-        useNativeDriver: false,
-        friction: 8,
-      }).start();
-    }
-  }, [isEditMode, editBarHeight]);
+    React.useEffect(() => {
+      if (!isEditMode) {
+        setText('');
+        onCancelEdit?.();
+      }
+    }, [isEditMode, onCancelEdit]);
 
-  const handleChangeText = (newText: string) => {
-    setText(newText);
-    textInputProps?.onChangeText?.(newText);
-  };
+    React.useEffect(() => {
+      if (isEditMode) {
+        // Animate edit bar height
+        Animated.spring(editBarHeight, {
+          toValue: 28,
+          useNativeDriver: false,
+          friction: 8,
+        }).start();
+        // Focus input
+        inputRef.current?.focus();
+      } else {
+        Animated.spring(editBarHeight, {
+          toValue: 0,
+          useNativeDriver: false,
+          friction: 8,
+        }).start();
+      }
+    }, [isEditMode, editBarHeight]);
 
-  const handleSend = () => {
-    const trimmedValue = value.trim();
-    if (trimmedValue) {
-      onSendPress({text: trimmedValue, type: 'text'});
+    const handleChangeText = (newText: string) => {
+      setText(newText);
+      textInputProps?.onChangeText?.(newText);
+    };
+
+    const handleSend = () => {
+      const trimmedValue = value.trim();
+      if (trimmedValue) {
+        onSendPress({text: trimmedValue, type: 'text'});
+        setText('');
+      }
+    };
+
+    const handleCancel = () => {
       setText('');
-    }
-  };
+      onCancelEdit?.();
+    };
 
-  const handleCancel = () => {
-    setText('');
-    onCancelEdit?.();
-  };
+    const isSendButtonVisible =
+      !isStreaming &&
+      !isStopVisible &&
+      user &&
+      (sendButtonVisibilityMode === 'always' || value.trim());
 
-  const isSendButtonVisible =
-    !isStreaming &&
-    !isStopVisible &&
-    user &&
-    (sendButtonVisibilityMode === 'always' || value.trim());
-
-  return (
-    <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        {isEditMode && (
-          <Animated.View
-            style={[
-              styles.editBar,
-              {
-                height: editBarHeight,
-              },
-            ]}>
-            <Text variant="labelSmall" style={styles.editBarText}>
-              Editing message
-            </Text>
-            <IconButton
-              icon="close"
-              size={16}
-              onPress={handleCancel}
-              style={styles.editBarButton}
-              iconColor={theme.colors.onSurfaceVariant}
-            />
-          </Animated.View>
-        )}
-        <View style={styles.inputRow}>
-          {user &&
-            (isAttachmentUploading ? (
-              <CircularActivityIndicator
-                {...{
-                  ...attachmentCircularActivityIndicatorProps,
-                  color: theme.colors.onSurface,
-                  style: styles.marginRight,
-                }}
+    return (
+      <View style={styles.container}>
+        <View style={styles.inputContainer}>
+          {isEditMode && (
+            <Animated.View
+              style={[
+                styles.editBar,
+                {
+                  height: editBarHeight,
+                },
+              ]}>
+              <Text variant="labelSmall" style={styles.editBarText}>
+                Editing message
+              </Text>
+              <IconButton
+                icon="close"
+                size={16}
+                onPress={handleCancel}
+                style={styles.editBarButton}
+                iconColor={theme.colors.onSurfaceVariant}
               />
-            ) : (
-              !!onAttachmentPress && (
-                <AttachmentButton
-                  {...unwrap(attachmentButtonProps)}
-                  onPress={onAttachmentPress}
+            </Animated.View>
+          )}
+          <View style={styles.inputRow}>
+            {user &&
+              (isAttachmentUploading ? (
+                <CircularActivityIndicator
+                  {...{
+                    ...attachmentCircularActivityIndicatorProps,
+                    color: theme.colors.onSurface,
+                    style: styles.marginRight,
+                  }}
                 />
-              )
-            ))}
-          <TextInput
-            ref={inputRef}
-            multiline
-            placeholder={l10n.inputPlaceholder}
-            placeholderTextColor={theme.colors.outline}
-            underlineColorAndroid="transparent"
-            {...textInputProps}
-            style={[styles.input, textInputProps?.style]}
-            onChangeText={handleChangeText}
-            value={value}
-          />
-          {isSendButtonVisible ? <SendButton onPress={handleSend} /> : null}
-          {isStopVisible && <StopButton onPress={onStopPress} />}
+              ) : (
+                !!onAttachmentPress && (
+                  <AttachmentButton
+                    {...unwrap(attachmentButtonProps)}
+                    onPress={onAttachmentPress}
+                  />
+                )
+              ))}
+            <TextInput
+              ref={inputRef}
+              multiline
+              placeholder={l10n.inputPlaceholder}
+              placeholderTextColor={theme.colors.outline}
+              underlineColorAndroid="transparent"
+              {...textInputProps}
+              style={[styles.input, textInputProps?.style]}
+              onChangeText={handleChangeText}
+              value={value}
+            />
+            {isSendButtonVisible ? <SendButton onPress={handleSend} /> : null}
+            {isStopVisible && <StopButton onPress={onStopPress} />}
+          </View>
         </View>
       </View>
-    </View>
-  );
-};
+    );
+  },
+);

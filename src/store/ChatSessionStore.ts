@@ -70,6 +70,7 @@ class ChatSessionStore {
 
   resetActiveSession() {
     runInAction(() => {
+      this.exitEditMode();
       this.activeSessionId = null;
     });
   }
