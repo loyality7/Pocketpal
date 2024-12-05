@@ -66,7 +66,11 @@ export const MenuItem: React.FC<MenuItemProps> = ({
     }
 
     return (
-      <View style={styles.leadingContainer}>
+      <View
+        style={[
+          styles.leadingContainer,
+          menuItemProps.disabled && styles.itemDisabled,
+        ]}>
         {selected && <Icon source="check" size={18} />}
         {leadingIcon &&
           (typeof leadingIcon === 'function' ? (
@@ -79,7 +83,11 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   };
 
   const renderTrailingIcon = props => (
-    <View style={styles.trailingContainer}>
+    <View
+      style={[
+        styles.trailingContainer,
+        menuItemProps.disabled && styles.itemDisabled,
+      ]}>
       {trailingIcon ? (
         typeof trailingIcon === 'function' ? (
           trailingIcon({...props, size: 18})
@@ -139,6 +147,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
           {
             color: danger ? theme.colors.menuDangerText : theme.colors.menuText,
           },
+          menuItemProps.disabled && styles.labelDisabled,
           labelStyle,
         ]}
         {...(!selectable && !leadingIcon

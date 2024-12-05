@@ -17,8 +17,6 @@ export const createStyles = (theme: Theme) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'flex-start',
-      //width: 24,
-      //marginRight: 8,
     },
     contentContainer: {
       flex: 1,
@@ -31,6 +29,12 @@ export const createStyles = (theme: Theme) =>
       ...theme.fonts.bodySmall,
       textAlign: 'left',
       paddingLeft: 0,
+    },
+    labelDisabled: {
+      opacity: 0.5,
+    },
+    itemDisabled: {
+      opacity: 0.5,
     },
     trailingContainer: {
       alignItems: 'flex-end',

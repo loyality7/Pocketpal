@@ -45,6 +45,8 @@ import {
   UserContext,
 } from '../../utils';
 import {Divider} from 'react-native-paper';
+import {observer} from 'mobx-react';
+import {modelStore} from '../../store';
 
 // Untestable
 /* istanbul ignore next */
@@ -112,457 +114,464 @@ export interface ChatProps extends ChatTopLevelProps {
 }
 
 /** Entry component, represents the complete chat */
-export const ChatView = ({
-  customBottomComponent,
-  customDateHeaderText,
-  dateFormat,
-  disableImageGallery,
-  emptyState,
-  enableAnimation,
-  flatListProps,
-  inputProps,
-  isAttachmentUploading,
-  isLastPage,
-  isStopVisible,
-  isStreaming = false,
-  isThinking = false,
-  l10nOverride,
-  locale = 'en',
-  messages,
-  onAttachmentPress,
-  onEndReached,
-  onMessageLongPress: externalOnMessageLongPress,
-  onMessagePress,
-  onPreviewDataFetched,
-  onSendPress,
-  onStopPress,
-  renderBubble,
-  renderCustomMessage,
-  renderFileMessage,
-  renderImageMessage,
-  renderTextMessage,
-  sendButtonVisibilityMode = 'editing',
-  showUserAvatars = false,
-  showUserNames = false,
-  textInputProps,
-  timeFormat,
-  usePreviewData = true,
-  user,
-}: ChatProps) => {
-  const theme = useTheme();
-
-  const {
-    container,
-    emptyComponentContainer,
-    emptyComponentTitle,
-    flatList,
-    flatListContentContainer,
-    footer,
-    footerLoadingPage,
-    keyboardAccessoryView,
-    menu,
-  } = styles({theme});
-
-  const {onLayout, size} = useComponentSize();
-  const animationRef = React.useRef(false);
-  const list = React.useRef<FlatList<MessageType.DerivedAny>>(null);
-  const insets = useSafeAreaInsets();
-  const [isImageViewVisible, setIsImageViewVisible] = React.useState(false);
-  const [isNextPageLoading, setNextPageLoading] = React.useState(false);
-  const [imageViewIndex, setImageViewIndex] = React.useState(0);
-  const [stackEntry, setStackEntry] = React.useState<StatusBarProps>({});
-
-  const l10nValue = React.useMemo(
-    () => ({...l10n[locale], ...unwrap(l10nOverride)}),
-    [l10nOverride, locale],
-  );
-
-  const {chatMessages, gallery} = calculateChatMessages(messages, user, {
+export const ChatView = observer(
+  ({
+    customBottomComponent,
     customDateHeaderText,
     dateFormat,
-    showUserNames,
+    disableImageGallery,
+    emptyState,
+    enableAnimation,
+    flatListProps,
+    inputProps,
+    isAttachmentUploading,
+    isLastPage,
+    isStopVisible,
+    isStreaming = false,
+    isThinking = false,
+    l10nOverride,
+    locale = 'en',
+    messages,
+    onAttachmentPress,
+    onEndReached,
+    onMessageLongPress: externalOnMessageLongPress,
+    onMessagePress,
+    onPreviewDataFetched,
+    onSendPress,
+    onStopPress,
+    renderBubble,
+    renderCustomMessage,
+    renderFileMessage,
+    renderImageMessage,
+    renderTextMessage,
+    sendButtonVisibilityMode = 'editing',
+    showUserAvatars = false,
+    showUserNames = false,
+    textInputProps,
     timeFormat,
-  });
+    usePreviewData = true,
+    user,
+  }: ChatProps) => {
+    const theme = useTheme();
 
-  const previousChatMessages = usePrevious(chatMessages);
+    const {
+      container,
+      emptyComponentContainer,
+      emptyComponentTitle,
+      flatList,
+      flatListContentContainer,
+      footer,
+      footerLoadingPage,
+      keyboardAccessoryView,
+      menu,
+    } = styles({theme});
 
-  React.useEffect(() => {
-    if (
-      chatMessages[0]?.type !== 'dateHeader' &&
-      chatMessages[0]?.id !== previousChatMessages?.[0]?.id &&
-      chatMessages[0]?.author?.id === user.id
-    ) {
-      list.current?.scrollToOffset({
-        animated: true,
-        offset: 0,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatMessages]);
+    const {onLayout, size} = useComponentSize();
+    const animationRef = React.useRef(false);
+    const list = React.useRef<FlatList<MessageType.DerivedAny>>(null);
+    const insets = useSafeAreaInsets();
+    const [isImageViewVisible, setIsImageViewVisible] = React.useState(false);
+    const [isNextPageLoading, setNextPageLoading] = React.useState(false);
+    const [imageViewIndex, setImageViewIndex] = React.useState(0);
+    const [stackEntry, setStackEntry] = React.useState<StatusBarProps>({});
 
-  React.useEffect(() => {
-    initLocale(locale);
-  }, [locale]);
+    const l10nValue = React.useMemo(
+      () => ({...l10n[locale], ...unwrap(l10nOverride)}),
+      [l10nOverride, locale],
+    );
 
-  // Untestable
-  /* istanbul ignore next */
-  if (animationRef.current && enableAnimation) {
-    InteractionManager.runAfterInteractions(animate);
-  }
+    const {chatMessages, gallery} = calculateChatMessages(messages, user, {
+      customDateHeaderText,
+      dateFormat,
+      showUserNames,
+      timeFormat,
+    });
 
-  React.useEffect(() => {
+    const previousChatMessages = usePrevious(chatMessages);
+
+    React.useEffect(() => {
+      if (
+        chatMessages[0]?.type !== 'dateHeader' &&
+        chatMessages[0]?.id !== previousChatMessages?.[0]?.id &&
+        chatMessages[0]?.author?.id === user.id
+      ) {
+        list.current?.scrollToOffset({
+          animated: true,
+          offset: 0,
+        });
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [chatMessages]);
+
+    React.useEffect(() => {
+      initLocale(locale);
+    }, [locale]);
+
     // Untestable
     /* istanbul ignore next */
     if (animationRef.current && enableAnimation) {
       InteractionManager.runAfterInteractions(animate);
-    } else {
-      animationRef.current = true;
-    }
-  }, [enableAnimation, messages]);
-
-  const handleEndReached = React.useCallback(
-    // Ignoring because `scroll` event for some reason doesn't trigger even basic
-    // `onEndReached`, impossible to test.
-    // TODO: Verify again later
-    /* istanbul ignore next */
-    async ({distanceFromEnd}: {distanceFromEnd: number}) => {
-      if (
-        !onEndReached ||
-        isLastPage ||
-        distanceFromEnd <= 0 ||
-        messages.length === 0 ||
-        isNextPageLoading
-      ) {
-        return;
-      }
-
-      setNextPageLoading(true);
-      await onEndReached?.();
-      setNextPageLoading(false);
-    },
-    [isLastPage, isNextPageLoading, messages.length, onEndReached],
-  );
-
-  const handleImagePress = React.useCallback(
-    (message: MessageType.Image) => {
-      setImageViewIndex(
-        gallery.findIndex(
-          image => image.id === message.id && image.uri === message.uri,
-        ),
-      );
-      setIsImageViewVisible(true);
-      setStackEntry(
-        StatusBar.pushStackEntry({
-          barStyle: 'light-content',
-          animated: true,
-        }),
-      );
-    },
-    [gallery],
-  );
-
-  const handleMessagePress = React.useCallback(
-    (message: MessageType.Any) => {
-      if (message.type === 'image' && !disableImageGallery) {
-        handleImagePress(message);
-      }
-      onMessagePress?.(message);
-    },
-    [disableImageGallery, handleImagePress, onMessagePress],
-  );
-
-  // TODO: Tapping on a close button results in the next warning:
-  // `An update to ImageViewing inside a test was not wrapped in act(...).`
-  /* istanbul ignore next */
-  const handleRequestClose = () => {
-    setIsImageViewVisible(false);
-    StatusBar.popStackEntry(stackEntry);
-  };
-
-  const keyExtractor = React.useCallback(
-    ({id}: MessageType.DerivedAny) => id,
-    [],
-  );
-
-  const [menuVisible, setMenuVisible] = React.useState(false);
-  const [menuPosition, setMenuPosition] = React.useState({x: 0, y: 0});
-  const [selectedMessage, setSelectedMessage] =
-    React.useState<MessageType.Any | null>(null);
-
-  const {handleCopy, handleEdit, handleTryAgain} = useMessageActions({
-    user,
-    messages,
-    handleSendPress: React.useCallback(
-      async (message: MessageType.PartialText) => {
-        await onSendPress?.(message);
-      },
-      [onSendPress],
-    ),
-  });
-
-  const handleMessageLongPress = React.useCallback(
-    (message: MessageType.Any, event: any) => {
-      if (message.type !== 'text') {
-        externalOnMessageLongPress?.(message);
-        return;
-      }
-
-      const {pageX, pageY} = event.nativeEvent;
-      setMenuPosition({x: pageX, y: pageY});
-      setSelectedMessage(message);
-      setMenuVisible(true);
-      externalOnMessageLongPress?.(message);
-    },
-    [externalOnMessageLongPress],
-  );
-
-  const handleMenuDismiss = React.useCallback(() => {
-    setMenuVisible(false);
-    setSelectedMessage(null);
-  }, []);
-
-  const menuItems = React.useMemo(() => {
-    if (!selectedMessage || selectedMessage.type !== 'text') {
-      return [];
     }
 
-    const isAuthor = selectedMessage.author.id === user.id;
-    const baseItems = [
-      {
-        label: 'Copy',
-        onPress: () => {
-          handleCopy(selectedMessage);
-          handleMenuDismiss();
-        },
-        icon: 'content-copy',
-      },
-      {
-        label: 'Try Again',
-        onPress: () => {
-          handleTryAgain(selectedMessage);
-          handleMenuDismiss();
-        },
-        icon: 'refresh',
-      },
-    ];
-
-    if (isAuthor) {
-      baseItems.splice(1, 0, {
-        label: 'Edit',
-        onPress: () => {
-          handleEdit(selectedMessage, selectedMessage.text);
-          handleMenuDismiss();
-        },
-        icon: 'pencil',
-      });
-    }
-
-    return baseItems;
-  }, [
-    selectedMessage,
-    user.id,
-    handleCopy,
-    handleTryAgain,
-    handleEdit,
-    handleMenuDismiss,
-  ]);
-
-  const renderMessage = React.useCallback(
-    ({item: message}: {item: MessageType.DerivedAny; index: number}) => {
-      const messageWidth =
-        showUserAvatars &&
-        message.type !== 'dateHeader' &&
-        message.author.id !== user.id
-          ? Math.floor(Math.min(size.width * 0.9, 440))
-          : Math.floor(Math.min(size.width * 0.92, 440));
-
-      const roundBorder =
-        message.type !== 'dateHeader' && message.nextMessageInGroup;
-      const showAvatar =
-        message.type !== 'dateHeader' && !message.nextMessageInGroup;
-      const showName = message.type !== 'dateHeader' && message.showName;
-      const showStatus = message.type !== 'dateHeader' && message.showStatus;
-
-      return (
-        <Message
-          {...{
-            enableAnimation,
-            message,
-            messageWidth,
-            onMessageLongPress: handleMessageLongPress,
-            onMessagePress: handleMessagePress,
-            onPreviewDataFetched,
-            renderBubble,
-            renderCustomMessage,
-            renderFileMessage,
-            renderImageMessage,
-            renderTextMessage,
-            roundBorder,
-            showAvatar,
-            showName,
-            showStatus,
-            showUserAvatars,
-            usePreviewData,
-          }}
-        />
-      );
-    },
-    [
-      enableAnimation,
-      handleMessageLongPress,
-      handleMessagePress,
-      onPreviewDataFetched,
-      renderBubble,
-      renderCustomMessage,
-      renderFileMessage,
-      renderImageMessage,
-      renderTextMessage,
-      showUserAvatars,
-      size.width,
-      usePreviewData,
-      user.id,
-    ],
-  );
-
-  const renderListEmptyComponent = React.useCallback(
-    () => (
-      <View style={emptyComponentContainer}>
-        {oneOf(
-          emptyState,
-          <Text style={emptyComponentTitle}>
-            {l10nValue.emptyChatPlaceholder}
-          </Text>,
-        )()}
-      </View>
-    ),
-    [emptyComponentContainer, emptyComponentTitle, emptyState, l10nValue],
-  );
-
-  const renderListFooterComponent = React.useCallback(
-    () =>
-      // Impossible to test, see `handleEndReached` function
+    React.useEffect(() => {
+      // Untestable
       /* istanbul ignore next */
-      isNextPageLoading ? (
-        <View style={footerLoadingPage}>
-          <CircularActivityIndicator color={theme.colors.primary} size={16} />
-        </View>
-      ) : (
-        <View style={footer} />
+      if (animationRef.current && enableAnimation) {
+        InteractionManager.runAfterInteractions(animate);
+      } else {
+        animationRef.current = true;
+      }
+    }, [enableAnimation, messages]);
+
+    const handleEndReached = React.useCallback(
+      // Ignoring because `scroll` event for some reason doesn't trigger even basic
+      // `onEndReached`, impossible to test.
+      // TODO: Verify again later
+      /* istanbul ignore next */
+      async ({distanceFromEnd}: {distanceFromEnd: number}) => {
+        if (
+          !onEndReached ||
+          isLastPage ||
+          distanceFromEnd <= 0 ||
+          messages.length === 0 ||
+          isNextPageLoading
+        ) {
+          return;
+        }
+
+        setNextPageLoading(true);
+        await onEndReached?.();
+        setNextPageLoading(false);
+      },
+      [isLastPage, isNextPageLoading, messages.length, onEndReached],
+    );
+
+    const handleImagePress = React.useCallback(
+      (message: MessageType.Image) => {
+        setImageViewIndex(
+          gallery.findIndex(
+            image => image.id === message.id && image.uri === message.uri,
+          ),
+        );
+        setIsImageViewVisible(true);
+        setStackEntry(
+          StatusBar.pushStackEntry({
+            barStyle: 'light-content',
+            animated: true,
+          }),
+        );
+      },
+      [gallery],
+    );
+
+    const handleMessagePress = React.useCallback(
+      (message: MessageType.Any) => {
+        if (message.type === 'image' && !disableImageGallery) {
+          handleImagePress(message);
+        }
+        onMessagePress?.(message);
+      },
+      [disableImageGallery, handleImagePress, onMessagePress],
+    );
+
+    // TODO: Tapping on a close button results in the next warning:
+    // `An update to ImageViewing inside a test was not wrapped in act(...).`
+    /* istanbul ignore next */
+    const handleRequestClose = () => {
+      setIsImageViewVisible(false);
+      StatusBar.popStackEntry(stackEntry);
+    };
+
+    const keyExtractor = React.useCallback(
+      ({id}: MessageType.DerivedAny) => id,
+      [],
+    );
+
+    const [menuVisible, setMenuVisible] = React.useState(false);
+    const [menuPosition, setMenuPosition] = React.useState({x: 0, y: 0});
+    const [selectedMessage, setSelectedMessage] =
+      React.useState<MessageType.Any | null>(null);
+
+    const {handleCopy, handleEdit, handleTryAgain} = useMessageActions({
+      user,
+      messages,
+      handleSendPress: React.useCallback(
+        async (message: MessageType.PartialText) => {
+          await onSendPress?.(message);
+        },
+        [onSendPress],
       ),
-    [footer, footerLoadingPage, isNextPageLoading, theme.colors.primary],
-  );
+    });
 
-  const renderListHeaderComponent = React.useCallback(
-    () => (isThinking ? <LoadingBubble /> : null),
-    [isThinking],
-  );
+    const handleMessageLongPress = React.useCallback(
+      (message: MessageType.Any, event: any) => {
+        if (message.type !== 'text') {
+          externalOnMessageLongPress?.(message);
+          return;
+        }
 
-  const renderScrollable = React.useCallback(
-    (panHandlers: GestureResponderHandlers) => (
-      <FlatList
-        automaticallyAdjustContentInsets={false}
-        contentContainerStyle={[
-          flatListContentContainer,
-          // eslint-disable-next-line react-native/no-inline-styles
-          {
-            justifyContent: chatMessages.length !== 0 ? undefined : 'center',
-            paddingTop: insets.bottom,
+        const {pageX, pageY} = event.nativeEvent;
+        setMenuPosition({x: pageX, y: pageY});
+        setSelectedMessage(message);
+        setMenuVisible(true);
+        externalOnMessageLongPress?.(message);
+      },
+      [externalOnMessageLongPress],
+    );
+
+    const handleMenuDismiss = React.useCallback(() => {
+      setMenuVisible(false);
+      setSelectedMessage(null);
+    }, []);
+
+    const menuItems = React.useMemo(() => {
+      if (!selectedMessage || selectedMessage.type !== 'text') {
+        return [];
+      }
+
+      const isAuthor = selectedMessage.author.id === user.id;
+      const hasActiveModel = modelStore.activeModelId !== undefined;
+
+      const baseItems = [
+        {
+          label: 'Copy',
+          onPress: () => {
+            handleCopy(selectedMessage);
+            handleMenuDismiss();
           },
-        ]}
-        initialNumToRender={10}
-        ListEmptyComponent={renderListEmptyComponent}
-        ListFooterComponent={renderListFooterComponent}
-        ListHeaderComponent={renderListHeaderComponent}
-        maxToRenderPerBatch={6}
-        onEndReachedThreshold={0.75}
-        style={flatList}
-        showsVerticalScrollIndicator={false}
-        {...unwrap(flatListProps)}
-        data={chatMessages}
-        inverted
-        keyboardDismissMode="interactive"
-        keyExtractor={keyExtractor}
-        onEndReached={handleEndReached}
-        ref={list}
-        renderItem={renderMessage}
-        {...panHandlers}
-      />
-    ),
-    [
-      chatMessages,
-      flatList,
-      flatListContentContainer,
-      flatListProps,
-      handleEndReached,
-      insets.bottom,
-      keyExtractor,
-      renderMessage,
-      renderListEmptyComponent,
-      renderListFooterComponent,
-      renderListHeaderComponent,
-    ],
-  );
+          icon: 'content-copy',
+        },
+        {
+          label: 'Try Again',
+          onPress: () => {
+            handleTryAgain(selectedMessage);
+            handleMenuDismiss();
+          },
+          icon: 'refresh',
+          disabled: !hasActiveModel,
+        },
+      ];
 
-  return (
-    <UserContext.Provider value={user}>
-      {/*<ThemeContext.Provider value={theme}>*/}
-      <L10nContext.Provider value={l10nValue}>
-        <View style={container} onLayout={onLayout}>
-          {customBottomComponent ? (
-            <>
-              <>{renderScrollable({})}</>
-              <>{customBottomComponent()}</>
-            </>
-          ) : (
-            <KeyboardAccessoryView
-              {...{
-                contentOffsetKeyboardOpened: 0,
-                contentOffsetKeyboardClosed: 0,
-                renderScrollable,
-                style: keyboardAccessoryView,
-              }}>
-              <Input
-                {...{
-                  ...unwrap(inputProps),
-                  isAttachmentUploading,
-                  isStreaming,
-                  onAttachmentPress,
-                  onSendPress,
-                  onStopPress,
-                  isStopVisible,
-                  renderScrollable,
-                  sendButtonVisibilityMode,
-                  textInputProps,
-                }}
-              />
-            </KeyboardAccessoryView>
-          )}
-          <ImageView
-            imageIndex={imageViewIndex}
-            images={gallery}
-            onRequestClose={handleRequestClose}
-            visible={isImageViewVisible}
+      if (isAuthor) {
+        baseItems.splice(1, 0, {
+          label: 'Edit',
+          onPress: () => {
+            handleEdit(selectedMessage, selectedMessage.text);
+            handleMenuDismiss();
+          },
+          icon: 'pencil',
+          disabled: !hasActiveModel,
+        });
+      }
+
+      return baseItems;
+    }, [
+      selectedMessage,
+      user.id,
+      handleCopy,
+      handleTryAgain,
+      handleEdit,
+      handleMenuDismiss,
+    ]);
+
+    const renderMessage = React.useCallback(
+      ({item: message}: {item: MessageType.DerivedAny; index: number}) => {
+        const messageWidth =
+          showUserAvatars &&
+          message.type !== 'dateHeader' &&
+          message.author.id !== user.id
+            ? Math.floor(Math.min(size.width * 0.9, 440))
+            : Math.floor(Math.min(size.width * 0.92, 440));
+
+        const roundBorder =
+          message.type !== 'dateHeader' && message.nextMessageInGroup;
+        const showAvatar =
+          message.type !== 'dateHeader' && !message.nextMessageInGroup;
+        const showName = message.type !== 'dateHeader' && message.showName;
+        const showStatus = message.type !== 'dateHeader' && message.showStatus;
+
+        return (
+          <Message
+            {...{
+              enableAnimation,
+              message,
+              messageWidth,
+              onMessageLongPress: handleMessageLongPress,
+              onMessagePress: handleMessagePress,
+              onPreviewDataFetched,
+              renderBubble,
+              renderCustomMessage,
+              renderFileMessage,
+              renderImageMessage,
+              renderTextMessage,
+              roundBorder,
+              showAvatar,
+              showName,
+              showStatus,
+              showUserAvatars,
+              usePreviewData,
+            }}
           />
-          <Menu
-            visible={menuVisible}
-            onDismiss={handleMenuDismiss}
-            style={menu}
-            selectable={false}
-            anchor={menuPosition}>
-            {menuItems.map((item, index) => (
-              <React.Fragment key={index}>
-                {index > 0 && <Divider />}
-                <Menu.Item
-                  label={item.label}
-                  onPress={item.onPress}
-                  icon={item.icon}
-                />
-              </React.Fragment>
-            ))}
-          </Menu>
+        );
+      },
+      [
+        enableAnimation,
+        handleMessageLongPress,
+        handleMessagePress,
+        onPreviewDataFetched,
+        renderBubble,
+        renderCustomMessage,
+        renderFileMessage,
+        renderImageMessage,
+        renderTextMessage,
+        showUserAvatars,
+        size.width,
+        usePreviewData,
+        user.id,
+      ],
+    );
+
+    const renderListEmptyComponent = React.useCallback(
+      () => (
+        <View style={emptyComponentContainer}>
+          {oneOf(
+            emptyState,
+            <Text style={emptyComponentTitle}>
+              {l10nValue.emptyChatPlaceholder}
+            </Text>,
+          )()}
         </View>
-      </L10nContext.Provider>
-      {/*</ThemeContext.Provider>*/}
-    </UserContext.Provider>
-  );
-};
+      ),
+      [emptyComponentContainer, emptyComponentTitle, emptyState, l10nValue],
+    );
+
+    const renderListFooterComponent = React.useCallback(
+      () =>
+        // Impossible to test, see `handleEndReached` function
+        /* istanbul ignore next */
+        isNextPageLoading ? (
+          <View style={footerLoadingPage}>
+            <CircularActivityIndicator color={theme.colors.primary} size={16} />
+          </View>
+        ) : (
+          <View style={footer} />
+        ),
+      [footer, footerLoadingPage, isNextPageLoading, theme.colors.primary],
+    );
+
+    const renderListHeaderComponent = React.useCallback(
+      () => (isThinking ? <LoadingBubble /> : null),
+      [isThinking],
+    );
+
+    const renderScrollable = React.useCallback(
+      (panHandlers: GestureResponderHandlers) => (
+        <FlatList
+          automaticallyAdjustContentInsets={false}
+          contentContainerStyle={[
+            flatListContentContainer,
+            // eslint-disable-next-line react-native/no-inline-styles
+            {
+              justifyContent: chatMessages.length !== 0 ? undefined : 'center',
+              paddingTop: insets.bottom,
+            },
+          ]}
+          initialNumToRender={10}
+          ListEmptyComponent={renderListEmptyComponent}
+          ListFooterComponent={renderListFooterComponent}
+          ListHeaderComponent={renderListHeaderComponent}
+          maxToRenderPerBatch={6}
+          onEndReachedThreshold={0.75}
+          style={flatList}
+          showsVerticalScrollIndicator={false}
+          {...unwrap(flatListProps)}
+          data={chatMessages}
+          inverted
+          keyboardDismissMode="interactive"
+          keyExtractor={keyExtractor}
+          onEndReached={handleEndReached}
+          ref={list}
+          renderItem={renderMessage}
+          {...panHandlers}
+        />
+      ),
+      [
+        chatMessages,
+        flatList,
+        flatListContentContainer,
+        flatListProps,
+        handleEndReached,
+        insets.bottom,
+        keyExtractor,
+        renderMessage,
+        renderListEmptyComponent,
+        renderListFooterComponent,
+        renderListHeaderComponent,
+      ],
+    );
+
+    return (
+      <UserContext.Provider value={user}>
+        {/*<ThemeContext.Provider value={theme}>*/}
+        <L10nContext.Provider value={l10nValue}>
+          <View style={container} onLayout={onLayout}>
+            {customBottomComponent ? (
+              <>
+                <>{renderScrollable({})}</>
+                <>{customBottomComponent()}</>
+              </>
+            ) : (
+              <KeyboardAccessoryView
+                {...{
+                  contentOffsetKeyboardOpened: 0,
+                  contentOffsetKeyboardClosed: 0,
+                  renderScrollable,
+                  style: keyboardAccessoryView,
+                }}>
+                <Input
+                  {...{
+                    ...unwrap(inputProps),
+                    isAttachmentUploading,
+                    isStreaming,
+                    onAttachmentPress,
+                    onSendPress,
+                    onStopPress,
+                    isStopVisible,
+                    renderScrollable,
+                    sendButtonVisibilityMode,
+                    textInputProps,
+                  }}
+                />
+              </KeyboardAccessoryView>
+            )}
+            <ImageView
+              imageIndex={imageViewIndex}
+              images={gallery}
+              onRequestClose={handleRequestClose}
+              visible={isImageViewVisible}
+            />
+            <Menu
+              visible={menuVisible}
+              onDismiss={handleMenuDismiss}
+              style={menu}
+              selectable={false}
+              anchor={menuPosition}>
+              {menuItems.map((item, index) => (
+                <React.Fragment key={index}>
+                  {index > 0 && <Divider />}
+                  <Menu.Item
+                    label={item.label}
+                    onPress={item.onPress}
+                    icon={item.icon}
+                    disabled={item.disabled}
+                  />
+                </React.Fragment>
+              ))}
+            </Menu>
+          </View>
+        </L10nContext.Provider>
+        {/*</ThemeContext.Provider>*/}
+      </UserContext.Provider>
+    );
+  },
+);
