@@ -9,6 +9,7 @@ import {computed, makeAutoObservable, ObservableMap, runInAction} from 'mobx';
 import {CompletionParams, LlamaContext, initLlama} from '@pocketpalai/llama.rn';
 
 import {uiStore} from './UIStore';
+import {chatSessionStore} from './ChatSessionStore';
 import {defaultModels, MODEL_LIST_VERSION} from './defaultModels';
 import {deepMerge, formatBytes, hasEnoughSpace, hfAsModel} from '../utils';
 
@@ -593,6 +594,7 @@ class ModelStore {
 
   releaseContext = async () => {
     console.log('attempt to release');
+    chatSessionStore.exitEditMode();
     if (!this.context) {
       return Promise.resolve('No context to release');
     }
