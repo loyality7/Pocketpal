@@ -294,10 +294,8 @@ class ChatSessionStore {
         );
         if (messageIndex >= 0) {
           runInAction(() => {
-            // Remove messages from the index (inclusive or exclusive based on includeMessage)
             session.messages = session.messages.slice(
-              0,
-              includeMessage ? messageIndex : messageIndex + 1,
+              includeMessage ? messageIndex + 1 : messageIndex,
             );
             this.saveSessionsMetadata();
           });

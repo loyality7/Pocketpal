@@ -340,8 +340,12 @@ export const ChatView = observer(
             handleMenuDismiss();
           },
           icon: 'content-copy',
+          disabled: false,
         },
-        {
+      ];
+
+      if (!isAuthor) {
+        baseItems.push({
           label: 'Try Again',
           onPress: () => {
             handleTryAgain(selectedMessage);
@@ -349,11 +353,11 @@ export const ChatView = observer(
           },
           icon: 'refresh',
           disabled: !hasActiveModel,
-        },
-      ];
+        });
+      }
 
       if (isAuthor) {
-        baseItems.splice(1, 0, {
+        baseItems.push({
           label: 'Edit',
           onPress: () => {
             handleEdit(selectedMessage, selectedMessage.text);

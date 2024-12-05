@@ -41,26 +41,25 @@ export const useMessageActions = ({
         return;
       }
 
-      // Remove all messages from this point (inclusive)
-      chatSessionStore.removeMessagesFromId(message.id, true);
-
       // If it's the user's message, resubmit it
       if (message.author.id === user.id) {
-        await handleSendPress({text: message.text, type: 'text'});
+        // Remove all messages from this point (inclusive)
+        const messageText = message.text;
+        chatSessionStore.removeMessagesFromId(message.id, true);
+        await handleSendPress({text: messageText, type: 'text'});
       } else {
         // If it's the assistant's message, find and resubmit the last user message
+        const messageIndex = messages.findIndex(msg => msg.id === message.id);
         const previousMessage = messages
-          .slice(
-            0,
-            messages.findIndex(msg => msg.id === message.id),
-          )
-          .reverse()
+          .slice(messageIndex + 1)
           .find(msg => msg.author.id === user.id && msg.type === 'text') as
           | MessageType.Text
           | undefined;
 
-        if (previousMessage?.type === 'text') {
-          await handleSendPress({text: previousMessage.text, type: 'text'});
+        if (previousMessage && previousMessage.text) {
+          const messageText = previousMessage.text;
+          chatSessionStore.removeMessagesFromId(previousMessage.id, true);
+          await handleSendPress({text: messageText, type: 'text'});
         }
       }
     },
