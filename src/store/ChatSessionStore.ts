@@ -1,9 +1,10 @@
-import {makeAutoObservable, runInAction} from 'mobx';
-import * as RNFS from '@dr.pogodin/react-native-fs';
-import {format, isToday, isYesterday} from 'date-fns';
-import {MessageType} from '../utils/types';
 import {LlamaContext} from '@pocketpalai/llama.rn';
+import * as RNFS from '@dr.pogodin/react-native-fs';
+import {makeAutoObservable, runInAction} from 'mobx';
+import {format, isToday, isYesterday} from 'date-fns';
+
 import {assistant} from '../utils/chat';
+import {MessageType} from '../utils/types';
 
 const NEW_SESSION_TITLE = 'New Session';
 const TITLE_LIMIT = 40;
@@ -22,6 +23,8 @@ interface SessionGroup {
 class ChatSessionStore {
   sessions: SessionMetaData[] = [];
   activeSessionId: string | null = null;
+  isEditMode: boolean = false;
+  editingMessageId: string | null = null;
 
   constructor() {
     makeAutoObservable(this);
@@ -110,6 +113,14 @@ class ChatSessionStore {
     if (this.activeSessionId) {
       const session = this.sessions.find(s => s.id === this.activeSessionId);
       if (session) {
+        if (this.isEditMode && this.editingMessageId) {
+          const messageIndex = session.messages.findIndex(
+            msg => msg.id === this.editingMessageId,
+          );
+          if (messageIndex >= 0) {
+            return session.messages.slice(messageIndex + 1);
+          }
+        }
         return session.messages;
       }
     }
@@ -273,6 +284,58 @@ class ChatSessionStore {
     });
 
     return orderedGroups;
+  }
+
+  /**
+   * Enters edit mode for a specific message
+   */
+  enterEditMode(messageId: string): void {
+    if (this.activeSessionId) {
+      const session = this.sessions.find(s => s.id === this.activeSessionId);
+      if (session) {
+        const messageIndex = session.messages.findIndex(
+          msg => msg.id === messageId,
+        );
+        if (messageIndex >= 0) {
+          runInAction(() => {
+            this.isEditMode = true;
+            this.editingMessageId = messageId;
+          });
+        }
+      }
+    }
+  }
+
+  /**
+   * Exits edit mode without making changes
+   */
+  exitEditMode(): void {
+    runInAction(() => {
+      this.isEditMode = false;
+      this.editingMessageId = null;
+    });
+  }
+
+  /**
+   * Commits the edit by actually removing messages after the edited message
+   */
+  commitEdit(): void {
+    if (this.activeSessionId && this.editingMessageId) {
+      const session = this.sessions.find(s => s.id === this.activeSessionId);
+      if (session) {
+        const messageIndex = session.messages.findIndex(
+          msg => msg.id === this.editingMessageId,
+        );
+        if (messageIndex >= 0) {
+          runInAction(() => {
+            session.messages = session.messages.slice(messageIndex + 1);
+            this.isEditMode = false;
+            this.editingMessageId = null;
+            this.saveSessionsMetadata();
+          });
+        }
+      }
+    }
   }
 
   /**

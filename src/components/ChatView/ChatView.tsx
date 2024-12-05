@@ -12,28 +12,20 @@ import {
 } from 'react-native';
 
 import dayjs from 'dayjs';
+import {observer} from 'mobx-react';
+import {Divider} from 'react-native-paper';
 import calendar from 'dayjs/plugin/calendar';
 import {oneOf} from '@flyerhq/react-native-link-preview';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import {useComponentSize} from '../KeyboardAccessoryView/hooks';
-import {LoadingBubble} from '../LoadingBubble';
 
-import {usePrevious, useTheme} from '../../hooks';
-import {useMessageActions} from '../../hooks/useMessageActions';
+import {usePrevious, useTheme, useMessageActions} from '../../hooks';
 
 import {styles} from './styles';
 import ImageView from './ImageView';
-import {
-  Message,
-  MessageTopLevelProps,
-  KeyboardAccessoryView,
-  CircularActivityIndicator,
-  Input,
-  InputAdditionalProps,
-  InputTopLevelProps,
-  Menu,
-} from '..';
+
+import {chatSessionStore, modelStore} from '../../store';
 
 import {l10n} from '../../utils/l10n';
 import {MessageType, User} from '../../utils/types';
@@ -44,9 +36,18 @@ import {
   unwrap,
   UserContext,
 } from '../../utils';
-import {Divider} from 'react-native-paper';
-import {observer} from 'mobx-react';
-import {modelStore} from '../../store';
+
+import {
+  Message,
+  MessageTopLevelProps,
+  KeyboardAccessoryView,
+  CircularActivityIndicator,
+  Input,
+  InputAdditionalProps,
+  InputTopLevelProps,
+  Menu,
+  LoadingBubble,
+} from '..';
 
 // Untestable
 /* istanbul ignore next */
@@ -153,6 +154,30 @@ export const ChatView = observer(
     user,
   }: ChatProps) => {
     const theme = useTheme();
+    const [inputText, setInputText] = React.useState('');
+
+    const wrappedOnSendPress = React.useCallback(
+      async (message: MessageType.PartialText) => {
+        if (chatSessionStore.isEditMode) {
+          chatSessionStore.commitEdit();
+        }
+        onSendPress(message);
+        setInputText('');
+      },
+      [onSendPress],
+    );
+
+    const handleCancelEdit = React.useCallback(() => {
+      setInputText('');
+      chatSessionStore.exitEditMode();
+    }, []);
+
+    const {handleCopy, handleEdit, handleTryAgain} = useMessageActions({
+      user,
+      messages,
+      handleSendPress: wrappedOnSendPress,
+      setInputText,
+    });
 
     const {
       container,
@@ -292,17 +317,6 @@ export const ChatView = observer(
     const [selectedMessage, setSelectedMessage] =
       React.useState<MessageType.Any | null>(null);
 
-    const {handleCopy, handleEdit, handleTryAgain} = useMessageActions({
-      user,
-      messages,
-      handleSendPress: React.useCallback(
-        async (message: MessageType.PartialText) => {
-          await onSendPress?.(message);
-        },
-        [onSendPress],
-      ),
-    });
-
     const handleMessageLongPress = React.useCallback(
       (message: MessageType.Any, event: any) => {
         if (message.type !== 'text') {
@@ -360,7 +374,7 @@ export const ChatView = observer(
         baseItems.push({
           label: 'Edit',
           onPress: () => {
-            handleEdit(selectedMessage, selectedMessage.text);
+            handleEdit(selectedMessage);
             handleMenuDismiss();
           },
           icon: 'pencil',
@@ -516,7 +530,6 @@ export const ChatView = observer(
 
     return (
       <UserContext.Provider value={user}>
-        {/*<ThemeContext.Provider value={theme}>*/}
         <L10nContext.Provider value={l10nValue}>
           <View style={container} onLayout={onLayout}>
             {customBottomComponent ? (
@@ -538,12 +551,17 @@ export const ChatView = observer(
                     isAttachmentUploading,
                     isStreaming,
                     onAttachmentPress,
-                    onSendPress,
+                    onSendPress: wrappedOnSendPress,
                     onStopPress,
+                    onCancelEdit: handleCancelEdit,
                     isStopVisible,
                     renderScrollable,
                     sendButtonVisibilityMode,
-                    textInputProps,
+                    textInputProps: {
+                      ...textInputProps,
+                      value: inputText,
+                      onChangeText: setInputText,
+                    },
                   }}
                 />
               </KeyboardAccessoryView>
@@ -574,7 +592,6 @@ export const ChatView = observer(
             </Menu>
           </View>
         </L10nContext.Provider>
-        {/*</ThemeContext.Provider>*/}
       </UserContext.Provider>
     );
   },

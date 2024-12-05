@@ -1,18 +1,23 @@
 import {useCallback} from 'react';
+
 import Clipboard from '@react-native-clipboard/clipboard';
-import {MessageType, User} from '../utils/types';
+
 import {chatSessionStore} from '../store';
+
+import {MessageType, User} from '../utils/types';
 
 interface UseMessageActionsProps {
   user: User;
   messages: MessageType.Any[];
   handleSendPress: (message: MessageType.PartialText) => Promise<void>;
+  setInputText?: (text: string) => void;
 }
 
 export const useMessageActions = ({
   user,
   messages,
   handleSendPress,
+  setInputText,
 }: UseMessageActionsProps) => {
   const handleCopy = useCallback((message: MessageType.Text) => {
     if (message.type === 'text') {
@@ -21,18 +26,16 @@ export const useMessageActions = ({
   }, []);
 
   const handleEdit = useCallback(
-    async (message: MessageType.Text, newText: string) => {
+    async (message: MessageType.Text) => {
       if (message.type !== 'text' || message.author.id !== user.id) {
         return;
       }
 
-      // Remove all messages after this message (exclusive)
-      chatSessionStore.removeMessagesFromId(message.id, false);
-
-      // Send the new message
-      await handleSendPress({text: newText, type: 'text'});
+      // Enter edit mode and set input text
+      chatSessionStore.enterEditMode(message.id);
+      setInputText?.(message.text);
     },
-    [handleSendPress, user.id],
+    [setInputText, user.id],
   );
 
   const handleTryAgain = useCallback(

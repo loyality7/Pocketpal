@@ -1,9 +1,13 @@
 import * as React from 'react';
 import {TextInput, TextInputProps, View} from 'react-native';
 
+import {IconButton} from 'react-native-paper';
+
 import {useTheme} from '../../hooks';
 
 import {styles} from './styles';
+
+import {chatSessionStore} from '../../store';
 
 import {MessageType} from '../../utils/types';
 import {L10nContext, unwrap, UserContext} from '../../utils';
@@ -31,6 +35,7 @@ export interface InputTopLevelProps {
    * be transformed to {@link MessageType.Text} and added to the messages list. */
   onSendPress: (message: MessageType.PartialText) => void;
   onStopPress?: () => void;
+  onCancelEdit?: () => void;
   isStopVisible?: boolean;
   /** Controls the visibility behavior of the {@link SendButton} based on the
    * `TextInput` state. Defaults to `editing`. */
@@ -55,6 +60,7 @@ export const Input = ({
   onAttachmentPress,
   onSendPress,
   onStopPress,
+  onCancelEdit,
   isStopVisible,
   sendButtonVisibilityMode,
   textInputProps,
@@ -78,13 +84,15 @@ export const Input = ({
   const handleSend = () => {
     const trimmedValue = value.trim();
 
-    // Impossible to test since button is not visible when value is empty.
-    // Additional check for the keyboard input.
-    /* istanbul ignore next */
     if (trimmedValue) {
       onSendPress({text: trimmedValue, type: 'text'});
       setText('');
     }
+  };
+
+  const handleCancel = () => {
+    setText('');
+    onCancelEdit?.();
   };
 
   const isSendButtonVisible =
@@ -123,6 +131,14 @@ export const Input = ({
         onChangeText={handleChangeText}
         value={value}
       />
+      {chatSessionStore.isEditMode && (
+        <IconButton
+          icon="close"
+          size={24}
+          onPress={handleCancel}
+          style={marginRight}
+        />
+      )}
       {isSendButtonVisible ? <SendButton onPress={handleSend} /> : null}
       {isStopVisible && <StopButton onPress={onStopPress} />}
     </View>
