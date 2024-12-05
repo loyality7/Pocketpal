@@ -1,11 +1,11 @@
 import * as React from 'react';
-import {TextInput, TextInputProps, View} from 'react-native';
+import {TextInput, TextInputProps, View, Animated} from 'react-native';
 
-import {IconButton} from 'react-native-paper';
+import {IconButton, Text} from 'react-native-paper';
 
 import {useTheme} from '../../hooks';
 
-import {styles} from './styles';
+import {createStyles} from './styles';
 
 import {chatSessionStore} from '../../store';
 
@@ -68,22 +68,43 @@ export const Input = ({
   const l10n = React.useContext(L10nContext);
   const theme = useTheme();
   const user = React.useContext(UserContext);
-  const {container, input, marginRight} = styles({theme});
+  const inputRef = React.useRef<TextInput>(null);
+  const editBarHeight = React.useRef(new Animated.Value(0)).current;
 
   // Use `defaultValue` if provided
   const [text, setText] = React.useState(textInputProps?.defaultValue ?? '');
+  const isEditMode = chatSessionStore.isEditMode;
+
+  const styles = createStyles({theme, isEditMode});
 
   const value = textInputProps?.value ?? text;
 
+  React.useEffect(() => {
+    if (isEditMode) {
+      // Animate edit bar height
+      Animated.spring(editBarHeight, {
+        toValue: 28,
+        useNativeDriver: false,
+        friction: 8,
+      }).start();
+      // Focus input
+      inputRef.current?.focus();
+    } else {
+      Animated.spring(editBarHeight, {
+        toValue: 0,
+        useNativeDriver: false,
+        friction: 8,
+      }).start();
+    }
+  }, [isEditMode, editBarHeight]);
+
   const handleChangeText = (newText: string) => {
-    // Track local state in case `onChangeText` is provided and `value` is not
     setText(newText);
     textInputProps?.onChangeText?.(newText);
   };
 
   const handleSend = () => {
     const trimmedValue = value.trim();
-
     if (trimmedValue) {
       onSendPress({text: trimmedValue, type: 'text'});
       setText('');
@@ -102,45 +123,61 @@ export const Input = ({
     (sendButtonVisibilityMode === 'always' || value.trim());
 
   return (
-    <View style={container}>
-      {user &&
-        (isAttachmentUploading ? (
-          <CircularActivityIndicator
-            {...{
-              ...attachmentCircularActivityIndicatorProps,
-              color: theme.colors.onSurface,
-              style: marginRight,
-            }}
-          />
-        ) : (
-          !!onAttachmentPress && (
-            <AttachmentButton
-              {...unwrap(attachmentButtonProps)}
-              onPress={onAttachmentPress}
+    <View style={styles.container}>
+      <View style={styles.inputContainer}>
+        {isEditMode && (
+          <Animated.View
+            style={[
+              styles.editBar,
+              {
+                height: editBarHeight,
+              },
+            ]}>
+            <Text variant="labelSmall" style={styles.editBarText}>
+              Editing message
+            </Text>
+            <IconButton
+              icon="close"
+              size={16}
+              onPress={handleCancel}
+              style={styles.editBarButton}
+              iconColor={theme.colors.onSurfaceVariant}
             />
-          )
-        ))}
-      <TextInput
-        multiline
-        placeholder={l10n.inputPlaceholder}
-        placeholderTextColor={theme.colors.outline}
-        underlineColorAndroid="transparent"
-        {...textInputProps}
-        // Keep our implementation but allow user to use these `TextInputProps`
-        style={[input, textInputProps?.style]}
-        onChangeText={handleChangeText}
-        value={value}
-      />
-      {chatSessionStore.isEditMode && (
-        <IconButton
-          icon="close"
-          size={24}
-          onPress={handleCancel}
-          style={marginRight}
-        />
-      )}
-      {isSendButtonVisible ? <SendButton onPress={handleSend} /> : null}
-      {isStopVisible && <StopButton onPress={onStopPress} />}
+          </Animated.View>
+        )}
+        <View style={styles.inputRow}>
+          {user &&
+            (isAttachmentUploading ? (
+              <CircularActivityIndicator
+                {...{
+                  ...attachmentCircularActivityIndicatorProps,
+                  color: theme.colors.onSurface,
+                  style: styles.marginRight,
+                }}
+              />
+            ) : (
+              !!onAttachmentPress && (
+                <AttachmentButton
+                  {...unwrap(attachmentButtonProps)}
+                  onPress={onAttachmentPress}
+                />
+              )
+            ))}
+          <TextInput
+            ref={inputRef}
+            multiline
+            placeholder={l10n.inputPlaceholder}
+            placeholderTextColor={theme.colors.outline}
+            underlineColorAndroid="transparent"
+            {...textInputProps}
+            style={[styles.input, textInputProps?.style]}
+            onChangeText={handleChangeText}
+            value={value}
+          />
+          {isSendButtonVisible ? <SendButton onPress={handleSend} /> : null}
+          {isStopVisible && <StopButton onPress={onStopPress} />}
+        </View>
+      </View>
     </View>
   );
 };
