@@ -8,12 +8,17 @@ export const createStyles = (theme: Theme) =>
       backgroundColor: 'transparent',
       flexDirection: 'row',
       alignItems: 'center',
-      paddingHorizontal: 10,
+      paddingHorizontal: 12,
+    },
+    containerWithLeading: {
+      paddingLeft: 8,
     },
     leadingContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'flex-start',
+      //width: 24,
+      //marginRight: 8,
     },
     contentContainer: {
       flex: 1,

@@ -20,6 +20,7 @@ import {useComponentSize} from '../KeyboardAccessoryView/hooks';
 import {LoadingBubble} from '../LoadingBubble';
 
 import {usePrevious, useTheme} from '../../hooks';
+import {useMessageActions} from '../../hooks/useMessageActions';
 
 import {styles} from './styles';
 import ImageView from './ImageView';
@@ -31,6 +32,7 @@ import {
   Input,
   InputAdditionalProps,
   InputTopLevelProps,
+  Menu,
 } from '..';
 
 import {l10n} from '../../utils/l10n';
@@ -42,6 +44,7 @@ import {
   unwrap,
   UserContext,
 } from '../../utils';
+import {Divider} from 'react-native-paper';
 
 // Untestable
 /* istanbul ignore next */
@@ -128,7 +131,7 @@ export const ChatView = ({
   messages,
   onAttachmentPress,
   onEndReached,
-  onMessageLongPress,
+  onMessageLongPress: externalOnMessageLongPress,
   onMessagePress,
   onPreviewDataFetched,
   onSendPress,
@@ -280,7 +283,90 @@ export const ChatView = ({
     [],
   );
 
-  const renderItem = React.useCallback(
+  const [menuVisible, setMenuVisible] = React.useState(false);
+  const [menuPosition, setMenuPosition] = React.useState({x: 0, y: 0});
+  const [selectedMessage, setSelectedMessage] =
+    React.useState<MessageType.Any | null>(null);
+
+  const {handleCopy, handleEdit, handleTryAgain} = useMessageActions({
+    user,
+    messages,
+    handleSendPress: React.useCallback(
+      async (message: MessageType.PartialText) => {
+        await onSendPress?.(message);
+      },
+      [onSendPress],
+    ),
+  });
+
+  const handleMessageLongPress = React.useCallback(
+    (message: MessageType.Any, event: any) => {
+      if (message.type !== 'text') {
+        externalOnMessageLongPress?.(message);
+        return;
+      }
+
+      const {pageX, pageY} = event.nativeEvent;
+      setMenuPosition({x: pageX, y: pageY});
+      setSelectedMessage(message);
+      setMenuVisible(true);
+      externalOnMessageLongPress?.(message);
+    },
+    [externalOnMessageLongPress],
+  );
+
+  const handleMenuDismiss = React.useCallback(() => {
+    setMenuVisible(false);
+    setSelectedMessage(null);
+  }, []);
+
+  const menuItems = React.useMemo(() => {
+    if (!selectedMessage || selectedMessage.type !== 'text') {
+      return [];
+    }
+
+    const isAuthor = selectedMessage.author.id === user.id;
+    const baseItems = [
+      {
+        label: 'Copy',
+        onPress: () => {
+          handleCopy(selectedMessage);
+          handleMenuDismiss();
+        },
+        icon: 'content-copy',
+      },
+      {
+        label: 'Try Again',
+        onPress: () => {
+          handleTryAgain(selectedMessage);
+          handleMenuDismiss();
+        },
+        icon: 'refresh',
+      },
+    ];
+
+    if (isAuthor) {
+      baseItems.splice(1, 0, {
+        label: 'Edit',
+        onPress: () => {
+          handleEdit(selectedMessage, selectedMessage.text);
+          handleMenuDismiss();
+        },
+        icon: 'pencil',
+      });
+    }
+
+    return baseItems;
+  }, [
+    selectedMessage,
+    user.id,
+    handleCopy,
+    handleTryAgain,
+    handleEdit,
+    handleMenuDismiss,
+  ]);
+
+  const renderMessage = React.useCallback(
     ({item: message}: {item: MessageType.DerivedAny; index: number}) => {
       const messageWidth =
         showUserAvatars &&
@@ -302,7 +388,7 @@ export const ChatView = ({
             enableAnimation,
             message,
             messageWidth,
-            onMessageLongPress,
+            onMessageLongPress: handleMessageLongPress,
             onMessagePress: handleMessagePress,
             onPreviewDataFetched,
             renderBubble,
@@ -322,8 +408,8 @@ export const ChatView = ({
     },
     [
       enableAnimation,
+      handleMessageLongPress,
       handleMessagePress,
-      onMessageLongPress,
       onPreviewDataFetched,
       renderBubble,
       renderCustomMessage,
@@ -397,7 +483,7 @@ export const ChatView = ({
         keyExtractor={keyExtractor}
         onEndReached={handleEndReached}
         ref={list}
-        renderItem={renderItem}
+        renderItem={renderMessage}
         {...panHandlers}
       />
     ),
@@ -409,7 +495,7 @@ export const ChatView = ({
       handleEndReached,
       insets.bottom,
       keyExtractor,
-      renderItem,
+      renderMessage,
       renderListEmptyComponent,
       renderListFooterComponent,
       renderListHeaderComponent,
@@ -456,6 +542,23 @@ export const ChatView = ({
             onRequestClose={handleRequestClose}
             visible={isImageViewVisible}
           />
+          <Menu
+            visible={menuVisible}
+            onDismiss={handleMenuDismiss}
+            //style={{width: 170}}
+            selectable={false}
+            anchor={menuPosition}>
+            {menuItems.map((item, index) => (
+              <React.Fragment key={index}>
+                {index > 0 && <Divider />}
+                <Menu.Item
+                  label={item.label}
+                  onPress={item.onPress}
+                  icon={item.icon}
+                />
+              </React.Fragment>
+            ))}
+          </Menu>
         </View>
       </L10nContext.Provider>
       {/*</ThemeContext.Provider>*/}

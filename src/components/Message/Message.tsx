@@ -16,9 +16,9 @@ import {excludeDerivedMessageProps, UserContext} from '../../utils';
 
 export interface MessageTopLevelProps extends TextMessageTopLevelProps {
   /** Called when user makes a long press on any message */
-  onMessageLongPress?: (message: MessageType.Any) => void;
+  onMessageLongPress?: (message: MessageType.Any, event?: any) => void;
   /** Called when user taps on any message */
-  onMessagePress?: (message: MessageType.Any) => void;
+  onMessagePress?: (message: MessageType.Any, event?: any) => void;
   /** Customize the default bubble using this function. `child` is a content
    * you should render inside your bubble, `message` is a current message
    * (contains `author` inside) and `nextMessageInGroup` allows you to see
@@ -197,10 +197,12 @@ export const Message = React.memo(
           }}
         />
         <Pressable
-          onLongPress={() =>
-            onMessageLongPress?.(excludeDerivedMessageProps(message))
-          }
-          onPress={() => onMessagePress?.(excludeDerivedMessageProps(message))}
+          onLongPress={event => {
+            onMessageLongPress?.(excludeDerivedMessageProps(message), event);
+          }}
+          onPress={event => {
+            onMessagePress?.(excludeDerivedMessageProps(message), event);
+          }}
           style={pressable}>
           {renderBubbleContainer()}
         </Pressable>

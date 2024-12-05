@@ -24,6 +24,7 @@ export interface MenuItemProps
   submenu?: React.ReactNode[];
   onSubmenuOpen?: () => void;
   onSubmenuClose?: () => void;
+  selectable?: boolean;
 }
 
 export const MenuItem: React.FC<MenuItemProps> = ({
@@ -39,6 +40,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   submenu,
   onSubmenuOpen,
   onSubmenuClose,
+  selectable = false,
   ...menuItemProps
 }) => {
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
@@ -58,17 +60,23 @@ export const MenuItem: React.FC<MenuItemProps> = ({
 
   const styles = createStyles(theme);
 
-  const renderLeadingIcon = props => (
-    <View style={styles.leadingContainer}>
-      {selected && <Icon source="check" size={18} />}
-      {leadingIcon &&
-        (typeof leadingIcon === 'function' ? (
-          leadingIcon({...props, size: 18})
-        ) : (
-          <Icon source={leadingIcon} size={18} />
-        ))}
-    </View>
-  );
+  const renderLeadingIcon = props => {
+    if (!selectable && !leadingIcon) {
+      return undefined;
+    }
+
+    return (
+      <View style={styles.leadingContainer}>
+        {selected && <Icon source="check" size={18} />}
+        {leadingIcon &&
+          (typeof leadingIcon === 'function' ? (
+            leadingIcon({...props, size: 18})
+          ) : (
+            <Icon source={leadingIcon} size={18} />
+          ))}
+      </View>
+    );
+  };
 
   const renderTrailingIcon = props => (
     <View style={styles.trailingContainer}>
@@ -119,6 +127,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
         title={label}
         style={[
           styles.container,
+          selectable || leadingIcon ? styles.containerWithLeading : null,
           isSubmenuOpen && styles.activeParent,
           isGroupLabel && styles.groupLabel,
           style,
@@ -132,7 +141,9 @@ export const MenuItem: React.FC<MenuItemProps> = ({
           },
           labelStyle,
         ]}
-        leadingIcon={renderLeadingIcon}
+        {...(!selectable && !leadingIcon
+          ? {}
+          : {leadingIcon: renderLeadingIcon})}
         trailingIcon={submenu ? renderSubmenuIcon : renderTrailingIcon}
       />
       {submenu && (

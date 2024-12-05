@@ -25,14 +25,14 @@ const GroupSeparator = () => {
   );
 };
 
-export interface MenuProps extends Omit<PaperMenuProps, 'anchor' | 'theme'> {
-  anchor: React.ReactNode;
+export interface MenuProps extends Omit<PaperMenuProps, 'theme'> {
+  selectable?: boolean;
 }
 
 export const Menu: React.FC<MenuProps> & {
   Item: typeof MenuItem;
   GroupSeparator: typeof GroupSeparator;
-} = ({anchor, children, style, ...menuProps}) => {
+} = ({children, selectable = false, ...menuProps}) => {
   const theme = useTheme();
   const styles = createStyles(theme);
   const [hasActiveSubmenu, setHasActiveSubmenu] = useState(false);
@@ -43,8 +43,11 @@ export const Menu: React.FC<MenuProps> & {
   return (
     <PaperMenu
       {...menuProps}
-      anchor={anchor}
-      style={[styles.menu, hasActiveSubmenu && styles.menuWithSubmenu, style]}
+      style={[
+        styles.menu,
+        hasActiveSubmenu && styles.menuWithSubmenu,
+        menuProps.style,
+      ]}
       contentStyle={[
         styles.content,
         hasActiveSubmenu && styles.contentWithSubmenu,
@@ -54,6 +57,7 @@ export const Menu: React.FC<MenuProps> & {
           ? React.cloneElement(child, {
               onSubmenuOpen: handleSubmenuOpen,
               onSubmenuClose: handleSubmenuClose,
+              selectable,
             })
           : child,
       )}

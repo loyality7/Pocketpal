@@ -5,7 +5,6 @@ import {Theme} from '../../utils/types';
 export const createStyles = (theme: Theme) =>
   StyleSheet.create({
     menu: {
-      minWidth: 200,
       borderRadius: 13,
       shadowColor: 'rgba(0, 0, 0, 0.05)',
       shadowRadius: 70,
@@ -17,7 +16,7 @@ export const createStyles = (theme: Theme) =>
       shadowOpacity: 0,
     },
     content: {
-      paddingVertical: 6,
+      paddingVertical: 4,
       backgroundColor: theme.colors.menuBackground,
     },
     contentWithSubmenu: {

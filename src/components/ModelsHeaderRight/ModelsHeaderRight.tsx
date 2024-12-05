@@ -13,7 +13,8 @@ import {ModelsResetDialog} from '../ModelsResetDialog';
 import {modelStore, uiStore} from '../../store';
 
 import {L10nContext} from '../../utils';
-import {Menu} from '../Menu';
+
+import {Menu} from '..';
 
 export const ModelsHeaderRight = observer(() => {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -61,6 +62,7 @@ export const ModelsHeaderRight = observer(() => {
       <Menu
         visible={menuVisible}
         onDismiss={() => setMenuVisible(false)}
+        selectable
         anchor={
           <IconButton
             icon="tune-vertical"

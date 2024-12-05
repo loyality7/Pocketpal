@@ -12,6 +12,7 @@ export * from './Input';
 export * from './KeyboardAccessoryView';
 export * from './LoadingBubble';
 export * from './MarkdownView';
+export * from './Menu';
 export * from './Message';
 export * from './ModelsHeaderRight';
 export * from './ModelsResetDialog';
