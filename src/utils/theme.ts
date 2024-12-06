@@ -125,22 +125,15 @@ const createSemanticColors = (
   focusStateOpacity: stateLayerOpacity.focus,
 
   // Menu specific
-  menuBackground: isDark ? withOpacity('#2D2D2D', 0.39) : baseColors.surface,
-  menuBackgroundDimmed: isDark
-    ? withOpacity('#2D2D2D', 0.8)
-    : withOpacity(baseColors.surface, 0.8),
-  menuBackgroundActive: isDark
-    ? withOpacity('#FFFFFF', 0.08)
-    : withOpacity('#000000', 0.04),
-  menuBackdrop: isDark ? 'rgba(30, 30, 30, 0.27)' : 'rgba(255, 255, 255, 0.27)',
-  menuSeparator: isDark
-    ? withOpacity('#FFFFFF', 0.15)
-    : withOpacity('#000000', 0.15),
+  menuBackground: baseColors.surface,
+  menuBackgroundDimmed: withOpacity(baseColors.surface, 0.9),
+  menuBackgroundActive: withOpacity(baseColors.primary, 0.08),
+  menuSeparator: withOpacity(baseColors.primary, 0.5),
   menuGroupSeparator: isDark
     ? withOpacity('#FFFFFF', 0.08)
     : withOpacity('#000000', 0.08),
-  menuText: isDark ? '#FFFFFF' : '#000000',
-  menuDangerText: isDark ? '#E69490' : '#B3261E',
+  menuText: baseColors.onSurface,
+  menuDangerText: baseColors.error,
 
   // Message specific
   authorBubbleBackground: isDark

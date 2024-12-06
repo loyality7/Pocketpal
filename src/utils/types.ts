@@ -197,7 +197,6 @@ export interface SemanticColors {
   menuBackground: string;
   menuBackgroundDimmed: string;
   menuBackgroundActive: string;
-  menuBackdrop: string;
   menuSeparator: string;
   menuGroupSeparator: string;
   menuText: string;
