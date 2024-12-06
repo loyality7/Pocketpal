@@ -71,7 +71,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
           styles.leadingContainer,
           menuItemProps.disabled && styles.itemDisabled,
         ]}>
-        {selected && <Icon source="check" size={18} />}
+        {selected && <Icon testID="selected-icon" source="check" size={18} />}
         {leadingIcon &&
           (typeof leadingIcon === 'function' ? (
             leadingIcon({...props, size: 18})
