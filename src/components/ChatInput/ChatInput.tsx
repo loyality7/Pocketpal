@@ -82,13 +82,6 @@ export const ChatInput = observer(
     const value = textInputProps?.value ?? text;
 
     React.useEffect(() => {
-      if (!isEditMode) {
-        setText('');
-        onCancelEdit?.();
-      }
-    }, [isEditMode, onCancelEdit]);
-
-    React.useEffect(() => {
       if (isEditMode) {
         // Animate edit bar height
         Animated.spring(editBarHeight, {
@@ -104,8 +97,9 @@ export const ChatInput = observer(
           useNativeDriver: false,
           friction: 8,
         }).start();
+        onCancelEdit?.();
       }
-    }, [isEditMode, editBarHeight]);
+    }, [isEditMode, editBarHeight, onCancelEdit]);
 
     const handleChangeText = (newText: string) => {
       setText(newText);
