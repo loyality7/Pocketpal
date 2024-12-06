@@ -575,13 +575,13 @@ export const ChatView = observer(
             <Menu
               visible={menuVisible}
               onDismiss={handleMenuDismiss}
-              style={styles.menu}
               selectable={false}
               anchor={menuPosition}>
               {menuItems.map((item, index) => (
                 <React.Fragment key={index}>
                   {index > 0 && <Divider />}
                   <Menu.Item
+                    style={styles.menu}
                     label={item.label}
                     onPress={item.onPress}
                     icon={item.icon}
