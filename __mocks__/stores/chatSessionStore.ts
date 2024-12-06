@@ -18,6 +18,7 @@ export const mockChatSessionStore = {
   createNewSession: jest.fn(),
   updateMessage: jest.fn(),
   updateMessageToken: jest.fn(),
+  exitEditMode: jest.fn(),
 };
 
 Object.defineProperty(mockChatSessionStore, 'currentSessionMessages', {
