@@ -367,7 +367,7 @@ export const ChatView = observer(
 
       if (!isAuthor) {
         baseItems.push({
-          label: 'Try Again',
+          label: 'Regenerate',
           onPress: () => {
             handleTryAgain(selectedMessage);
             handleMenuDismiss();
@@ -377,7 +377,7 @@ export const ChatView = observer(
         });
 
         baseItems.push({
-          label: 'Try Again With',
+          label: 'Regenerate with',
           icon: 'chevron-right',
           disabled: false,
           submenu: models.map(model => ({

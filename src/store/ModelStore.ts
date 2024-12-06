@@ -47,6 +47,9 @@ class ModelStore {
 
   MIN_CONTEXT_SIZE = 200;
 
+  inferencing: boolean = false;
+  isStreaming: boolean = false;
+
   constructor() {
     makeAutoObservable(this, {activeModel: computed});
     makePersistable(this, {
@@ -830,7 +833,6 @@ class ModelStore {
       const ctxtTemplate = (ctx.model as any)?.metadata?.[
         'tokenizer.chat_template'
       ];
-      console.log('ctxtTemplate: ', ctxtTemplate);
       if (ctxtTemplate) {
         const contextStops = stops.filter(stop => ctxtTemplate.includes(stop));
         stopTokens.push(...contextStops);
@@ -871,6 +873,14 @@ class ModelStore {
         model.origin === ModelOrigin.LOCAL ||
         model.isDownloaded,
     );
+  }
+
+  setInferencing(value: boolean) {
+    this.inferencing = value;
+  }
+
+  setIsStreaming(value: boolean) {
+    this.isStreaming = value;
   }
 }
 

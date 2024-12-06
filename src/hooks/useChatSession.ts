@@ -1,5 +1,4 @@
-import React, {useRef, useCallback, useState} from 'react';
-
+import React, {useRef, useCallback} from 'react';
 import {toJS} from 'mobx';
 import throttle from 'lodash.throttle';
 
@@ -19,8 +18,6 @@ export const useChatSession = (
   user: User,
   assistant: User,
 ) => {
-  const [inferencing, setInferencing] = useState<boolean>(false);
-  const [isStreaming, setIsStreaming] = useState<boolean>(false);
   const l10n = React.useContext(L10nContext);
   const conversationIdRef = useRef<string>(randId());
 
@@ -86,8 +83,8 @@ export const useChatSession = (
       },
     };
     addMessage(textMessage);
-    setInferencing(true);
-    setIsStreaming(false);
+    modelStore.setInferencing(true);
+    modelStore.setIsStreaming(false);
 
     const id = randId();
     const createdAt = Date.now();
@@ -121,11 +118,10 @@ export const useChatSession = (
         {...completionParams, prompt},
         data => {
           if (data.token && currentMessageInfo.current) {
-            if (!isStreaming) {
-              setIsStreaming(true);
+            if (!modelStore.isStreaming) {
+              modelStore.setIsStreaming(true);
             }
             tokenBufferRef.current += data.token;
-            // Avoid variable shadowing by using properties directly
             throttledFlushTokenBuffer(
               currentMessageInfo.current.createdAt,
               currentMessageInfo.current.id,
@@ -148,11 +144,11 @@ export const useChatSession = (
       chatSessionStore.updateMessage(id, {
         metadata: {timings: result.timings, copyable: true},
       });
-      setInferencing(false);
-      setIsStreaming(false);
+      modelStore.setInferencing(false);
+      modelStore.setIsStreaming(false);
     } catch (error) {
-      setInferencing(false);
-      setIsStreaming(false);
+      modelStore.setInferencing(false);
+      modelStore.setIsStreaming(false);
       const errorMessage = (error as Error).message;
       if (errorMessage.includes('network')) {
         // TODO: This can be removed. We don't use network for chat.
@@ -170,7 +166,7 @@ export const useChatSession = (
 
   const handleStopPress = () => {
     const context = modelStore.context;
-    if (inferencing && context) {
+    if (modelStore.inferencing && context) {
       context.stopCompletion();
     }
     if (
@@ -182,13 +178,15 @@ export const useChatSession = (
         currentMessageInfo.current.id,
       );
     }
+    modelStore.setInferencing(false);
+    modelStore.setIsStreaming(false);
   };
 
   return {
     handleSendPress,
     handleResetConversation,
     handleStopPress,
-    inferencing,
-    isStreaming,
+    inferencing: modelStore.inferencing,
+    isStreaming: modelStore.isStreaming,
   };
 };
