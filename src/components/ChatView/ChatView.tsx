@@ -42,9 +42,9 @@ import {
   MessageTopLevelProps,
   KeyboardAccessoryView,
   CircularActivityIndicator,
-  Input,
-  InputAdditionalProps,
-  InputTopLevelProps,
+  ChatInput,
+  ChatInputAdditionalProps,
+  ChatInputTopLevelProps,
   Menu,
   LoadingBubble,
 } from '..';
@@ -57,7 +57,7 @@ const animate = () => {
 
 dayjs.extend(calendar);
 
-export type ChatTopLevelProps = InputTopLevelProps & MessageTopLevelProps;
+export type ChatTopLevelProps = ChatInputTopLevelProps & MessageTopLevelProps;
 
 export interface ChatProps extends ChatTopLevelProps {
   /** Allows you to replace the default Input widget e.g. if you want to create a channel view. */
@@ -83,7 +83,7 @@ export interface ChatProps extends ChatTopLevelProps {
   /** Use this to enable `LayoutAnimation`. Experimental on Android (same as React Native). */
   enableAnimation?: boolean;
   flatListProps?: Partial<FlatListProps<MessageType.DerivedAny[]>>;
-  inputProps?: InputAdditionalProps;
+  inputProps?: ChatInputAdditionalProps;
   /** Used for pagination (infinite scroll) together with {@link ChatProps.onEndReached}.
    * When true, indicates that there are no more pages to load and
    * pagination will not be triggered. */
@@ -545,7 +545,7 @@ export const ChatView = observer(
                   renderScrollable,
                   style: styles.keyboardAccessoryView,
                 }}>
-                <Input
+                <ChatInput
                   {...{
                     ...unwrap(inputProps),
                     isAttachmentUploading,

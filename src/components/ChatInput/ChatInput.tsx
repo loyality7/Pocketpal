@@ -22,7 +22,7 @@ import {
   StopButton,
 } from '..';
 
-export interface InputTopLevelProps {
+export interface ChatInputTopLevelProps {
   /** Whether attachment is uploading. Will replace attachment button with a
    * {@link CircularActivityIndicator}. Since we don't have libraries for
    * managing media in dependencies we have no way of knowing if
@@ -44,16 +44,16 @@ export interface InputTopLevelProps {
   textInputProps?: TextInputProps;
 }
 
-export interface InputAdditionalProps {
+export interface ChatInputAdditionalProps {
   attachmentButtonProps?: AttachmentButtonAdditionalProps;
   attachmentCircularActivityIndicatorProps?: CircularActivityIndicatorProps;
 }
 
-export type InputProps = InputTopLevelProps & InputAdditionalProps;
+export type ChatInputProps = ChatInputTopLevelProps & ChatInputAdditionalProps;
 
 /** Bottom bar input component with a text input, attachment and
  * send buttons inside. By default hides send button when text input is empty. */
-export const Input = observer(
+export const ChatInput = observer(
   ({
     attachmentButtonProps,
     attachmentCircularActivityIndicatorProps,
@@ -66,7 +66,7 @@ export const Input = observer(
     isStopVisible,
     sendButtonVisibilityMode,
     textInputProps,
-  }: InputProps) => {
+  }: ChatInputProps) => {
     const l10n = React.useContext(L10nContext);
     const theme = useTheme();
     const user = React.useContext(UserContext);
