@@ -132,6 +132,7 @@ export interface Size {
 }
 
 export interface Colors extends MD3Colors {
+  authorBubbleBackground: string;
   outlineVariant: string;
   receivedMessageDocumentIcon: string;
   sentMessageDocumentIcon: string;

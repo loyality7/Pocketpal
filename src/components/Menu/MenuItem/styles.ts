@@ -4,7 +4,7 @@ import {Theme} from '../../../utils/types';
 export const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
-      height: 36,
+      height: 30,
       backgroundColor: 'transparent',
       flexDirection: 'row',
       alignItems: 'center',

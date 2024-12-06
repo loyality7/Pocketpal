@@ -9,7 +9,7 @@ import {getThemeColorsAsArray} from '.';
 
 const lightColors: Colors = {
   ...PaperLightTheme.colors,
-  primary: '#202124',
+  primary: '#111111',
   onPrimary: '#FFFFFF',
   primaryContainer: '#DEE0E6',
   onPrimaryContainer: '#2D2F33',
@@ -34,6 +34,7 @@ const lightColors: Colors = {
   outline: '#969799',
 
   outlineVariant: '#a1a1a1',
+  authorBubbleBackground: 'rgba(0, 0, 0, 0.03)',
   receivedMessageDocumentIcon: PaperLightTheme.colors.primary,
   sentMessageDocumentIcon: PaperLightTheme.colors.onSurface,
   userAvatarImageBackground: 'transparent',
@@ -53,7 +54,7 @@ export const lightTheme: Theme = {
   ...PaperLightTheme,
   borders: {
     inputBorderRadius: 20,
-    messageBorderRadius: 20,
+    messageBorderRadius: 15,
   },
   colors: lightColors,
   fonts: {
@@ -169,6 +170,7 @@ const darkColors: Colors = {
   outline: '#b0b1b3',
 
   outlineVariant: '#a1a1a1',
+  authorBubbleBackground: 'rgba(255, 255, 255, 0.03)',
   receivedMessageDocumentIcon: MD3DarkTheme.colors.primary,
   sentMessageDocumentIcon: MD3DarkTheme.colors.onSurface,
   userAvatarImageBackground: 'transparent',
