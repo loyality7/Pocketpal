@@ -71,12 +71,15 @@ export const useMessageActions = ({
 
   const handleTryAgainWith = useCallback(
     async (modelId: string, message: MessageType.Text) => {
+      if (modelId === modelStore.activeModelId) {
+        await handleTryAgain(message);
+        return;
+      }
       const model = modelStore.models.find(m => m.id === modelId);
       if (model) {
-        modelStore.initContext(model);
+        await modelStore.initContext(model);
         await handleTryAgain(message);
       }
-      console.log('handleTryAgainWith', message);
     },
     [handleTryAgain],
   );

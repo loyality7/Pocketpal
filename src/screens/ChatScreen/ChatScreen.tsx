@@ -35,7 +35,6 @@ const renderBubble = ({
 );
 
 export const ChatScreen: React.FC = observer(() => {
-  const context = modelStore.context;
   const currentMessageInfo = useRef<{createdAt: number; id: string} | null>(
     null,
   );
@@ -43,7 +42,7 @@ export const ChatScreen: React.FC = observer(() => {
   const messages = chatSessionStore.currentSessionMessages;
 
   const {handleSendPress, handleStopPress, inferencing, isStreaming} =
-    useChatSession(context, currentMessageInfo, messages, user, assistant);
+    useChatSession(currentMessageInfo, messages, user, assistant);
 
   // Show loading bubble only during the thinking phase (inferencing but not streaming)
   const isThinking = inferencing && !isStreaming;
@@ -52,7 +51,7 @@ export const ChatScreen: React.FC = observer(() => {
     <SafeAreaProvider>
       <ChatView
         customBottomComponent={
-          !context && !modelStore.isContextLoading
+          !modelStore.context && !modelStore.isContextLoading
             ? () => <ModelNotLoadedMessage />
             : undefined
         }
@@ -66,8 +65,8 @@ export const ChatScreen: React.FC = observer(() => {
         isStreaming={isStreaming}
         sendButtonVisibilityMode="editing"
         textInputProps={{
-          editable: !!context,
-          placeholder: !context
+          editable: !!modelStore.context,
+          placeholder: !modelStore.context
             ? modelStore.isContextLoading
               ? l10n.loadingModel
               : l10n.modelNotLoaded

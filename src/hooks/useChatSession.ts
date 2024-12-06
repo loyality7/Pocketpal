@@ -1,7 +1,6 @@
 import React, {useRef, useCallback, useState} from 'react';
 
 import {toJS} from 'mobx';
-import {LlamaContext} from '@pocketpalai/llama.rn';
 import throttle from 'lodash.throttle';
 
 import {randId} from '../utils';
@@ -12,7 +11,6 @@ import {MessageType, User} from '../utils/types';
 import {applyChatTemplate, convertToChatMessages} from '../utils/chat';
 
 export const useChatSession = (
-  context: LlamaContext | undefined,
   currentMessageInfo: React.MutableRefObject<{
     createdAt: number;
     id: string;
@@ -31,20 +29,18 @@ export const useChatSession = (
   const updateInterval = 150; // Interval for flushing token buffer (in ms)
 
   // Function to flush the token buffer and update the chat message
-  const flushTokenBuffer = useCallback(
-    (createdAt: number, id: string) => {
-      if (tokenBufferRef.current.length > 0 && context) {
-        chatSessionStore.updateMessageToken(
-          {token: tokenBufferRef.current},
-          createdAt,
-          id,
-          context,
-        );
-        tokenBufferRef.current = ''; // Reset the token buffer
-      }
-    },
-    [context],
-  );
+  const flushTokenBuffer = useCallback((createdAt: number, id: string) => {
+    const context = modelStore.context;
+    if (tokenBufferRef.current.length > 0 && context) {
+      chatSessionStore.updateMessageToken(
+        {token: tokenBufferRef.current},
+        createdAt,
+        id,
+        context,
+      );
+      tokenBufferRef.current = ''; // Reset the token buffer
+    }
+  }, []);
 
   // Throttled version of flushTokenBuffer to prevent excessive updates
   const throttledFlushTokenBuffer = throttle(
@@ -71,6 +67,7 @@ export const useChatSession = (
   };
 
   const handleSendPress = async (message: MessageType.PartialText) => {
+    const context = modelStore.context;
     if (!context) {
       addSystemMessage(l10n.modelNotLoaded);
       return;
@@ -172,6 +169,7 @@ export const useChatSession = (
   };
 
   const handleStopPress = () => {
+    const context = modelStore.context;
     if (inferencing && context) {
       context.stopCompletion();
     }
