@@ -22,7 +22,7 @@ import {useComponentSize} from '../KeyboardAccessoryView/hooks';
 
 import {usePrevious, useTheme, useMessageActions} from '../../hooks';
 
-import {styles} from './styles';
+import {createStyles} from './styles';
 import ImageView from './ImageView';
 
 import {chatSessionStore, modelStore} from '../../store';
@@ -179,17 +179,7 @@ export const ChatView = observer(
       setInputText,
     });
 
-    const {
-      container,
-      emptyComponentContainer,
-      emptyComponentTitle,
-      flatList,
-      flatListContentContainer,
-      footer,
-      footerLoadingPage,
-      keyboardAccessoryView,
-      menu,
-    } = styles({theme});
+    const styles = createStyles({theme});
 
     const {onLayout, size} = useComponentSize();
     const animationRef = React.useRef(false);
@@ -451,16 +441,21 @@ export const ChatView = observer(
 
     const renderListEmptyComponent = React.useCallback(
       () => (
-        <View style={emptyComponentContainer}>
+        <View style={styles.emptyComponentContainer}>
           {oneOf(
             emptyState,
-            <Text style={emptyComponentTitle}>
+            <Text style={styles.emptyComponentTitle}>
               {l10nValue.emptyChatPlaceholder}
             </Text>,
           )()}
         </View>
       ),
-      [emptyComponentContainer, emptyComponentTitle, emptyState, l10nValue],
+      [
+        styles.emptyComponentContainer,
+        styles.emptyComponentTitle,
+        emptyState,
+        l10nValue,
+      ],
     );
 
     const renderListFooterComponent = React.useCallback(
@@ -468,13 +463,18 @@ export const ChatView = observer(
         // Impossible to test, see `handleEndReached` function
         /* istanbul ignore next */
         isNextPageLoading ? (
-          <View style={footerLoadingPage}>
+          <View style={styles.footerLoadingPage}>
             <CircularActivityIndicator color={theme.colors.primary} size={16} />
           </View>
         ) : (
-          <View style={footer} />
+          <View style={styles.footer} />
         ),
-      [footer, footerLoadingPage, isNextPageLoading, theme.colors.primary],
+      [
+        isNextPageLoading,
+        styles.footerLoadingPage,
+        styles.footer,
+        theme.colors.primary,
+      ],
     );
 
     const renderListHeaderComponent = React.useCallback(
@@ -487,7 +487,7 @@ export const ChatView = observer(
         <FlatList
           automaticallyAdjustContentInsets={false}
           contentContainerStyle={[
-            flatListContentContainer,
+            styles.flatListContentContainer,
             // eslint-disable-next-line react-native/no-inline-styles
             {
               justifyContent: chatMessages.length !== 0 ? undefined : 'center',
@@ -500,7 +500,7 @@ export const ChatView = observer(
           ListHeaderComponent={renderListHeaderComponent}
           maxToRenderPerBatch={6}
           onEndReachedThreshold={0.75}
-          style={flatList}
+          style={styles.flatList}
           showsVerticalScrollIndicator={false}
           {...unwrap(flatListProps)}
           data={chatMessages}
@@ -515,8 +515,8 @@ export const ChatView = observer(
       ),
       [
         chatMessages,
-        flatList,
-        flatListContentContainer,
+        styles.flatList,
+        styles.flatListContentContainer,
         flatListProps,
         handleEndReached,
         insets.bottom,
@@ -531,7 +531,7 @@ export const ChatView = observer(
     return (
       <UserContext.Provider value={user}>
         <L10nContext.Provider value={l10nValue}>
-          <View style={container} onLayout={onLayout}>
+          <View style={styles.container} onLayout={onLayout}>
             {customBottomComponent ? (
               <>
                 <>{renderScrollable({})}</>
@@ -543,7 +543,7 @@ export const ChatView = observer(
                   contentOffsetKeyboardOpened: 0,
                   contentOffsetKeyboardClosed: 0,
                   renderScrollable,
-                  style: keyboardAccessoryView,
+                  style: styles.keyboardAccessoryView,
                 }}>
                 <Input
                   {...{
@@ -575,7 +575,7 @@ export const ChatView = observer(
             <Menu
               visible={menuVisible}
               onDismiss={handleMenuDismiss}
-              style={menu}
+              style={styles.menu}
               selectable={false}
               anchor={menuPosition}>
               {menuItems.map((item, index) => (
