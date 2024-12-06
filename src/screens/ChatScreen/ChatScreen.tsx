@@ -41,11 +41,15 @@ export const ChatScreen: React.FC = observer(() => {
   const l10n = React.useContext(L10nContext);
   const messages = chatSessionStore.currentSessionMessages;
 
-  const {handleSendPress, handleStopPress, inferencing, isStreaming} =
-    useChatSession(currentMessageInfo, messages, user, assistant);
+  const {handleSendPress, handleStopPress} = useChatSession(
+    currentMessageInfo,
+    messages,
+    user,
+    assistant,
+  );
 
   // Show loading bubble only during the thinking phase (inferencing but not streaming)
-  const isThinking = inferencing && !isStreaming;
+  const isThinking = modelStore.inferencing && !modelStore.isStreaming;
 
   return (
     <SafeAreaProvider>
@@ -60,9 +64,9 @@ export const ChatScreen: React.FC = observer(() => {
         onSendPress={handleSendPress}
         onStopPress={handleStopPress}
         user={user}
-        isStopVisible={inferencing}
+        isStopVisible={modelStore.inferencing}
         isThinking={isThinking}
-        isStreaming={isStreaming}
+        isStreaming={modelStore.isStreaming}
         sendButtonVisibilityMode="editing"
         textInputProps={{
           editable: !!modelStore.context,

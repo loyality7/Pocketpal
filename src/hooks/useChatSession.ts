@@ -186,7 +186,5 @@ export const useChatSession = (
     handleSendPress,
     handleResetConversation,
     handleStopPress,
-    inferencing: modelStore.inferencing,
-    isStreaming: modelStore.isStreaming,
   };
 };
