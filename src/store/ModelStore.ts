@@ -862,6 +862,16 @@ class ModelStore {
       // Continue execution - stop token update is not critical
     }
   }
+
+  get availableModels(): Model[] {
+    return this.models.filter(
+      model =>
+        // Include models that are either local or downloaded
+        model.isLocal ||
+        model.origin === ModelOrigin.LOCAL ||
+        model.isDownloaded,
+    );
+  }
 }
 
 export const modelStore = new ModelStore();

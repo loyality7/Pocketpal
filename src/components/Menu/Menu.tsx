@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 
 import {
+  Divider,
   Menu as PaperMenu,
   MenuProps as PaperMenuProps,
 } from 'react-native-paper';
@@ -9,6 +10,12 @@ import {useTheme} from '../../hooks';
 
 import {createStyles} from './styles';
 import {MenuItem, MenuItemProps} from './MenuItem';
+
+const Separator = () => {
+  const theme = useTheme();
+  const styles = createStyles(theme);
+  return <Divider style={styles.separator} />;
+};
 
 const GroupSeparator = () => {
   const theme = useTheme();
@@ -32,6 +39,7 @@ export interface MenuProps extends Omit<PaperMenuProps, 'theme'> {
 export const Menu: React.FC<MenuProps> & {
   Item: typeof MenuItem;
   GroupSeparator: typeof GroupSeparator;
+  Separator: typeof Separator;
 } = ({children, selectable = false, ...menuProps}) => {
   const theme = useTheme();
   const styles = createStyles(theme);
@@ -67,3 +75,4 @@ export const Menu: React.FC<MenuProps> & {
 
 Menu.Item = MenuItem;
 Menu.GroupSeparator = GroupSeparator;
+Menu.Separator = Separator;

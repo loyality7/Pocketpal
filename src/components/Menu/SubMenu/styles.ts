@@ -12,5 +12,6 @@ export const createStyles = (theme: Theme) =>
     content: {
       paddingVertical: 6,
       backgroundColor: theme.colors.menuBackground,
+      borderRadius: 15,
     },
   });

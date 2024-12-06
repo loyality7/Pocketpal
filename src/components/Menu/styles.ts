@@ -27,4 +27,8 @@ export const createStyles = (theme: Theme) =>
       flexShrink: 0,
       backgroundColor: 'transparent',
     },
+    separator: {
+      //height: 1,
+      backgroundColor: theme.colors.menuSeparator,
+    },
   });

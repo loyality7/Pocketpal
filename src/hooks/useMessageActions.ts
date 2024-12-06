@@ -2,7 +2,7 @@ import {useCallback} from 'react';
 
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import {chatSessionStore} from '../store';
+import {chatSessionStore, modelStore} from '../store';
 
 import {MessageType, User} from '../utils/types';
 
@@ -69,9 +69,22 @@ export const useMessageActions = ({
     [messages, handleSendPress, user.id],
   );
 
+  const handleTryAgainWith = useCallback(
+    async (modelId: string, message: MessageType.Text) => {
+      const model = modelStore.models.find(m => m.id === modelId);
+      if (model) {
+        modelStore.initContext(model);
+        await handleTryAgain(message);
+      }
+      console.log('handleTryAgainWith', message);
+    },
+    [handleTryAgain],
+  );
+
   return {
     handleCopy,
     handleEdit,
     handleTryAgain,
+    handleTryAgainWith,
   };
 };

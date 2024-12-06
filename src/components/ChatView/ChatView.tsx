@@ -13,7 +13,6 @@ import {
 
 import dayjs from 'dayjs';
 import {observer} from 'mobx-react';
-import {Divider} from 'react-native-paper';
 import calendar from 'dayjs/plugin/calendar';
 import {oneOf} from '@flyerhq/react-native-link-preview';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -22,8 +21,8 @@ import {useComponentSize} from '../KeyboardAccessoryView/hooks';
 
 import {usePrevious, useTheme, useMessageActions} from '../../hooks';
 
-import {createStyles} from './styles';
 import ImageView from './ImageView';
+import {createStyles} from './styles';
 
 import {chatSessionStore, modelStore} from '../../store';
 
@@ -114,6 +113,22 @@ export interface ChatProps extends ChatTopLevelProps {
   user: User;
 }
 
+// Add these types at the top of the file with other imports
+type MenuItem = {
+  label: string;
+  onPress?: () => void;
+  icon?: string;
+  disabled: boolean;
+  submenu?: SubMenuItem[];
+};
+
+type SubMenuItem = {
+  label: string;
+  onPress: () => void;
+  disabled?: boolean;
+  width?: number;
+};
+
 /** Entry component, represents the complete chat */
 export const ChatView = observer(
   ({
@@ -172,12 +187,13 @@ export const ChatView = observer(
       chatSessionStore.exitEditMode();
     }, []);
 
-    const {handleCopy, handleEdit, handleTryAgain} = useMessageActions({
-      user,
-      messages,
-      handleSendPress: wrappedOnSendPress,
-      setInputText,
-    });
+    const {handleCopy, handleEdit, handleTryAgain, handleTryAgainWith} =
+      useMessageActions({
+        user,
+        messages,
+        handleSendPress: wrappedOnSendPress,
+        setInputText,
+      });
 
     const styles = createStyles({theme});
 
@@ -328,15 +344,16 @@ export const ChatView = observer(
       setSelectedMessage(null);
     }, []);
 
-    const menuItems = React.useMemo(() => {
+    const menuItems = React.useMemo((): MenuItem[] => {
       if (!selectedMessage || selectedMessage.type !== 'text') {
         return [];
       }
 
       const isAuthor = selectedMessage.author.id === user.id;
       const hasActiveModel = modelStore.activeModelId !== undefined;
+      const models = modelStore.availableModels || [];
 
-      const baseItems = [
+      const baseItems: MenuItem[] = [
         {
           label: 'Copy',
           onPress: () => {
@@ -358,6 +375,20 @@ export const ChatView = observer(
           icon: 'refresh',
           disabled: !hasActiveModel,
         });
+
+        baseItems.push({
+          label: 'Try Again With',
+          icon: 'chevron-right',
+          disabled: false,
+          submenu: models.map(model => ({
+            label: model.name,
+            width: Math.min(300, size.width),
+            onPress: () => {
+              handleTryAgainWith(model.id, selectedMessage);
+              handleMenuDismiss();
+            },
+          })),
+        });
       }
 
       if (isAuthor) {
@@ -378,9 +409,57 @@ export const ChatView = observer(
       user.id,
       handleCopy,
       handleTryAgain,
+      handleTryAgainWith,
       handleEdit,
       handleMenuDismiss,
+      size.width,
     ]);
+
+    const renderMenuItem = React.useCallback(
+      (item: MenuItem, index: number) => {
+        if (item.submenu) {
+          return (
+            <React.Fragment key={index}>
+              {index > 0 && <Menu.Separator />}
+              <Menu.Item
+                style={styles.menu}
+                label={item.label}
+                icon={item.icon}
+                disabled={item.disabled}
+                submenu={item.submenu.map(
+                  (subItem: SubMenuItem, subIndex: number) => (
+                    <React.Fragment key={subIndex}>
+                      {subIndex > 0 && <Menu.Separator />}
+                      <Menu.Item
+                        key={subIndex}
+                        style={{...styles.menu, width: subItem.width}}
+                        label={subItem.label}
+                        onPress={subItem.onPress}
+                        disabled={subItem.disabled}
+                      />
+                    </React.Fragment>
+                  ),
+                )}
+              />
+            </React.Fragment>
+          );
+        }
+
+        return (
+          <React.Fragment key={index}>
+            {index > 0 && <Menu.Separator />}
+            <Menu.Item
+              style={styles.menu}
+              label={item.label}
+              onPress={item.onPress}
+              icon={item.icon}
+              disabled={item.disabled}
+            />
+          </React.Fragment>
+        );
+      },
+      [styles.menu],
+    );
 
     const renderMessage = React.useCallback(
       ({item: message}: {item: MessageType.DerivedAny; index: number}) => {
@@ -577,18 +656,7 @@ export const ChatView = observer(
               onDismiss={handleMenuDismiss}
               selectable={false}
               anchor={menuPosition}>
-              {menuItems.map((item, index) => (
-                <React.Fragment key={index}>
-                  {index > 0 && <Divider />}
-                  <Menu.Item
-                    style={styles.menu}
-                    label={item.label}
-                    onPress={item.onPress}
-                    icon={item.icon}
-                    disabled={item.disabled}
-                  />
-                </React.Fragment>
-              ))}
+              {menuItems.map(renderMenuItem)}
             </Menu>
           </View>
         </L10nContext.Provider>
