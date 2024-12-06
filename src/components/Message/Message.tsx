@@ -1,18 +1,28 @@
 import * as React from 'react';
-import {Pressable, Text, View} from 'react-native';
+import {Pressable, Text, View, Animated} from 'react-native';
+
+import {oneOf} from '@flyerhq/react-native-link-preview';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 
 import {useTheme} from '../../hooks';
-import {oneOf} from '@flyerhq/react-native-link-preview';
 
 import styles from './styles';
-import {Avatar} from '../Avatar';
-import {StatusIcon} from '../StatusIcon';
-import {FileMessage} from '../FileMessage';
-import {ImageMessage} from '../ImageMessage';
-import {TextMessage, TextMessageTopLevelProps} from '../TextMessage';
+import {
+  Avatar,
+  StatusIcon,
+  FileMessage,
+  ImageMessage,
+  TextMessage,
+  TextMessageTopLevelProps,
+} from '..';
 
 import {MessageType} from '../../utils/types';
 import {excludeDerivedMessageProps, UserContext} from '../../utils';
+
+const hapticOptions = {
+  enableVibrateFallback: true,
+  ignoreAndroidSystemSettings: false,
+};
 
 export interface MessageTopLevelProps extends TextMessageTopLevelProps {
   /** Called when user makes a long press on any message */
@@ -28,6 +38,7 @@ export interface MessageTopLevelProps extends TextMessageTopLevelProps {
     child: React.ReactNode;
     message: MessageType.Any;
     nextMessageInGroup: boolean;
+    scale?: Animated.Value;
   }) => React.ReactNode;
   /** Render a custom message inside predefined bubble */
   renderCustomMessage?: (
@@ -89,6 +100,7 @@ export const Message = React.memo(
   }: MessageProps) => {
     const user = React.useContext(UserContext);
     const theme = useTheme();
+    const scaleAnim = React.useRef(new Animated.Value(1)).current;
 
     const currentUserIsAuthor =
       message.type !== 'dateHeader' && user?.id === message.author.id;
@@ -100,6 +112,24 @@ export const Message = React.memo(
       roundBorder,
       theme,
     });
+
+    const handlePressIn = () => {
+      Animated.spring(scaleAnim, {
+        toValue: 0.97,
+        friction: 8,
+        tension: 100,
+        useNativeDriver: true,
+      }).start();
+    };
+
+    const handlePressOut = () => {
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 8,
+        tension: 100,
+        useNativeDriver: true,
+      }).start();
+    };
 
     if (message.type === 'dateHeader') {
       return (
@@ -127,6 +157,7 @@ export const Message = React.memo(
         child,
         message: excludeDerivedMessageProps(message),
         nextMessageInGroup: roundBorder,
+        scale: scaleAnim,
       });
     };
 
@@ -198,11 +229,14 @@ export const Message = React.memo(
         />
         <Pressable
           onLongPress={event => {
+            ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
             onMessageLongPress?.(excludeDerivedMessageProps(message), event);
           }}
           onPress={event => {
             onMessagePress?.(excludeDerivedMessageProps(message), event);
           }}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
           style={pressable}>
           {renderBubbleContainer()}
         </Pressable>
