@@ -50,6 +50,7 @@ const createBaseColors = (isDark: boolean): MD3BaseColors => {
       inverseSurface: '#e5e5e6',
       inverseOnSurface: '#333333',
       inversePrimary: '#5B5E66',
+      inverseSecondary: md3BaseColors.secondary!,
       shadow: '#ffffff',
       scrim: 'rgba(0, 0, 0, 0.25)',
     };
@@ -87,6 +88,7 @@ const createBaseColors = (isDark: boolean): MD3BaseColors => {
     inverseSurface: '#333333',
     inverseOnSurface: '#fcfcfc',
     inversePrimary: '#DEE0E6',
+    inverseSecondary: '#95ABE6',
     shadow: '#000000',
     scrim: 'rgba(0, 0, 0, 0.25)',
   };
@@ -140,7 +142,7 @@ const createSemanticColors = (
   // Message specific
   authorBubbleBackground: isDark
     ? 'rgba(255, 255, 255, 0.03)'
-    : 'rgba(0, 0, 0, 0.03)',
+    : 'rgba(0, 0, 0, 0.04)',
   receivedMessageDocumentIcon: baseColors.primary,
   sentMessageDocumentIcon: baseColors.onSurface,
   userAvatarImageBackground: 'transparent',

@@ -163,6 +163,7 @@ export interface MD3BaseColors extends MD3Colors {
   inverseSurface: string;
   inverseOnSurface: string;
   inversePrimary: string;
+  inverseSecondary: string;
   shadow: string;
   scrim: string;
 }
