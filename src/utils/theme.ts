@@ -26,8 +26,8 @@ const createBaseColors = (isDark: boolean): MD3BaseColors => {
       onPrimaryContainer: '#DEE0E6',
       secondary: '#95ABE6',
       onSecondary: '#11214C',
-      secondaryContainer: '#162C66',
-      onSecondaryContainer: '#ADBCE6',
+      secondaryContainer: '#424242',
+      onSecondaryContainer: '#E0E0E0',
       tertiary: '#80E6E4',
       onTertiary: '#014C4C',
       tertiaryContainer: '#016665',
@@ -50,6 +50,7 @@ const createBaseColors = (isDark: boolean): MD3BaseColors => {
       inverseSurface: '#e5e5e6',
       inverseOnSurface: '#333333',
       inversePrimary: '#5B5E66',
+      shadow: '#ffffff',
       scrim: 'rgba(0, 0, 0, 0.25)',
     };
   }
@@ -62,8 +63,8 @@ const createBaseColors = (isDark: boolean): MD3BaseColors => {
     onPrimaryContainer: '#2D2F33',
     secondary: md3BaseColors.secondary!,
     onSecondary: '#FFFFFF',
-    secondaryContainer: '#ADBCE6',
-    onSecondaryContainer: '#0B1633',
+    secondaryContainer: '#E0E0E0',
+    onSecondaryContainer: '#424242',
     tertiary: md3BaseColors.tertiary!,
     onTertiary: '#FFFFFF',
     tertiaryContainer: '#9EE6E5',
@@ -86,6 +87,7 @@ const createBaseColors = (isDark: boolean): MD3BaseColors => {
     inverseSurface: '#333333',
     inverseOnSurface: '#fcfcfc',
     inversePrimary: '#DEE0E6',
+    shadow: '#000000',
     scrim: 'rgba(0, 0, 0, 0.25)',
   };
 };
