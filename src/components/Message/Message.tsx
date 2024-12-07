@@ -229,7 +229,7 @@ export const Message = React.memo(
         />
         <Pressable
           onLongPress={event => {
-            ReactNativeHapticFeedback.trigger('impactMedium', hapticOptions);
+            ReactNativeHapticFeedback.trigger('impactLight', hapticOptions);
             onMessageLongPress?.(excludeDerivedMessageProps(message), event);
           }}
           onPress={event => {

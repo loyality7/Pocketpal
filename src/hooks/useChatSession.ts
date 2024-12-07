@@ -14,7 +14,6 @@ export const useChatSession = (
     createdAt: number;
     id: string;
   } | null>,
-  messages: MessageType.Any[],
   user: User,
   assistant: User,
 ) => {
@@ -101,7 +100,9 @@ export const useChatSession = (
         : []),
       ...convertToChatMessages([
         textMessage,
-        ...messages.filter(msg => msg.id !== textMessage.id),
+        ...chatSessionStore.currentSessionMessages.filter(
+          msg => msg.id !== textMessage.id,
+        ),
       ]),
     ];
 

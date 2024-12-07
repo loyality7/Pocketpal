@@ -39,11 +39,9 @@ export const ChatScreen: React.FC = observer(() => {
     null,
   );
   const l10n = React.useContext(L10nContext);
-  const messages = chatSessionStore.currentSessionMessages;
 
   const {handleSendPress, handleStopPress} = useChatSession(
     currentMessageInfo,
-    messages,
     user,
     assistant,
   );
@@ -60,7 +58,7 @@ export const ChatScreen: React.FC = observer(() => {
             : undefined
         }
         renderBubble={renderBubble}
-        messages={messages}
+        messages={chatSessionStore.currentSessionMessages}
         onSendPress={handleSendPress}
         onStopPress={handleStopPress}
         user={user}
