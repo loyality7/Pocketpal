@@ -13,7 +13,7 @@ export const l10n = {
     networkError: 'Network error. Please try again.',
     goToModels: 'Go to Models',
     readyToChat: 'Ready to chat? Load the last used model.',
-    pleaseLoadModel: 'Please load a model to start chatting.',
+    pleaseLoadModel: 'Load a model to chat.',
     shortMemoryWarning: 'Memory Warning',
     memoryWarning:
       "Warning: Model size is close to or exceeds your device's total memory ({{totalMemory}}). This may cause unexpected behavior such as slow performance or system instability.",
@@ -82,7 +82,7 @@ export const l10n = {
     networkError: 'Error de red. Inténtalo de nuevo.',
     goToModels: 'Ir a Modelos',
     readyToChat: '¿Listo para chatear? Cargue el último modelo usado.',
-    pleaseLoadModel: 'Por favor, cargue un modelo para comenzar a chatear.',
+    pleaseLoadModel: 'Cargue un modelo para chatear.',
     shortMemoryWarning: 'Advertencia de memoria',
     memoryWarning:
       'Advertencia: El tamaño del modelo está cerca de o excede la memoria total de su dispositivo ({{totalMemory}}). Esto puede causar comportamientos inesperados como rendimiento lento o inestabilidad del sistema.',
@@ -156,7 +156,7 @@ export const l10n = {
     networkError: '네트워크 오류가 발생했습니다. 다시 시도해주세요.',
     goToModels: '모델로 가기',
     readyToChat: '채팅을 준비하세요. 마지막으로 사용된 모델을 로드하세요.',
-    pleaseLoadModel: '채팅을 시작하려면 모델을 로드하세요.',
+    pleaseLoadModel: '채팅을 위해 모델을 로드하세요.',
     shortMemoryWarning: '메모리 경고',
     memoryWarning:
       '경고: 모델 크기가 또는 장치의 총 메모리를 초과합니다 ({{totalMemory}}). 이는 속도가 느려지거나 시스템 불안정성을 일으킬 수 있는 예기치 않은 동작을 일으켜 초래할 수 있습니다.',
@@ -211,7 +211,7 @@ export const l10n = {
     menuTitleReset: '모델 목록 재설정',
     iOSBackgroundDownload: '백그라운드 다운로드',
     iOSBackgroundDownloadDescription:
-      '백그라운드에서 다운로드가 계속되도록 허용합니다 (속도가 느려질 수 있습니다).',
+      '백그라운드���서 다운로드가 계속되도록 허용합니다 (속도가 느려질 수 있습니다).',
   },
   pl: {
     attachmentButtonAccessibilityLabel: 'Wyślij multimedia',
@@ -226,7 +226,7 @@ export const l10n = {
     networkError: 'Błąd sieci. Spróbuj ponownie.',
     goToModels: 'Przejdź do modeli',
     readyToChat: 'Czy gotowy do rozmowy? Załaduj ostatnio używany model.',
-    pleaseLoadModel: 'Proszę załadować model, aby rozpocząć rozmowę.',
+    pleaseLoadModel: 'Załaduj model, aby czatować.',
     shortMemoryWarning: 'Ostrzeżenie o pamięci',
     memoryWarning:
       'Ostrzeżenie: Rozmiar modelu jest bliski lub przekracza całkowitą pamięć swojego urządzenia ({{totalMemory}}). To może spowodować nieoczekiwane zachowanie, takie jak wolne wydajność lub niestabilność systemu.',
@@ -296,7 +296,7 @@ export const l10n = {
     networkError: 'Erro de rede. Tente novamente.',
     goToModels: 'Ir para Modelos',
     readyToChat: 'Pronto para conversar? Carregue o último modelo usado.',
-    pleaseLoadModel: 'Por favor, carregue um modelo para começar a conversar.',
+    pleaseLoadModel: 'Carregue um modelo para conversar.',
     shortMemoryWarning: 'Advertência de memória',
     memoryWarning:
       'Advertência: O tamanho do modelo está próximo ou excede a memória total do seu dispositivo ({{totalMemory}}). Isso pode causar comportamentos inesperados como desempenho lento ou instabilidade do sistema.',
@@ -366,7 +366,7 @@ export const l10n = {
     networkError: 'Ошибка сети. Пожалуйста, попробуйте снова.',
     goToModels: 'Перейти к моделям',
     readyToChat: 'Готовы к общению? Загрузите последний используемый модель.',
-    pleaseLoadModel: 'Пожалуйста, загрузите модель, чтобы начать общение.',
+    pleaseLoadModel: 'Загрузите модель для общения.',
     shortMemoryWarning: 'Предупреждение о памяти',
     memoryWarning:
       'Предупреждение: Размер модели близок или превышает общую память вашего устройства ({{totalMemory}}). Это может привести к непредвиденным поведением, таким как медленная производительность или нестабильность системы.',
@@ -395,7 +395,7 @@ export const l10n = {
     modelSettingsTitle: 'Конфигурация модели',
     autoOffloadLoad: 'Автоматическое выгрузка/загрузка',
     autoOffloadLoadDescription:
-      'Выгрузить модель, когда приложение находится в фоне.',
+      'Выг��узить модель, когда приложение находится в фоне.',
     metal: 'Metal',
     metalDescription: 'API оборудования, ускоренного Apple.',
     layersOnGPU: 'Слои в GPU: {{gpuLayers}}',
@@ -414,7 +414,7 @@ export const l10n = {
     darkModeDescription: 'Включить или выключить темный режим.',
     displayMemoryUsage: 'Показать использование памяти',
     displayMemoryUsageDescription:
-      'Показать использование памяти на странице чата.',
+      'Показать использование памяти на страни��е чата.',
     tooltipGroupByType: 'Группировать по типу модели',
     tooltipDownloaded: 'Показать только загруженные',
     tooltipHf: 'Показать модели из HuggingFace',
@@ -440,7 +440,7 @@ export const l10n = {
     networkError: 'Ağ hatası. Lütfen tekrar deneyin.',
     goToModels: 'Modellere git',
     readyToChat: 'Sohbete hazır mısınız? Son kullanılan modeli yükleyin.',
-    pleaseLoadModel: 'Lütfen bir model yükleyin, sohbete başlamak için.',
+    pleaseLoadModel: 'Sohbet için model yükleyin.',
     shortMemoryWarning: 'Hafıza Uyarısı',
     memoryWarning:
       'Uyarı: Model boyutu cihazınızın toplam hafızasına yakın veya onu aşıyor ({{totalMemory}}). Bu, beklenmedik davranışlar, örneğin yavaş performans veya sistem istikrarının oluşmasına neden olabilir.',
@@ -510,7 +510,7 @@ export const l10n = {
     networkError: 'Ошибка сети. Пожалуйста, попробуйте снова.',
     goToModels: 'Перейти к моделям',
     readyToChat: 'Готовы к общению? Загрузите последний используемый модель.',
-    pleaseLoadModel: 'Пожалуйста, загрузите модель, чтобы начать общение.',
+    pleaseLoadModel: 'Завантажте модель для спілкування.',
     shortMemoryWarning: 'Предупреждение о памяти',
     memoryWarning:
       'Предупреждение: Размер модели близок или превышает общую память вашего устройства ({{totalMemory}}). Это может привести к непредвиденным поведением, таким как медленная производительность или нестабильность системы.',
@@ -584,7 +584,7 @@ export const l10n = {
     networkError: 'Error de xarxa. Torneu-ho a intentar.',
     goToModels: 'Anar a Models',
     readyToChat: "Preparat per xatejar? Carregueu l'últim model utilitzat.",
-    pleaseLoadModel: 'Si us plau, carregueu un model per començar a xatejar.',
+    pleaseLoadModel: 'Carregueu un model per xatejar.',
     shortMemoryWarning: 'Advertència de memòria',
     memoryWarning:
       'Advertència: La mida del model està prop o supera la memòria total del dispositiu ({{totalMemory}}). Això pot causar comportaments inesperats com baix rendiment o inestabilitat del sistema.',
