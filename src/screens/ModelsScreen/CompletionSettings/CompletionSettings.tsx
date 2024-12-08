@@ -1,13 +1,15 @@
-import React, {useState} from 'react';
 import {View} from 'react-native';
+import React, {useState} from 'react';
 
-import {CompletionParams} from '@pocketpalai/llama.rn';
 import Slider from '@react-native-community/slider';
-import {Text, Switch, TextInput, Divider, Chip} from 'react-native-paper';
+import {CompletionParams} from '@pocketpalai/llama.rn';
+import {Text, Switch, Divider, Chip} from 'react-native-paper';
+
+import {TextInput} from '../../../components';
 
 import {useTheme} from '../../../hooks';
 
-import {styles} from './styles';
+import {createStyles} from './styles';
 
 interface Props {
   settings: CompletionParams;
@@ -17,20 +19,28 @@ interface Props {
 export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
   const [localSliderValues, setLocalSliderValues] = useState({});
   const [newStopWord, setNewStopWord] = useState('');
-  const {colors} = useTheme();
+  const theme = useTheme();
+  const styles = createStyles();
 
   const handleOnChange = (name, value) => {
     onChange(name, value);
   };
 
-  const renderSlider = (
-    name: string,
-    min: number,
-    max: number,
-    step: number = 0.01,
-  ) => (
+  const renderSlider = ({
+    name,
+    min,
+    max,
+    step = 0.01,
+    label,
+  }: {
+    name: string;
+    min: number;
+    max: number;
+    step?: number;
+    label?: string;
+  }) => (
     <View style={styles.settingItem}>
-      <Text style={styles.settingLabel}>{name}</Text>
+      <Text style={styles.settingLabel}>{label ?? name}</Text>
       <Slider
         style={styles.slider}
         minimumValue={min}
@@ -43,8 +53,8 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
         onSlidingComplete={value => {
           handleOnChange(name, value);
         }}
-        thumbTintColor={colors.primary}
-        minimumTrackTintColor={colors.primary}
+        thumbTintColor={theme.colors.primary}
+        minimumTrackTintColor={theme.colors.primary}
         //onValueChange={value => onChange(name, value)}
         testID={`${name}-slider`}
       />
@@ -56,13 +66,21 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
     </View>
   );
 
-  const renderIntegerInput = (name: string, min: number, max: number) => (
+  const renderIntegerInput = ({
+    name,
+    min,
+    max,
+    label,
+  }: {
+    name: string;
+    min: number;
+    max: number;
+    label?: string;
+  }) => (
     <View style={styles.settingItem}>
-      {/*<Text style={styles.settingLabel}>{name}</Text>*/}
       <TextInput
         value={settings[name].toString()}
-        mode="outlined"
-        label={name}
+        label={label ?? name}
         onChangeText={value => {
           const intValue = parseInt(value, 10);
           if (!isNaN(intValue)) {
@@ -70,8 +88,6 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
           }
         }}
         keyboardType="numeric"
-        style={styles.textInput}
-        contentStyle={styles.textInputContent}
         /*left={<TextInput.Affix text={name} textStyle={styles.inputLabel} />}*/
         testID={`${name}-input`}
       />
@@ -106,6 +122,8 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
               );
               onChange('stop', newStops);
             }}
+            compact
+            textStyle={styles.stopChipText}
             style={styles.stopChip}>
             {word}
           </Chip>
@@ -123,7 +141,6 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
             setNewStopWord('');
           }
         }}
-        style={styles.textInput}
         testID="stop-input"
       />
     </View>
@@ -131,18 +148,38 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
 
   return (
     <View>
-      {renderIntegerInput('n_predict', 0, 2048)}
-      {renderSlider('temperature', 0, 1)}
-      {renderSlider('top_k', 1, 128, 1)}
-      {renderSlider('top_p', 0, 1)}
-      {renderSlider('min_p', 0, 1)}
-      {renderSlider('xtc_threshold', 0, 1)}
-      {renderSlider('xtc_probability', 0, 1)}
-      {renderSlider('typical_p', 0, 2)}
-      {renderSlider('penalty_last_n', 0, 256, 1)}
-      {renderSlider('penalty_repeat', 0, 2)}
-      {renderSlider('penalty_freq', 0, 2)}
-      {renderSlider('penalty_present', 0, 2)}
+      {renderIntegerInput({
+        name: 'n_predict',
+        min: 0,
+        max: 2048,
+        label: 'N-Predict',
+      })}
+      {renderSlider({
+        name: 'temperature',
+        min: 0,
+        max: 1,
+        label: 'Temperature',
+      })}
+      {renderSlider({name: 'top_k', min: 1, max: 128, step: 1, label: 'Top-K'})}
+      {renderSlider({name: 'top_p', min: 0, max: 1, label: 'Top-P'})}
+      {renderSlider({name: 'min_p', min: 0, max: 1, label: 'Min-P'})}
+      {renderSlider({
+        name: 'xtc_threshold',
+        min: 0,
+        max: 1,
+        label: 'XTC Threshold',
+      })}
+      {renderSlider({
+        name: 'xtc_probability',
+        min: 0,
+        max: 1,
+        label: 'XTC Probability',
+      })}
+      {renderSlider({name: 'typical_p', min: 0, max: 2, label: 'Typical P'})}
+      {renderSlider({name: 'penalty_last_n', min: 0, max: 256, step: 1})}
+      {renderSlider({name: 'penalty_repeat', min: 0, max: 2})}
+      {renderSlider({name: 'penalty_freq', min: 0, max: 2})}
+      {renderSlider({name: 'penalty_present', min: 0, max: 2})}
       <Divider style={styles.divider} />
       <View style={styles.settingItem}>
         <Text style={styles.settingLabel}>mirostat</Text>
@@ -158,11 +195,32 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
           ))}
         </View>
       </View>
-      {renderSlider('mirostat_tau', 0, 10, 1)}
-      {renderSlider('mirostat_eta', 0, 1)}
+      {renderSlider({
+        name: 'mirostat_tau',
+        min: 0,
+        max: 10,
+        step: 1,
+        label: 'Mirostat Tau',
+      })}
+      {renderSlider({
+        name: 'mirostat_eta',
+        min: 0,
+        max: 1,
+        label: 'Mirostat Eta',
+      })}
       {renderSwitch('penalize_nl')}
-      {renderIntegerInput('seed', 0, Number.MAX_SAFE_INTEGER)}
-      {renderIntegerInput('n_probs', 0, 100)}
+      {renderIntegerInput({
+        name: 'seed',
+        min: 0,
+        max: Number.MAX_SAFE_INTEGER,
+        label: 'Seed',
+      })}
+      {renderIntegerInput({
+        name: 'n_probs',
+        min: 0,
+        max: 100,
+        label: 'N-Probs',
+      })}
       {renderStopWords()}
     </View>
   );

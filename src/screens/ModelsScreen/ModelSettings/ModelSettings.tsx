@@ -221,9 +221,6 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
 
         {/* Completion Settings Section */}
         <View style={styles.completionSettingsContainer}>
-          <Text variant="titleMedium" style={styles.completionSettingsTitle}>
-            Generation Settings
-          </Text>
           <CompletionSettings
             settings={completionSettings}
             onChange={onCompletionSettingsChange}

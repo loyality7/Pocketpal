@@ -41,10 +41,6 @@ export const createStyles = (theme: Theme) =>
       marginTop: 12,
       paddingHorizontal: 2,
     },
-    completionSettingsTitle: {
-      marginBottom: 8,
-      fontWeight: '600',
-    },
     switchContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
