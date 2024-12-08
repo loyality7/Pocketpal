@@ -9,16 +9,16 @@ import {
 
 import {toJS} from 'mobx';
 import {v4 as uuidv4} from 'uuid';
-import * as RNFS from '@dr.pogodin/react-native-fs';
 import 'react-native-get-random-values';
 import {observer} from 'mobx-react-lite';
+import * as RNFS from '@dr.pogodin/react-native-fs';
 import DocumentPicker from 'react-native-document-picker';
 
 import {useTheme, useMoveScroll} from '../../hooks';
 
-import {styles} from './styles';
 import {FABGroup} from './FABGroup';
 import {ModelCard} from './ModelCard';
+import {createStyles} from './styles';
 import {HFModelSearch} from './HFModelSearch';
 import {ModelAccordion} from './ModelAccordion';
 
@@ -32,7 +32,8 @@ export const ModelsScreen: React.FC = observer(() => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [hfSearchVisible, setHFSearchVisible] = useState(false);
   const [_, setTrigger] = useState<boolean>(false);
-  const {colors} = useTheme();
+  const theme = useTheme();
+  const styles = createStyles(theme);
 
   const filters = uiStore.pageStates.modelsScreen.filters;
   const expandedGroups = uiStore.pageStates.modelsScreen.expandedGroups;
@@ -223,7 +224,7 @@ export const ModelsScreen: React.FC = observer(() => {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 80}
-      style={[styles.container, {backgroundColor: colors.surface}]}>
+      style={styles.container}>
       <FlatList
         ref={scrollRef}
         testID="flat-list"
@@ -244,7 +245,7 @@ export const ModelsScreen: React.FC = observer(() => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={[colors.primary]}
+            colors={[theme.colors.primary]}
           />
         }
       />

@@ -17,16 +17,18 @@ import {
   Snackbar,
 } from 'react-native-paper';
 
+import {Divider} from '../../../components';
+
 import {useTheme, useMemoryCheck, useStorageCheck} from '../../../hooks';
 
-import {styles} from './styles';
+import {createStyles} from './styles';
 import {ModelSettings} from '../ModelSettings';
 
 import {uiStore, modelStore} from '../../../store';
 
 import {chatTemplates} from '../../../utils/chat';
-import {Model, ModelOrigin, RootDrawerParamList} from '../../../utils/types';
 import {getModelDescription, L10nContext} from '../../../utils';
+import {Model, ModelOrigin, RootDrawerParamList} from '../../../utils/types';
 
 type ChatScreenNavigationProp = DrawerNavigationProp<RootDrawerParamList>;
 
@@ -39,7 +41,9 @@ interface ModelCardProps {
 export const ModelCard: React.FC<ModelCardProps> = observer(
   ({model, activeModelId, onFocus}) => {
     const l10n = React.useContext(L10nContext);
-    const {colors} = useTheme();
+    const theme = useTheme();
+    const styles = createStyles(theme);
+
     const navigation = useNavigation<ChatScreenNavigationProp>();
 
     const [expanded, setExpanded] = useState(false);
@@ -123,8 +127,8 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
     }, [model]);
 
     const renderDownloadOverlay = () => (
-      <View style={styles.overlayContainer}>
-        <View style={styles.overlay}>
+      <View>
+        {!storageOk && (
           <HelperText
             testID="storage-error-text"
             type="error"
@@ -133,30 +137,31 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
             style={styles.storageErrorText}>
             {storageNOkMessage}
           </HelperText>
-          <View style={styles.overlayButtons}>
-            {storageOk && (
-              <Button
-                testID="download-button"
-                icon="download"
-                mode="text"
-                onPress={() => modelStore.checkSpaceAndDownload(model.id)}
-                disabled={!storageOk}
-                style={styles.downloadButton}>
-                Download
-              </Button>
-            )}
-            {isHfModel && (
-              <Button
-                testID="remove-model-button"
-                icon="delete-outline"
-                mode="text"
-                textColor={colors.error}
-                onPress={handleRemove}
-                style={styles.removeButton}>
-                Remove
-              </Button>
-            )}
-          </View>
+        )}
+        <View style={styles.overlayButtons}>
+          {isHfModel && (
+            <Button
+              testID="remove-model-button"
+              icon="delete-outline"
+              mode="text"
+              textColor={theme.colors.error}
+              onPress={handleRemove}
+              style={styles.removeButton}>
+              Remove
+            </Button>
+          )}
+          {storageOk && (
+            <Button
+              testID="download-button"
+              icon="download"
+              mode="text"
+              onPress={() => modelStore.checkSpaceAndDownload(model.id)}
+              disabled={!storageOk}
+              textColor={theme.colors.secondary}
+              style={styles.downloadButton}>
+              Download
+            </Button>
+          )}
         </View>
       </View>
     );
@@ -171,7 +176,7 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
             <ActivityIndicator
               testID="loading-indicator"
               animating={true}
-              color={colors.primary}
+              color={theme.colors.primary}
             />
           </View>
         );
@@ -199,7 +204,6 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
         <Button
           testID={isActiveModel ? 'offload-button' : 'load-button'}
           icon={isActiveModel ? 'eject' : 'play-circle-outline'}
-          textColor={colors.onSurface}
           mode="text"
           onPress={handlePress}
           style={styles.actionButton}>
@@ -215,11 +219,12 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
     return (
       <>
         <Card
+          elevation={0}
           style={[
             styles.card,
-            {backgroundColor: colors.surface},
-            isActiveModel && {backgroundColor: colors.tertiaryContainer},
-            {borderColor: colors.primary},
+            {backgroundColor: theme.colors.surface},
+            isActiveModel && {backgroundColor: theme.colors.tertiaryContainer},
+            {borderColor: theme.colors.primary},
           ]}>
           {isHfModel && (
             <Image
@@ -237,29 +242,20 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
                 <View style={styles.headerRow}>
                   <View style={styles.modelInfoContainer}>
                     <View style={styles.titleRow}>
-                      <Text
-                        style={[
-                          styles.modelName,
-                          !isDownloaded && styles.disabledText,
-                        ]}>
-                        {model.name}
-                      </Text>
+                      <Text style={[styles.modelName]}>{model.name}</Text>
 
                       {model.hfUrl && (
                         <IconButton
                           testID="open-huggingface-url"
                           icon="open-in-new"
                           size={14}
+                          iconColor={theme.colors.onSurfaceVariant}
                           onPress={openHuggingFaceUrl}
                           style={styles.hfButton}
                         />
                       )}
                     </View>
-                    <Text
-                      style={[
-                        styles.modelDescription,
-                        {color: colors.outline},
-                      ]}>
+                    <Text style={styles.modelDescription}>
                       {getModelDescription(model, isActiveModel, modelStore)}
                     </Text>
                   </View>
@@ -283,7 +279,7 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
                 <View style={styles.warningContent}>
                   <IconButton
                     icon="alert-circle-outline"
-                    iconColor={colors.error}
+                    iconColor={theme.colors.error}
                     size={20}
                     style={styles.warningIcon}
                   />
@@ -297,7 +293,7 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
                 <ProgressBar
                   testID="download-progress-bar"
                   progress={modelStore.getDownloadProgress(model.id)}
-                  color={colors.tertiary}
+                  color={theme.colors.tertiary}
                   style={styles.progressBar}
                 />
                 {model.downloadSpeed && (
@@ -323,13 +319,15 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
               )}
             </View>
 
+            <Divider style={styles.divider} />
             {isDownloaded ? (
               <Card.Actions style={styles.actions}>
                 <Button
                   testID="delete-button"
                   icon="delete"
                   mode="text"
-                  textColor={colors.error}
+                  compact
+                  textColor={theme.colors.error}
                   onPress={() => handleDelete()}
                   style={styles.actionButton}>
                   {l10n.delete}
@@ -338,7 +336,7 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
                   testID="reset-button"
                   icon="refresh"
                   mode="text"
-                  textColor={colors.secondary}
+                  compact
                   onPress={handleReset}
                   style={styles.actionButton}>
                   {l10n.reset}
@@ -347,14 +345,16 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
               </Card.Actions>
             ) : isDownloading ? (
               <Card.Actions style={styles.actions}>
-                <Button
-                  testID="cancel-button"
-                  icon="cancel"
-                  mode="outlined"
-                  onPress={() => modelStore.cancelDownload(model.id)}
-                  style={styles.button}>
-                  {l10n.cancel}
-                </Button>
+                <View style={styles.overlayButtons}>
+                  <Button
+                    testID="cancel-button"
+                    icon="close"
+                    mode="text"
+                    textColor={theme.colors.error}
+                    onPress={() => modelStore.cancelDownload(model.id)}>
+                    {l10n.cancel}
+                  </Button>
+                </View>
               </Card.Actions>
             ) : (
               renderDownloadOverlay()

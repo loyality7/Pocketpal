@@ -25,7 +25,6 @@ export const ModelAccordion: React.FC<ModelAccordionProps> = observer(
 
     const accordionStyles = StyleSheet.flatten([
       styles.accordion,
-      {backgroundColor: colors.surface, borderColor: colors.surfaceVariant},
       activeGroup && {
         backgroundColor: colors.tertiaryContainer,
         borderColor: colors.primary,
@@ -38,7 +37,7 @@ export const ModelAccordion: React.FC<ModelAccordionProps> = observer(
         title={group.type}
         titleStyle={StyleSheet.flatten([
           styles.accordionTitle,
-          {color: colors.onSurface},
+          {color: colors.secondary},
         ])}
         expanded={expanded}
         onPress={onPress}

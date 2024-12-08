@@ -6,6 +6,7 @@ export * from './Bubble';
 export * from './ChatInput';
 export * from './ChatView';
 export * from './CircularActivityIndicator';
+export * from './Divider';
 export * from './FileMessage';
 export * from './HeaderRight';
 export * from './ImageMessage';
