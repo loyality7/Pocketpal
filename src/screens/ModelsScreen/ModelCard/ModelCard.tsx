@@ -322,6 +322,11 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
                   onPress={handleOpenSettings}
                   style={styles.actionButton}>
                   Settings
+                  <IconButton
+                    icon="chevron-down"
+                    size={14}
+                    style={styles.settingsChevron}
+                  />
                 </Button>
                 {renderModelLoadButton()}
               </Card.Actions>

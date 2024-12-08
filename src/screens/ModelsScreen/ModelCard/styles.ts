@@ -40,6 +40,10 @@ export const createStyles = (theme: Theme) =>
     actionButton: {
       width: '33%',
     },
+    settingsChevron: {
+      margin: 0,
+      marginLeft: -12,
+    },
     errorText: {
       textAlign: 'center',
       marginBottom: 8,
