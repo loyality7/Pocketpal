@@ -15,10 +15,11 @@ interface ModelAccordionProps {
   expanded: boolean;
   onPress: () => void;
   children: React.ReactNode;
+  description?: string;
 }
 
 export const ModelAccordion: React.FC<ModelAccordionProps> = observer(
-  ({group, expanded, onPress, children}) => {
+  ({group, expanded, onPress, children, description}) => {
     const {colors} = useTheme();
     const activeModel = modelStore.activeModel;
     const activeGroup = activeModel && activeModel.type === group.type;
@@ -39,6 +40,8 @@ export const ModelAccordion: React.FC<ModelAccordionProps> = observer(
           styles.accordionTitle,
           {color: colors.secondary},
         ])}
+        description={description}
+        descriptionStyle={styles.accordionDescription}
         expanded={expanded}
         onPress={onPress}
         style={accordionStyles}>

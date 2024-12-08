@@ -70,6 +70,7 @@ export const l10n = {
       'Allow downloads to continue in the background (it will be slower).',
     availableToUse: 'Ready to Use',
     availableToDownload: 'Available to Download',
+    useAddButtonForMore: 'Use + button to find more models',
   },
   es: {
     attachmentButtonAccessibilityLabel: 'Enviar multimedia',
@@ -146,6 +147,7 @@ export const l10n = {
       'Permitir que las descargas continúen en segundo plano (será más lento).',
     availableToUse: 'Listo para Usar',
     availableToDownload: 'Disponible para Descargar',
+    useAddButtonForMore: 'Use el botón + para encontrar más modelos',
   },
   ko: {
     attachmentButtonAccessibilityLabel: '미디어 보내기',
@@ -218,6 +220,7 @@ export const l10n = {
       '백그라운드에서 다운로드가 계속되도록 허용합니다 (속도가 느려질 수 있습니다).',
     availableToUse: '사용 준비 완료',
     availableToDownload: '다운로드 가능',
+    useAddButtonForMore: '+ 버튼을 사용하여 더 많은 모델 찾기',
   },
   pl: {
     attachmentButtonAccessibilityLabel: 'Wyślij multimedia',
@@ -290,6 +293,7 @@ export const l10n = {
       'Zezwól na kontynuowanie pobierania w tle (będzie wolniejsze).',
     availableToUse: 'Gotowy do Użycia',
     availableToDownload: 'Dostępny do Pobrania',
+    useAddButtonForMore: 'Użyj przycisku +, aby znaleźć więcej modeli',
   },
   pt: {
     attachmentButtonAccessibilityLabel: 'Envia mídia',
@@ -362,6 +366,7 @@ export const l10n = {
       'Permitir que os downloads continuem em segundo plano (será mais lento).',
     availableToUse: 'Pronto para Usar',
     availableToDownload: 'Disponível para Baixar',
+    useAddButtonForMore: 'Use o botão + para encontrar mais modelos',
   },
   ru: {
     attachmentButtonAccessibilityLabel: 'Отправить медиа',
@@ -403,7 +408,7 @@ export const l10n = {
     proceedWithReset: 'Продолжить сброс',
     confirmReset: 'Подтвердить сброс',
     modelSettingsTitle: 'Конфигурация модели',
-    autoOffloadLoad: 'Автомати��еское выгрузка/загрузка',
+    autoOffloadLoad: 'Автоматическое выгрузка/загрузка',
     autoOffloadLoadDescription:
       'Выгрузить модель, когда приложение находится в фоне.',
     metal: 'Metal',
@@ -438,6 +443,7 @@ export const l10n = {
       'Разрешить загрузки в фоновом режиме (это будет медленнее).',
     availableToUse: 'Готов к Использованию',
     availableToDownload: 'Доступен для Скачивания',
+    useAddButtonForMore: 'Используйте кнопку + для поиска моделей',
   },
   tr: {
     attachmentButtonAccessibilityLabel: 'Medya gönder',
@@ -510,6 +516,7 @@ export const l10n = {
       'İndirmelerin arka planda devam etmesine izin verin (daha yavaş olacaktır).',
     availableToUse: 'Kullanıma Hazır',
     availableToDownload: 'İndirilebilir',
+    useAddButtonForMore: 'Daha fazla model bulmak için + düğmesini kullanın',
   },
   uk: {
     attachmentButtonAccessibilityLabel: 'Надіслати медіа',
@@ -586,6 +593,7 @@ export const l10n = {
       'Дозволити завантаження у фоновому режимі (це буде повільніше).',
     availableToUse: 'Готовий до Використання',
     availableToDownload: 'Доступний для Завантаження',
+    useAddButtonForMore: 'Використовуйте кнопку + для пошуку моделей',
   },
   ca: {
     attachmentButtonAccessibilityLabel: 'Enviar multimèdia',
@@ -661,5 +669,6 @@ export const l10n = {
       'Permet que les descàrregues continuïn en segon pla (serà més lent).',
     availableToUse: 'Llest per Usar',
     availableToDownload: 'Disponible per Descarregar',
+    useAddButtonForMore: 'Utilitzeu el botó + per trobar més models',
   },
 };

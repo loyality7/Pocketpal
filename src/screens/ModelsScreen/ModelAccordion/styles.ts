@@ -8,4 +8,8 @@ export const styles = StyleSheet.create({
   accordionTitle: {
     fontSize: 14,
   },
+  accordionDescription: {
+    fontSize: 12,
+    paddingBottom: 10,
+  },
 });

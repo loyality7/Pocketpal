@@ -12,7 +12,7 @@ export class UIStore {
 
   pageStates = {
     modelsScreen: {
-      filters: ['grouped'],
+      filters: [] as string[],
       expandedGroups: {
         [UIStore.GROUP_KEYS.READY_TO_USE]: true,
       },

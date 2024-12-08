@@ -195,10 +195,16 @@ export const ModelsScreen: React.FC = observer(() => {
     const displayName = filters.includes('grouped')
       ? group.type
       : getGroupDisplayName(group.type);
+    const description =
+      !filters.includes('grouped') &&
+      group.type === UIStore.GROUP_KEYS.AVAILABLE_TO_DOWNLOAD
+        ? l10n.useAddButtonForMore
+        : undefined;
     return (
       <ModelAccordion
         group={{...group, type: displayName}}
         expanded={isExpanded}
+        description={description}
         onPress={() => toggleGroup(group.type)}>
         <FlatList
           data={group.items}
