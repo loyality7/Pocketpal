@@ -188,6 +188,8 @@ export interface SemanticColors {
   surfaceDim: string;
   surfaceBright: string;
 
+  textSecondary: string;
+
   border: string;
   placeholder: string;
 

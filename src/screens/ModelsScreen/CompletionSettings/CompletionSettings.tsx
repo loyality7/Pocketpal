@@ -3,7 +3,7 @@ import React, {useState} from 'react';
 
 import Slider from '@react-native-community/slider';
 import {CompletionParams} from '@pocketpalai/llama.rn';
-import {Text, Switch, Divider, Chip} from 'react-native-paper';
+import {Text, Switch, Chip, SegmentedButtons} from 'react-native-paper';
 
 import {TextInput} from '../../../components';
 
@@ -16,11 +16,33 @@ interface Props {
   onChange: (name: string, value: any) => void;
 }
 
+const PARAMETER_DESCRIPTIONS = {
+  n_predict: 'Maximum number of tokens to generate',
+  temperature: 'Controls randomness (higher = more creative)',
+  top_k: 'Limits token selection to K most likely options',
+  top_p: 'Cumulative probability threshold for token selection',
+  min_p: 'Minimum token probability relative to best token',
+  xtc_threshold: 'Minimum probability for token consideration',
+  xtc_probability: 'Probability of token removal at start',
+  typical_p: 'Controls locally typical sampling',
+  penalty_last_n: 'Number of tokens to check for repetition',
+  penalty_repeat: 'Penalizes token sequence repetition',
+  penalty_freq: 'Penalizes frequent token usage',
+  penalty_present: 'Penalizes token presence in context',
+  mirostat: 'Advanced sampling mode for stable output',
+  mirostat_tau: 'Target complexity for Mirostat',
+  mirostat_eta: 'Learning rate for Mirostat',
+  penalize_nl: 'Apply repeat penalty to newlines',
+  seed: 'Random seed for reproducible output',
+  n_probs: 'Return top token probabilities',
+  stop: 'Sequences that end generation',
+};
+
 export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
   const [localSliderValues, setLocalSliderValues] = useState({});
   const [newStopWord, setNewStopWord] = useState('');
   const theme = useTheme();
-  const styles = createStyles();
+  const styles = createStyles(theme);
 
   const handleOnChange = (name, value) => {
     onChange(name, value);
@@ -41,6 +63,7 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
   }) => (
     <View style={styles.settingItem}>
       <Text style={styles.settingLabel}>{label ?? name}</Text>
+      <Text style={styles.description}>{PARAMETER_DESCRIPTIONS[name]}</Text>
       <Slider
         style={styles.slider}
         minimumValue={min}
@@ -78,9 +101,10 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
     label?: string;
   }) => (
     <View style={styles.settingItem}>
+      <Text style={styles.settingLabel}>{label ?? name}</Text>
+      <Text style={styles.description}>{PARAMETER_DESCRIPTIONS[name]}</Text>
       <TextInput
         value={settings[name].toString()}
-        label={label ?? name}
         onChangeText={value => {
           const intValue = parseInt(value, 10);
           if (!isNaN(intValue)) {
@@ -94,9 +118,12 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
     </View>
   );
 
-  const renderSwitch = (name: string) => (
+  const renderSwitch = (name: string, label?: string) => (
     <View style={[styles.settingItem, styles.row]}>
-      <Text style={styles.settingLabel}>{name}</Text>
+      <View>
+        <Text style={styles.settingLabel}>{label ?? name}</Text>
+        <Text style={styles.description}>{PARAMETER_DESCRIPTIONS[name]}</Text>
+      </View>
       <Switch
         value={settings[name]}
         onValueChange={value => onChange(name, value)}
@@ -146,6 +173,33 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
     </View>
   );
 
+  const renderMirostatSelector = () => (
+    <View style={styles.settingItem}>
+      <Text style={styles.settingLabel}>Mirostat</Text>
+      <Text style={styles.description}>{PARAMETER_DESCRIPTIONS.mirostat}</Text>
+      <SegmentedButtons
+        value={(settings.mirostat ?? 0).toString()}
+        onValueChange={value => onChange('mirostat', parseInt(value, 10))}
+        density="high"
+        buttons={[
+          {
+            value: '0',
+            label: 'Off',
+          },
+          {
+            value: '1',
+            label: 'v1',
+          },
+          {
+            value: '2',
+            label: 'v2',
+          },
+        ]}
+        style={styles.segmentedButtons}
+      />
+    </View>
+  );
+
   return (
     <View>
       {renderIntegerInput({
@@ -176,39 +230,50 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
         label: 'XTC Probability',
       })}
       {renderSlider({name: 'typical_p', min: 0, max: 2, label: 'Typical P'})}
-      {renderSlider({name: 'penalty_last_n', min: 0, max: 256, step: 1})}
-      {renderSlider({name: 'penalty_repeat', min: 0, max: 2})}
-      {renderSlider({name: 'penalty_freq', min: 0, max: 2})}
-      {renderSlider({name: 'penalty_present', min: 0, max: 2})}
-      <Divider style={styles.divider} />
-      <View style={styles.settingItem}>
-        <Text style={styles.settingLabel}>mirostat</Text>
-        <View style={styles.chipContainer}>
-          {[0, 1, 2].map(value => (
-            <Chip
-              key={value}
-              selected={settings.mirostat === value}
-              onPress={() => onChange('mirostat', value)}
-              style={styles.chip}>
-              {value.toString()}
-            </Chip>
-          ))}
-        </View>
-      </View>
       {renderSlider({
-        name: 'mirostat_tau',
+        name: 'penalty_last_n',
         min: 0,
-        max: 10,
+        max: 256,
         step: 1,
-        label: 'Mirostat Tau',
+        label: 'Penalty Last N',
       })}
       {renderSlider({
-        name: 'mirostat_eta',
+        name: 'penalty_repeat',
         min: 0,
-        max: 1,
-        label: 'Mirostat Eta',
+        max: 2,
+        label: 'Penalty Repeat',
       })}
-      {renderSwitch('penalize_nl')}
+      {renderSlider({
+        name: 'penalty_freq',
+        min: 0,
+        max: 2,
+        label: 'Penalty Freq',
+      })}
+      {renderSlider({
+        name: 'penalty_present',
+        min: 0,
+        max: 2,
+        label: 'Penalty Present',
+      })}
+      {renderMirostatSelector()}
+      {(settings.mirostat ?? 0) > 0 && (
+        <>
+          {renderSlider({
+            name: 'mirostat_tau',
+            min: 0,
+            max: 10,
+            step: 1,
+            label: 'Mirostat Tau',
+          })}
+          {renderSlider({
+            name: 'mirostat_eta',
+            min: 0,
+            max: 1,
+            label: 'Mirostat Eta',
+          })}
+        </>
+      )}
+      {renderSwitch('penalize_nl', 'Penalize NL')}
       {renderIntegerInput({
         name: 'seed',
         min: 0,

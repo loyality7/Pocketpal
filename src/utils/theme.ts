@@ -123,6 +123,7 @@ const createSemanticColors = (
 
   border: withOpacity(baseColors.onSurface, 0.05),
   placeholder: withOpacity(baseColors.onSurface, 0.3),
+  textSecondary: withOpacity(baseColors.onSurface, 0.5),
 
   // Interactive states
   stateLayerOpacity: 0.12,

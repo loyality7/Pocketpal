@@ -1,6 +1,8 @@
 import {StyleSheet} from 'react-native';
 
-export const createStyles = () =>
+import {Theme} from '../../../utils/types';
+
+export const createStyles = (theme: Theme) =>
   StyleSheet.create({
     row: {
       flexDirection: 'row',
@@ -12,11 +14,13 @@ export const createStyles = () =>
       alignItems: 'center',
     },
     settingItem: {
-      marginBottom: 16,
+      marginBottom: 24,
+      paddingHorizontal: 4,
     },
     settingLabel: {
       fontSize: 14,
       fontWeight: 'bold',
+      marginBottom: 2,
     },
     settingValue: {
       textAlign: 'right',
@@ -28,12 +32,8 @@ export const createStyles = () =>
     divider: {
       marginVertical: 16,
     },
-    chipContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-around',
-    },
-    chip: {
-      marginHorizontal: 4,
+    segmentedButtons: {
+      marginTop: 8,
     },
     inputLabel: {
       flex: 1,
@@ -52,5 +52,11 @@ export const createStyles = () =>
     },
     stopChipText: {
       fontSize: 12,
+    },
+    description: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+      marginTop: 2,
+      marginBottom: 8,
     },
   });

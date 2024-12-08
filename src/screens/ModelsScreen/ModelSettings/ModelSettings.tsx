@@ -117,7 +117,6 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
           placeholder={`${label} Token`}
           value={token}
           onChangeText={text => onChange(tokenName, text)}
-          dense
           testID={`${testID}-input`}
         />
       )}

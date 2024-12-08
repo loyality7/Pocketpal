@@ -22,6 +22,7 @@ export const TextInput: React.FC<CustomTextInputProps> = ({
     <View style={styles.container}>
       <PaperTextInput
         {...rest}
+        dense
         underlineColor={theme.colors.border}
         style={[styles.input, style]}
         placeholderTextColor={theme.colors.placeholder}
