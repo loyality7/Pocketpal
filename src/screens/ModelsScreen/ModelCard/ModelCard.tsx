@@ -384,13 +384,24 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
               </ScrollView>
             </Dialog.Content>
             <Dialog.Actions>
-              <Button onPress={handleCloseSettings}>Cancel</Button>
-              <Button onPress={handleReset}>Reset</Button>
+              <Button
+                mode="text"
+                onPress={handleReset}
+                style={styles.dialogActionButton}>
+                Reset
+              </Button>
+              <Button
+                mode="text"
+                onPress={handleCloseSettings}
+                style={styles.dialogActionButton}>
+                Cancel
+              </Button>
               <Button
                 mode="contained"
                 onPress={() => {
                   handleCloseSettings();
-                }}>
+                }}
+                style={styles.dialogActionButton}>
                 Save
               </Button>
             </Dialog.Actions>

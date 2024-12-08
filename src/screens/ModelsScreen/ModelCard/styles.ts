@@ -145,4 +145,7 @@ export const createStyles = (theme: Theme) =>
       paddingHorizontal: 16,
       backgroundColor: theme.colors.surface,
     },
+    dialogActionButton: {
+      minWidth: 80,
+    },
   });
