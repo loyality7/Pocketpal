@@ -1,5 +1,5 @@
 import React, {useCallback, useState} from 'react';
-import {Alert, Linking, View, Image} from 'react-native';
+import {Alert, Linking, View, Image, ScrollView} from 'react-native';
 
 import {observer} from 'mobx-react-lite';
 import {useNavigation} from '@react-navigation/native';
@@ -15,6 +15,8 @@ import {
   HelperText,
   ActivityIndicator,
   Snackbar,
+  Dialog,
+  Portal,
 } from 'react-native-paper';
 
 import {Divider} from '../../../components';
@@ -46,8 +48,8 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
 
     const navigation = useNavigation<ChatScreenNavigationProp>();
 
-    const [expanded, setExpanded] = useState(false);
     const [snackbarVisible, setSnackbarVisible] = useState(false); // Snackbar visibility
+    const [settingsModalVisible, setSettingsModalVisible] = useState(false);
 
     const {memoryWarning, shortMemoryWarning} = useMemoryCheck(model);
     const {isOk: storageOk, message: storageNOkMessage} =
@@ -125,6 +127,14 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
         ],
       );
     }, [model]);
+
+    const handleOpenSettings = useCallback(() => {
+      setSettingsModalVisible(true);
+    }, []);
+
+    const handleCloseSettings = useCallback(() => {
+      setSettingsModalVisible(false);
+    }, []);
 
     const renderDownloadOverlay = () => (
       <View>
@@ -233,42 +243,29 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
             />
           )}
           <View style={styles.cardInner}>
-            <TouchableRipple
-              testID={`model-card-header-${model.id}`}
-              onPress={() => setExpanded(!expanded)}
-              disabled={!isDownloaded}
-              style={styles.touchableRipple}>
-              <View style={styles.cardContent}>
-                <View style={styles.headerRow}>
-                  <View style={styles.modelInfoContainer}>
-                    <View style={styles.titleRow}>
-                      <Text style={[styles.modelName]}>{model.name}</Text>
+            <View style={styles.cardContent}>
+              <View style={styles.headerRow}>
+                <View style={styles.modelInfoContainer}>
+                  <View style={styles.titleRow}>
+                    <Text style={[styles.modelName]}>{model.name}</Text>
 
-                      {model.hfUrl && (
-                        <IconButton
-                          testID="open-huggingface-url"
-                          icon="open-in-new"
-                          size={14}
-                          iconColor={theme.colors.onSurfaceVariant}
-                          onPress={openHuggingFaceUrl}
-                          style={styles.hfButton}
-                        />
-                      )}
-                    </View>
-                    <Text style={styles.modelDescription}>
-                      {getModelDescription(model, isActiveModel, modelStore)}
-                    </Text>
+                    {model.hfUrl && (
+                      <IconButton
+                        testID="open-huggingface-url"
+                        icon="open-in-new"
+                        size={14}
+                        iconColor={theme.colors.onSurfaceVariant}
+                        onPress={openHuggingFaceUrl}
+                        style={styles.hfButton}
+                      />
+                    )}
                   </View>
-                  {isDownloaded && (
-                    <IconButton
-                      icon={expanded ? 'chevron-up' : 'chevron-down'}
-                      size={20}
-                      onPress={() => setExpanded(!expanded)}
-                    />
-                  )}
+                  <Text style={styles.modelDescription}>
+                    {getModelDescription(model, isActiveModel, modelStore)}
+                  </Text>
                 </View>
               </View>
-            </TouchableRipple>
+            </View>
 
             {/* Display warning icon if there's a memory warning */}
             {shortMemoryWarning && isDownloaded && (
@@ -304,21 +301,6 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
               </>
             )}
 
-            <View style={styles.settings}>
-              {expanded && isDownloaded && (
-                <ModelSettings
-                  chatTemplate={model.chatTemplate}
-                  completionSettings={model.completionSettings}
-                  isActive={isActiveModel}
-                  onChange={handleSettingsUpdate}
-                  onCompletionSettingsChange={handleCompletionSettingsUpdate}
-                  onFocus={() => {
-                    onFocus && onFocus();
-                  }}
-                />
-              )}
-            </View>
-
             <Divider style={styles.divider} />
             {isDownloaded ? (
               <Card.Actions style={styles.actions}>
@@ -333,13 +315,13 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
                   {l10n.delete}
                 </Button>
                 <Button
-                  testID="reset-button"
-                  icon="refresh"
+                  testID="settings-button"
+                  icon="tune"
                   mode="text"
                   compact
-                  onPress={handleReset}
+                  onPress={handleOpenSettings}
                   style={styles.actionButton}>
-                  {l10n.reset}
+                  Settings
                 </Button>
                 {renderModelLoadButton()}
               </Card.Actions>
@@ -375,6 +357,40 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
           }}>
           {memoryWarning}
         </Snackbar>
+        {/* Settings Modal */}
+        <Portal>
+          <Dialog
+            visible={settingsModalVisible}
+            onDismiss={handleCloseSettings}
+            style={styles.settingsDialog}>
+            <Dialog.Title style={styles.dialogTitle}>
+              Model Settings
+            </Dialog.Title>
+            <Dialog.Content style={styles.dialogContent}>
+              <ScrollView style={styles.dialogScrollArea}>
+                <ModelSettings
+                  chatTemplate={model.chatTemplate}
+                  completionSettings={model.completionSettings}
+                  isActive={isActiveModel}
+                  onChange={handleSettingsUpdate}
+                  onCompletionSettingsChange={handleCompletionSettingsUpdate}
+                  onFocus={onFocus}
+                />
+              </ScrollView>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={handleCloseSettings}>Cancel</Button>
+              <Button onPress={handleReset}>Reset</Button>
+              <Button
+                mode="contained"
+                onPress={() => {
+                  handleCloseSettings();
+                }}>
+                Save
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
       </>
     );
   },

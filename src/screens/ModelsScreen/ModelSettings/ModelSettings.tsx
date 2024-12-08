@@ -17,7 +17,6 @@ import {
   Dialog,
   Portal,
   Text,
-  List,
 } from 'react-native-paper';
 
 import {useTheme} from '../../../hooks';
@@ -40,7 +39,6 @@ interface ModelSettingsProps {
 export const ModelSettings: React.FC<ModelSettingsProps> = ({
   chatTemplate,
   completionSettings,
-  isActive,
   onChange,
   onCompletionSettingsChange,
   onFocus,
@@ -157,14 +155,14 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
             style={styles.chatTemplateContainer}
             maskElement={
               <View style={styles.chatTemplateMaskContainer}>
-                <Text variant="labelSmall" style={styles.chatTemplateText}>
+                <Text variant="labelSmall">
                   {chatTemplate.chatTemplate.trim().slice(0, 30)}
                 </Text>
               </View>
             }>
             <LinearGradient
               colors={[theme.colors.onSurface, 'transparent']}
-              style={styles.gradient}
+              style={styles.chatTemplatePreviewGradient}
               start={{x: 0.7, y: 0}}
               end={{x: 1, y: 0}}
             />
@@ -194,31 +192,23 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
           />
         </View>
         {/** Completion Settings */}
-        <List.Accordion
-          title="Advanced Settings"
-          style={[
-            styles.accordion,
-            isActive
-              ? [
-                  styles.active,
-                  {backgroundColor: theme.colors.tertiaryContainer},
-                ]
-              : {backgroundColor: theme.colors.surface},
-          ]}
-          titleStyle={styles.accordionTitle}>
+        <View style={styles.completionSettingsContainer}>
+          <Text variant="titleMedium" style={styles.completionSettingsTitle}>
+            Generation Settings
+          </Text>
           <CompletionSettings
             settings={completionSettings}
             onChange={onCompletionSettingsChange}
           />
-        </List.Accordion>
+        </View>
 
+        {/** Chat Template Dialog */}
         <Portal>
           <Dialog
             visible={isDialogVisible}
-            onDismiss={() => setDialogVisible(false)}
-            style={styles.dialog}>
+            onDismiss={() => setDialogVisible(false)}>
             <Dialog.Content>
-              <View style={styles.pickerContainer}>
+              <View>
                 <ChatTemplatePicker
                   selectedTemplateName={selectedTemplateName}
                   handleChatTemplateNameChange={handleChatTemplateNameChange}
@@ -230,9 +220,7 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
                   template.
                 </Text>
               </View>
-              <ScrollView
-                contentContainerStyle={styles.scrollViewContent}
-                style={styles.scrollView}>
+              <ScrollView style={styles.scrollView}>
                 <TextInput
                   ref={textInputRef}
                   placeholder="Enter your chat template here..."

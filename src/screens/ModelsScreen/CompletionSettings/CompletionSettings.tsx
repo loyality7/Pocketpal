@@ -3,7 +3,7 @@ import {View} from 'react-native';
 
 import {CompletionParams} from '@pocketpalai/llama.rn';
 import Slider from '@react-native-community/slider';
-import {Card, Text, Switch, TextInput, Divider, Chip} from 'react-native-paper';
+import {Text, Switch, TextInput, Divider, Chip} from 'react-native-paper';
 
 import {useTheme} from '../../../hooks';
 
@@ -131,41 +131,39 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
 
   return (
     <View>
-      <Card.Content>
-        {renderIntegerInput('n_predict', 0, 2048)}
-        {renderSlider('temperature', 0, 1)}
-        {renderSlider('top_k', 1, 128, 1)}
-        {renderSlider('top_p', 0, 1)}
-        {renderSlider('min_p', 0, 1)}
-        {renderSlider('xtc_threshold', 0, 1)}
-        {renderSlider('xtc_probability', 0, 1)}
-        {renderSlider('typical_p', 0, 2)}
-        {renderSlider('penalty_last_n', 0, 256, 1)}
-        {renderSlider('penalty_repeat', 0, 2)}
-        {renderSlider('penalty_freq', 0, 2)}
-        {renderSlider('penalty_present', 0, 2)}
-        <Divider style={styles.divider} />
-        <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>mirostat</Text>
-          <View style={styles.chipContainer}>
-            {[0, 1, 2].map(value => (
-              <Chip
-                key={value}
-                selected={settings.mirostat === value}
-                onPress={() => onChange('mirostat', value)}
-                style={styles.chip}>
-                {value.toString()}
-              </Chip>
-            ))}
-          </View>
+      {renderIntegerInput('n_predict', 0, 2048)}
+      {renderSlider('temperature', 0, 1)}
+      {renderSlider('top_k', 1, 128, 1)}
+      {renderSlider('top_p', 0, 1)}
+      {renderSlider('min_p', 0, 1)}
+      {renderSlider('xtc_threshold', 0, 1)}
+      {renderSlider('xtc_probability', 0, 1)}
+      {renderSlider('typical_p', 0, 2)}
+      {renderSlider('penalty_last_n', 0, 256, 1)}
+      {renderSlider('penalty_repeat', 0, 2)}
+      {renderSlider('penalty_freq', 0, 2)}
+      {renderSlider('penalty_present', 0, 2)}
+      <Divider style={styles.divider} />
+      <View style={styles.settingItem}>
+        <Text style={styles.settingLabel}>mirostat</Text>
+        <View style={styles.chipContainer}>
+          {[0, 1, 2].map(value => (
+            <Chip
+              key={value}
+              selected={settings.mirostat === value}
+              onPress={() => onChange('mirostat', value)}
+              style={styles.chip}>
+              {value.toString()}
+            </Chip>
+          ))}
         </View>
-        {renderSlider('mirostat_tau', 0, 10, 1)}
-        {renderSlider('mirostat_eta', 0, 1)}
-        {renderSwitch('penalize_nl')}
-        {renderIntegerInput('seed', 0, Number.MAX_SAFE_INTEGER)}
-        {renderIntegerInput('n_probs', 0, 100)}
-        {renderStopWords()}
-      </Card.Content>
+      </View>
+      {renderSlider('mirostat_tau', 0, 10, 1)}
+      {renderSlider('mirostat_eta', 0, 1)}
+      {renderSwitch('penalize_nl')}
+      {renderIntegerInput('seed', 0, Number.MAX_SAFE_INTEGER)}
+      {renderIntegerInput('n_probs', 0, 100)}
+      {renderStopWords()}
     </View>
   );
 };

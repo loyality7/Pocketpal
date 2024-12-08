@@ -123,4 +123,22 @@ export const createStyles = (theme: Theme) =>
     divider: {
       marginTop: 8,
     },
+    settingsDialog: {
+      maxHeight: '80%',
+      backgroundColor: theme.colors.surface,
+      borderRadius: 15,
+      margin: 0,
+      padding: 0,
+    },
+    dialogTitle: {
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    dialogScrollArea: {
+      paddingHorizontal: 0,
+    },
+    dialogContent: {
+      paddingHorizontal: 16,
+      backgroundColor: theme.colors.surface,
+    },
   });
