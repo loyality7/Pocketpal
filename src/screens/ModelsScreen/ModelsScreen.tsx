@@ -22,7 +22,7 @@ import {createStyles} from './styles';
 import {HFModelSearch} from './HFModelSearch';
 import {ModelAccordion} from './ModelAccordion';
 
-import {uiStore, modelStore} from '../../store';
+import {uiStore, modelStore, UIStore} from '../../store';
 
 import {L10nContext} from '../../utils';
 import {Model, ModelOrigin} from '../../utils/types';
@@ -142,9 +142,26 @@ export const ModelsScreen: React.FC = observer(() => {
     return result;
   }, [models, filters]);
 
+  const getGroupDisplayName = (key: string) => {
+    switch (key) {
+      case UIStore.GROUP_KEYS.READY_TO_USE:
+        return l10n.availableToUse;
+      case UIStore.GROUP_KEYS.AVAILABLE_TO_DOWNLOAD:
+        return l10n.availableToDownload;
+      default:
+        return key;
+    }
+  };
+
   const groupedModels = useMemo(() => {
     if (!filters.includes('grouped')) {
-      return {ungrouped: filteredAndSortedModels};
+      return {
+        [UIStore.GROUP_KEYS.READY_TO_USE]: filteredAndSortedModels.filter(
+          model => model.isDownloaded,
+        ),
+        [UIStore.GROUP_KEYS.AVAILABLE_TO_DOWNLOAD]:
+          filteredAndSortedModels.filter(model => !model.isDownloaded),
+      };
     }
 
     return filteredAndSortedModels.reduce((acc, item) => {
@@ -175,9 +192,12 @@ export const ModelsScreen: React.FC = observer(() => {
 
   const renderGroupHeader = ({item: group}) => {
     const isExpanded = expandedGroups[group.type];
+    const displayName = filters.includes('grouped')
+      ? group.type
+      : getGroupDisplayName(group.type);
     return (
       <ModelAccordion
-        group={group}
+        group={{...group, type: displayName}}
         expanded={isExpanded}
         onPress={() => toggleGroup(group.type)}>
         <FlatList
@@ -189,7 +209,6 @@ export const ModelsScreen: React.FC = observer(() => {
               activeModelId={activeModelId}
               onFocus={() => {
                 if (Platform.OS === 'ios') {
-                  // Workaround for multiline input text not avoiding the keyboard.
                   moveScrollToDown();
                 }
               }}
@@ -199,19 +218,6 @@ export const ModelsScreen: React.FC = observer(() => {
       </ModelAccordion>
     );
   };
-
-  const renderItem = ({item}) => (
-    <ModelCard
-      model={item}
-      activeModelId={activeModelId}
-      onFocus={() => {
-        if (Platform.OS === 'ios') {
-          // Workaround for multiline input text not avoiding the keyboard.
-          moveScrollToDown();
-        }
-      }}
-    />
-  );
 
   const flatListModels = Object.keys(groupedModels)
     .map(type => ({
@@ -231,16 +237,10 @@ export const ModelsScreen: React.FC = observer(() => {
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.listContainer}
-        data={
-          filters.includes('grouped') ? flatListModels : filteredAndSortedModels
-        }
-        keyExtractor={item =>
-          filters.includes('grouped') ? item.type : item.id
-        }
+        data={flatListModels}
+        keyExtractor={item => item.type}
         extraData={activeModelId}
-        renderItem={
-          filters.includes('grouped') ? renderGroupHeader : renderItem
-        }
+        renderItem={renderGroupHeader}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
