@@ -80,7 +80,7 @@ const createBaseColors = (isDark: boolean): MD3BaseColors => {
     onSurface: '#333333',
     surfaceVariant: '#e4e4e6',
     onSurfaceVariant: '#646466',
-    outline: '#969799',
+    outline: withOpacity(md3BaseColors.primary!, 0.05),
     outlineVariant: '#a1a1a1',
     // Additional required MD3 colors
     surfaceDisabled: withOpacity('#fcfcfc', 0.12),
@@ -120,6 +120,9 @@ const createSemanticColors = (
   surfaceBright: isDark
     ? withOpacity(baseColors.surface, 0.24)
     : baseColors.surface,
+
+  border: withOpacity(baseColors.onSurface, 0.05),
+  placeholder: withOpacity(baseColors.onSurface, 0.3),
 
   // Interactive states
   stateLayerOpacity: 0.12,

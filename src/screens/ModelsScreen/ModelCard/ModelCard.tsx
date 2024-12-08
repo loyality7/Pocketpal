@@ -15,11 +15,9 @@ import {
   HelperText,
   ActivityIndicator,
   Snackbar,
-  Dialog,
-  Portal,
 } from 'react-native-paper';
 
-import {Divider} from '../../../components';
+import {Dialog, Divider} from '../../../components';
 
 import {useTheme, useMemoryCheck, useStorageCheck} from '../../../hooks';
 
@@ -362,51 +360,40 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
           }}>
           {memoryWarning}
         </Snackbar>
+
         {/* Settings Modal */}
-        <Portal>
-          <Dialog
-            visible={settingsModalVisible}
-            onDismiss={handleCloseSettings}
-            style={styles.settingsDialog}>
-            <Dialog.Title style={styles.dialogTitle}>
-              Model Settings
-            </Dialog.Title>
-            <Dialog.Content style={styles.dialogContent}>
-              <ScrollView style={styles.dialogScrollArea}>
-                <ModelSettings
-                  chatTemplate={model.chatTemplate}
-                  completionSettings={model.completionSettings}
-                  isActive={isActiveModel}
-                  onChange={handleSettingsUpdate}
-                  onCompletionSettingsChange={handleCompletionSettingsUpdate}
-                  onFocus={onFocus}
-                />
-              </ScrollView>
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button
-                mode="text"
-                onPress={handleReset}
-                style={styles.dialogActionButton}>
-                Reset
-              </Button>
-              <Button
-                mode="text"
-                onPress={handleCloseSettings}
-                style={styles.dialogActionButton}>
-                Cancel
-              </Button>
-              <Button
-                mode="contained"
-                onPress={() => {
-                  handleCloseSettings();
-                }}
-                style={styles.dialogActionButton}>
-                Save
-              </Button>
-            </Dialog.Actions>
-          </Dialog>
-        </Portal>
+        <Dialog
+          visible={settingsModalVisible}
+          onDismiss={handleCloseSettings}
+          title="Model Settings"
+          actions={[
+            {
+              label: 'Reset',
+              onPress: handleReset,
+            },
+            {
+              label: 'Cancel',
+              onPress: handleCloseSettings,
+            },
+            {
+              label: 'Save',
+              onPress: () => {
+                handleCloseSettings();
+              },
+              mode: 'contained',
+            },
+          ]}>
+          <ScrollView style={styles.dialogScrollArea}>
+            <ModelSettings
+              chatTemplate={model.chatTemplate}
+              completionSettings={model.completionSettings}
+              isActive={isActiveModel}
+              onChange={handleSettingsUpdate}
+              onCompletionSettingsChange={handleCompletionSettingsUpdate}
+              onFocus={onFocus}
+            />
+          </ScrollView>
+        </Dialog>
       </>
     );
   },

@@ -188,6 +188,9 @@ export interface SemanticColors {
   surfaceDim: string;
   surfaceBright: string;
 
+  border: string;
+  placeholder: string;
+
   // Interactive states
   stateLayerOpacity: number;
   hoverStateOpacity: number;

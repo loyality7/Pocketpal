@@ -1,27 +1,17 @@
-import {TextInput as RNTextInput} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
-import {
-  View,
-  ScrollView,
-  Keyboard,
-  TouchableWithoutFeedback,
-} from 'react-native';
+import {TextInput as RNTextInput, ScrollView} from 'react-native';
+import {View, Keyboard, TouchableWithoutFeedback} from 'react-native';
 
 import {CompletionParams} from '@pocketpalai/llama.rn';
+import {Button, Text, Switch} from 'react-native-paper';
 import LinearGradient from 'react-native-linear-gradient';
 import MaskedView from '@react-native-masked-view/masked-view';
-import {
-  Button,
-  TextInput,
-  Chip,
-  Dialog,
-  Portal,
-  Text,
-} from 'react-native-paper';
+
+import {Dialog, Divider, TextInput} from '../../../components';
 
 import {useTheme} from '../../../hooks';
 
-import {styles} from './styles';
+import {createStyles} from './styles';
 import {ChatTemplatePicker} from '../ChatTemplatePicker';
 import {CompletionSettings} from '../CompletionSettings';
 
@@ -55,6 +45,8 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
   );
 
   const theme = useTheme();
+  const styles = createStyles(theme);
+
   const textInputRef = useRef<RNTextInput>(null);
   const systemPromptTextInputRef = useRef<RNTextInput>(null);
 
@@ -103,95 +95,131 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
     Keyboard.dismiss();
   };
 
+  const renderTokenSetting = (
+    testID: string,
+    label: string,
+    isEnabled: boolean,
+    token: string | undefined,
+    toggleName: string,
+    tokenName?: string,
+  ) => (
+    <View>
+      <View style={styles.switchContainer}>
+        <Text>{label}</Text>
+        <Switch
+          testID={`${testID}-switch`}
+          value={isEnabled}
+          onValueChange={value => onChange(toggleName, value)}
+        />
+      </View>
+      {isEnabled && tokenName && (
+        <TextInput
+          placeholder={`${label} Token`}
+          value={token}
+          onChangeText={text => onChange(tokenName, text)}
+          dense
+          testID={`${testID}-input`}
+        />
+      )}
+    </View>
+  );
+
+  const renderTemplateSection = () => (
+    <View style={styles.settingsSection}>
+      <View style={styles.chatTemplateRow}>
+        <Text style={styles.chatTemplateLabel} variant="labelLarge">
+          Template:
+        </Text>
+        <MaskedView
+          style={styles.chatTemplateContainer}
+          maskElement={
+            <View style={styles.chatTemplateMaskContainer}>
+              <Text variant="labelSmall">
+                {chatTemplate.chatTemplate.trim().slice(0, 30)}
+              </Text>
+            </View>
+          }>
+          <LinearGradient
+            colors={[theme.colors.onSurface, 'transparent']}
+            style={styles.chatTemplatePreviewGradient}
+            start={{x: 0.7, y: 0}}
+            end={{x: 1, y: 0}}
+          />
+        </MaskedView>
+        <Button
+          onPress={() => {
+            setLocalChatTemplate(chatTemplate.chatTemplate);
+            setDialogVisible(true);
+          }}>
+          Edit
+        </Button>
+      </View>
+    </View>
+  );
+
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <View style={styles.container} testID="settings-container">
-        <View style={styles.row}>
-          <Chip
-            selected={chatTemplate.addBosToken}
-            onPress={() => onChange('addBosToken', !chatTemplate.addBosToken)}
-            style={styles.chip}>
-            Use BOS
-          </Chip>
-          <TextInput
-            placeholder="BOS Token"
-            value={chatTemplate.bosToken}
-            onChangeText={text => onChange('bosToken', text)}
-            style={styles.minimalInput}
-            //disabled={!chatTemplate.addBosToken}
-            dense
-          />
-        </View>
-        <View style={styles.row}>
-          <Chip
-            selected={chatTemplate.addEosToken}
-            onPress={() => onChange('addEosToken', !chatTemplate.addEosToken)}
-            style={styles.chip}>
-            Use EOS
-          </Chip>
-          <TextInput
-            placeholder="EOS Token"
-            value={chatTemplate.eosToken}
-            onChangeText={text => onChange('eosToken', text)}
-            style={styles.minimalInput}
-            //disabled={!chatTemplate.addEosToken}
-          />
-        </View>
-        <View style={styles.row}>
-          <Chip
-            selected={chatTemplate.addGenerationPrompt}
-            onPress={() =>
-              onChange('addGenerationPrompt', !chatTemplate.addGenerationPrompt)
-            }
-            style={styles.generationPromptChip}>
-            Add Generation Prompt
-          </Chip>
-        </View>
-        <View style={styles.chatTemplateRow}>
-          <Text style={styles.chatTemplateLabel} variant="labelLarge">
-            Template:
-          </Text>
-          <MaskedView
-            style={styles.chatTemplateContainer}
-            maskElement={
-              <View style={styles.chatTemplateMaskContainer}>
-                <Text variant="labelSmall">
-                  {chatTemplate.chatTemplate.trim().slice(0, 30)}
-                </Text>
-              </View>
-            }>
-            <LinearGradient
-              colors={[theme.colors.onSurface, 'transparent']}
-              style={styles.chatTemplatePreviewGradient}
-              start={{x: 0.7, y: 0}}
-              end={{x: 1, y: 0}}
+        {/* Token Settings Section */}
+        <View style={styles.settingsSection}>
+          {renderTokenSetting(
+            'BOS',
+            'BOS',
+            chatTemplate.addBosToken ?? false,
+            chatTemplate.bosToken,
+            'addBosToken',
+            'bosToken',
+          )}
+
+          <Divider style={styles.divider} />
+
+          {renderTokenSetting(
+            'EOS',
+            'EOS',
+            chatTemplate.addEosToken ?? false,
+            chatTemplate.eosToken,
+            'addEosToken',
+            'eosToken',
+          )}
+
+          <Divider style={styles.divider} />
+
+          {renderTokenSetting(
+            'add-generation-prompt',
+            'Add Generation Prompt',
+            chatTemplate.addGenerationPrompt ?? false,
+            undefined,
+            'addGenerationPrompt',
+          )}
+
+          <Divider style={styles.divider} />
+
+          {renderTemplateSection()}
+
+          <Divider style={styles.divider} />
+
+          {/* System Prompt Section */}
+          <View style={styles.settingsSection}>
+            <TextInput
+              testID="system-prompt-input"
+              ref={systemPromptTextInputRef}
+              defaultValue={localSystemPrompt}
+              onChangeText={text => setLocalSystemPrompt(text)}
+              onBlur={() => handleSaveSystemPrompt()}
+              multiline
+              numberOfLines={3}
+              style={styles.textArea}
+              label={'System prompt'}
+              onFocus={() => {
+                onFocus && onFocus();
+              }}
             />
-          </MaskedView>
-          <Button
-            onPress={() => {
-              setLocalChatTemplate(chatTemplate.chatTemplate);
-              setDialogVisible(true);
-            }}>
-            Edit
-          </Button>
+          </View>
         </View>
-        <View>
-          <TextInput
-            testID="system-prompt-input"
-            ref={systemPromptTextInputRef}
-            defaultValue={localSystemPrompt}
-            onChangeText={text => setLocalSystemPrompt(text)}
-            onBlur={() => handleSaveSystemPrompt()}
-            multiline
-            numberOfLines={3}
-            style={styles.textArea}
-            label={'System prompt'}
-            onFocus={() => {
-              onFocus && onFocus();
-            }}
-          />
-        </View>
-        {/** Completion Settings */}
+
+        <Divider style={styles.divider} />
+
+        {/* Completion Settings Section */}
         <View style={styles.completionSettingsContainer}>
           <Text variant="titleMedium" style={styles.completionSettingsTitle}>
             Generation Settings
@@ -203,41 +231,43 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
         </View>
 
         {/** Chat Template Dialog */}
-        <Portal>
-          <Dialog
-            visible={isDialogVisible}
-            onDismiss={() => setDialogVisible(false)}>
-            <Dialog.Content>
-              <View>
-                <ChatTemplatePicker
-                  selectedTemplateName={selectedTemplateName}
-                  handleChatTemplateNameChange={handleChatTemplateNameChange}
-                />
-                <Text
-                  variant="labelSmall"
-                  style={{color: theme.colors.onSurfaceVariant}}>
-                  Note: Uses Nunjucks format only. Leave empty to use model's
-                  template.
-                </Text>
-              </View>
-              <ScrollView style={styles.scrollView}>
-                <TextInput
-                  ref={textInputRef}
-                  placeholder="Enter your chat template here..."
-                  defaultValue={localChatTemplate}
-                  onChangeText={text => setLocalChatTemplate(text)}
-                  multiline
-                  numberOfLines={10}
-                  style={styles.textArea}
-                />
-              </ScrollView>
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button onPress={() => setDialogVisible(false)}>Cancel</Button>
-              <Button onPress={handleSave}>Save</Button>
-            </Dialog.Actions>
-          </Dialog>
-        </Portal>
+        <Dialog
+          visible={isDialogVisible}
+          onDismiss={() => setDialogVisible(false)}
+          title="Edit Chat Template"
+          actions={[
+            {
+              label: 'Cancel',
+              onPress: () => setDialogVisible(false),
+            },
+            {
+              label: 'Save',
+              onPress: handleSave,
+              mode: 'contained',
+            },
+          ]}>
+          <View>
+            <ChatTemplatePicker
+              selectedTemplateName={selectedTemplateName}
+              handleChatTemplateNameChange={handleChatTemplateNameChange}
+            />
+            <Text variant="labelSmall" style={styles.templateNote}>
+              Note: Uses Nunjucks format only. Leave empty to use model's
+              template.
+            </Text>
+          </View>
+          <ScrollView style={styles.scrollView}>
+            <TextInput
+              ref={textInputRef}
+              placeholder="Enter your chat template here..."
+              defaultValue={localChatTemplate}
+              onChangeText={text => setLocalChatTemplate(text)}
+              multiline
+              numberOfLines={10}
+              style={styles.textArea}
+            />
+          </ScrollView>
+        </Dialog>
       </View>
     </TouchableWithoutFeedback>
   );
