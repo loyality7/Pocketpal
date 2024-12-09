@@ -27,7 +27,7 @@ export const COMPLETION_PARAMS_METADATA: Partial<
     descriptionKey: 'modelSettings.n_predict',
   },
   temperature: {
-    validation: {type: 'numeric', min: 0, max: 1, required: true},
+    validation: {type: 'numeric', min: 0, max: 2, required: true},
     defaultValue: defaultCompletionParams.temperature,
     descriptionKey: 'modelSettings.temperature',
   },
