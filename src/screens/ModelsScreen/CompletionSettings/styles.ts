@@ -18,8 +18,6 @@ export const createStyles = (theme: Theme) =>
       paddingHorizontal: 4,
     },
     settingLabel: {
-      fontSize: 14,
-      fontWeight: 'bold',
       marginBottom: 2,
     },
     settingValue: {

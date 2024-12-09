@@ -11,43 +11,23 @@ import {useTheme} from '../../../hooks';
 
 import {createStyles} from './styles';
 
+import {L10nContext} from '../../../utils';
 import {
-  MODEL_VALIDATION_RULES,
+  COMPLETION_PARAMS_METADATA,
   validateNumericField,
-} from '../../../utils/validation';
+} from '../../../utils/modelSettings';
 
 interface Props {
   settings: CompletionParams;
   onChange: (name: string, value: any) => void;
 }
 
-const PARAMETER_DESCRIPTIONS = {
-  n_predict: 'Maximum number of tokens to generate',
-  temperature: 'Controls randomness (higher = more creative)',
-  top_k: 'Limits token selection to K most likely options',
-  top_p: 'Cumulative probability threshold for token selection',
-  min_p: 'Minimum token probability relative to best token',
-  xtc_threshold: 'Minimum probability for token consideration',
-  xtc_probability: 'Probability of token removal at start',
-  typical_p: 'Controls locally typical sampling',
-  penalty_last_n: 'Number of tokens to check for repetition',
-  penalty_repeat: 'Penalizes token sequence repetition',
-  penalty_freq: 'Penalizes frequent token usage',
-  penalty_present: 'Penalizes token presence in context',
-  mirostat: 'Advanced sampling mode for stable output',
-  mirostat_tau: 'Target complexity for Mirostat',
-  mirostat_eta: 'Learning rate for Mirostat',
-  penalize_nl: 'Apply repeat penalty to newlines',
-  seed: 'Random seed for reproducible output',
-  n_probs: 'Return top token probabilities',
-  stop: 'Sequences that end generation',
-};
-
 export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
   const [localSliderValues, setLocalSliderValues] = useState({});
   const [newStopWord, setNewStopWord] = useState('');
   const theme = useTheme();
   const styles = createStyles(theme);
+  const l10n = React.useContext(L10nContext);
 
   // Reset local values when settings change
   useEffect(() => {
@@ -58,26 +38,18 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
     onChange(name, value);
   };
 
-  const renderSlider = ({
-    name,
-    min,
-    max,
-    step = 0.01,
-    label,
-  }: {
-    name: string;
-    min: number;
-    max: number;
-    step?: number;
-    label?: string;
-  }) => (
+  const renderSlider = ({name, step = 0.01}: {name: string; step?: number}) => (
     <View style={styles.settingItem}>
-      <Text style={styles.settingLabel}>{label ?? name}</Text>
-      <Text style={styles.description}>{PARAMETER_DESCRIPTIONS[name]}</Text>
+      <Text variant="labelSmall" style={styles.settingLabel}>
+        {name.toUpperCase().replace('_', ' ')}
+      </Text>
+      <Text style={styles.description}>
+        {l10n[COMPLETION_PARAMS_METADATA[name]?.descriptionKey]}
+      </Text>
       <Slider
         style={styles.slider}
-        minimumValue={min}
-        maximumValue={max}
+        minimumValue={COMPLETION_PARAMS_METADATA[name]?.validation.min}
+        maximumValue={COMPLETION_PARAMS_METADATA[name]?.validation.max}
         step={step}
         value={localSliderValues[name] ?? settings[name]}
         onValueChange={value => {
@@ -99,49 +71,41 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
     </View>
   );
 
-  const renderIntegerInput = ({
-    name,
-    label,
-  }: {
-    name: string;
-    label?: string;
-  }) => {
-    const rule = MODEL_VALIDATION_RULES[name];
-    if (!rule) {
-      console.warn(`No validation rule found for ${name}`);
+  const renderIntegerInput = ({name}: {name: keyof CompletionParams}) => {
+    const metadata = COMPLETION_PARAMS_METADATA[name];
+    if (!metadata) {
       return null;
     }
 
-    const value = settings[name].toString();
-    const isValid = validateNumericField(value, rule);
+    const value = settings[name]?.toString() ?? '';
+    const validation = validateNumericField(value, metadata.validation);
 
     return (
       <View style={styles.settingItem}>
-        <Text style={styles.settingLabel}>{label ?? name}</Text>
-        <Text style={styles.description}>{PARAMETER_DESCRIPTIONS[name]}</Text>
+        <Text variant="labelSmall" style={styles.settingLabel}>
+          {name.toUpperCase().replace('_', ' ')}
+        </Text>
+        <Text style={styles.description}>{l10n[metadata.descriptionKey]}</Text>
         <TextInput
           value={value}
-          onChangeText={_value => {
-            onChange(name, _value);
-          }}
+          onChangeText={_value => onChange(name, _value)}
           keyboardType="numeric"
-          error={!isValid}
-          helperText={
-            !isValid
-              ? `Value must be between ${rule.min} and ${rule.max}`
-              : undefined
-          }
-          testID={`${name}-input`}
+          error={!validation.isValid}
+          helperText={validation.errorMessage}
         />
       </View>
     );
   };
 
-  const renderSwitch = (name: string, label?: string) => (
+  const renderSwitch = (name: string) => (
     <View style={[styles.settingItem, styles.row]}>
       <View>
-        <Text style={styles.settingLabel}>{label ?? name}</Text>
-        <Text style={styles.description}>{PARAMETER_DESCRIPTIONS[name]}</Text>
+        <Text variant="labelSmall" style={styles.settingLabel}>
+          {name.toUpperCase().replace('_', ' ')}
+        </Text>
+        <Text style={styles.description}>
+          {l10n[COMPLETION_PARAMS_METADATA[name]?.descriptionKey]}
+        </Text>
       </View>
       <Switch
         value={settings[name]}
@@ -154,7 +118,9 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
   const renderStopWords = () => (
     <View style={styles.settingItem}>
       <View style={styles.stopLabel}>
-        <Text style={styles.settingLabel}>stop</Text>
+        <Text variant="labelSmall" style={styles.settingLabel}>
+          STOP WORDS
+        </Text>
       </View>
 
       {/* Display existing stop words as chips */}
@@ -192,134 +158,62 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
     </View>
   );
 
-  const renderMirostatSelector = () => (
-    <View style={styles.settingItem}>
-      <Text style={styles.settingLabel}>Mirostat</Text>
-      <Text style={styles.description}>{PARAMETER_DESCRIPTIONS.mirostat}</Text>
-      <SegmentedButtons
-        value={(settings.mirostat ?? 0).toString()}
-        onValueChange={value => onChange('mirostat', parseInt(value, 10))}
-        density="high"
-        buttons={[
-          {
-            value: '0',
-            label: 'Off',
-          },
-          {
-            value: '1',
-            label: 'v1',
-          },
-          {
-            value: '2',
-            label: 'v2',
-          },
-        ]}
-        style={styles.segmentedButtons}
-      />
-    </View>
-  );
+  const renderMirostatSelector = () => {
+    const descriptionKey = COMPLETION_PARAMS_METADATA.mirostat?.descriptionKey;
+    const description = descriptionKey ? l10n[descriptionKey] : '';
+
+    return (
+      <View style={styles.settingItem}>
+        <Text style={styles.settingLabel}>Mirostat</Text>
+        {description && <Text style={styles.description}>{description}</Text>}
+        <SegmentedButtons
+          value={(settings.mirostat ?? 0).toString()}
+          onValueChange={value => onChange('mirostat', parseInt(value, 10))}
+          density="high"
+          buttons={[
+            {
+              value: '0',
+              label: 'Off',
+            },
+            {
+              value: '1',
+              label: 'v1',
+            },
+            {
+              value: '2',
+              label: 'v2',
+            },
+          ]}
+          style={styles.segmentedButtons}
+        />
+      </View>
+    );
+  };
 
   return (
     <View>
-      {renderIntegerInput({
-        name: 'n_predict',
-        label: 'N-Predict',
-      })}
-      {renderSlider({
-        name: 'temperature',
-        min: MODEL_VALIDATION_RULES.temperature.min,
-        max: MODEL_VALIDATION_RULES.temperature.max,
-        label: 'Temperature',
-      })}
-      {renderSlider({
-        name: 'top_k',
-        min: MODEL_VALIDATION_RULES.top_k.min,
-        max: MODEL_VALIDATION_RULES.top_k.max,
-        step: 1,
-        label: 'Top-K',
-      })}
-      {renderSlider({
-        name: 'top_p',
-        min: MODEL_VALIDATION_RULES.top_p.min,
-        max: MODEL_VALIDATION_RULES.top_p.max,
-        label: 'Top-P',
-      })}
-      {renderSlider({
-        name: 'min_p',
-        min: MODEL_VALIDATION_RULES.min_p.min,
-        max: MODEL_VALIDATION_RULES.min_p.max,
-        label: 'Min-P',
-      })}
-      {renderSlider({
-        name: 'xtc_threshold',
-        min: MODEL_VALIDATION_RULES.xtc_threshold.min,
-        max: MODEL_VALIDATION_RULES.xtc_threshold.max,
-        label: 'XTC Threshold',
-      })}
-      {renderSlider({
-        name: 'xtc_probability',
-        min: MODEL_VALIDATION_RULES.xtc_probability.min,
-        max: MODEL_VALIDATION_RULES.xtc_probability.max,
-        label: 'XTC Probability',
-      })}
-      {renderSlider({
-        name: 'typical_p',
-        min: MODEL_VALIDATION_RULES.typical_p.min,
-        max: MODEL_VALIDATION_RULES.typical_p.max,
-        label: 'Typical P',
-      })}
-      {renderSlider({
-        name: 'penalty_last_n',
-        min: MODEL_VALIDATION_RULES.penalty_last_n.min,
-        max: MODEL_VALIDATION_RULES.penalty_last_n.max,
-        step: 1,
-        label: 'Penalty Last N',
-      })}
-      {renderSlider({
-        name: 'penalty_repeat',
-        min: MODEL_VALIDATION_RULES.penalty_repeat.min,
-        max: MODEL_VALIDATION_RULES.penalty_repeat.max,
-        label: 'Penalty Repeat',
-      })}
-      {renderSlider({
-        name: 'penalty_freq',
-        min: MODEL_VALIDATION_RULES.penalty_freq.min,
-        max: MODEL_VALIDATION_RULES.penalty_freq.max,
-        label: 'Penalty Freq',
-      })}
-      {renderSlider({
-        name: 'penalty_present',
-        min: MODEL_VALIDATION_RULES.penalty_present.min,
-        max: MODEL_VALIDATION_RULES.penalty_present.max,
-        label: 'Penalty Present',
-      })}
+      {renderIntegerInput({name: 'n_predict'})}
+      {renderSlider({name: 'temperature'})}
+      {renderSlider({name: 'top_k', step: 1})}
+      {renderSlider({name: 'top_p'})}
+      {renderSlider({name: 'min_p'})}
+      {renderSlider({name: 'xtc_threshold'})}
+      {renderSlider({name: 'xtc_probability'})}
+      {renderSlider({name: 'typical_p'})}
+      {renderSlider({name: 'penalty_last_n', step: 1})}
+      {renderSlider({name: 'penalty_repeat'})}
+      {renderSlider({name: 'penalty_freq'})}
+      {renderSlider({name: 'penalty_present'})}
       {renderMirostatSelector()}
       {(settings.mirostat ?? 0) > 0 && (
         <>
-          {renderSlider({
-            name: 'mirostat_tau',
-            min: MODEL_VALIDATION_RULES.mirostat_tau.min,
-            max: MODEL_VALIDATION_RULES.mirostat_tau.max,
-            step: 1,
-            label: 'Mirostat Tau',
-          })}
-          {renderSlider({
-            name: 'mirostat_eta',
-            min: MODEL_VALIDATION_RULES.mirostat_eta.min,
-            max: MODEL_VALIDATION_RULES.mirostat_eta.max,
-            label: 'Mirostat Eta',
-          })}
+          {renderSlider({name: 'mirostat_tau', step: 1})}
+          {renderSlider({name: 'mirostat_eta'})}
         </>
       )}
-      {renderSwitch('penalize_nl', 'Penalize NL')}
-      {renderIntegerInput({
-        name: 'seed',
-        label: 'Seed',
-      })}
-      {renderIntegerInput({
-        name: 'n_probs',
-        label: 'N-Probs',
-      })}
+      {renderSwitch('penalize_nl')}
+      {renderIntegerInput({name: 'seed'})}
+      {renderIntegerInput({name: 'n_probs'})}
       {renderStopWords()}
     </View>
   );

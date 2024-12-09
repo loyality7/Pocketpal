@@ -28,8 +28,8 @@ import {uiStore, modelStore} from '../../../store';
 
 import {chatTemplates} from '../../../utils/chat';
 import {getModelDescription, L10nContext} from '../../../utils';
+import {validateCompletionSettings} from '../../../utils/modelSettings';
 import {Model, ModelOrigin, RootDrawerParamList} from '../../../utils/types';
-import {validateCompletionSettings} from '../../../utils/validation';
 
 type ChatScreenNavigationProp = DrawerNavigationProp<RootDrawerParamList>;
 
@@ -429,6 +429,7 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
 
         {/* Settings Modal */}
         <Dialog
+          dismissable={false}
           visible={settingsModalVisible}
           onDismiss={handleCancelSettings}
           title="Model Settings"

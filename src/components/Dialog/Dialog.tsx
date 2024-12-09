@@ -22,6 +22,8 @@ interface CustomDialogProps {
   style?: ViewStyle;
   contentStyle?: ViewStyle;
   scrollable?: boolean;
+  dismissableBackButton?: boolean;
+  dismissable?: boolean;
 }
 
 export const Dialog: React.FC<CustomDialogProps> = ({
@@ -32,6 +34,8 @@ export const Dialog: React.FC<CustomDialogProps> = ({
   actions = [],
   style,
   contentStyle,
+  dismissableBackButton = true,
+  dismissable = true,
 }) => {
   const theme = useTheme();
   const styles = createStyles(theme);
@@ -39,6 +43,8 @@ export const Dialog: React.FC<CustomDialogProps> = ({
   return (
     <Portal>
       <PaperDialog
+        dismissableBackButton={dismissableBackButton}
+        dismissable={dismissable}
         visible={visible}
         onDismiss={onDismiss}
         style={[styles.dialog, style]}>
