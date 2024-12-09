@@ -213,7 +213,6 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
       )}
       {renderSwitch('penalize_nl')}
       {renderIntegerInput({name: 'seed'})}
-      {renderIntegerInput({name: 'n_probs'})}
       {renderStopWords()}
     </View>
   );
