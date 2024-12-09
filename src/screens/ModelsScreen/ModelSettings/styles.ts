@@ -54,7 +54,7 @@ export const createStyles = (theme: Theme) =>
       marginVertical: 4,
     },
     templateNote: {
-      color: theme.colors.onSurfaceVariant,
-      marginBottom: 8,
+      color: theme.colors.textSecondary,
+      marginVertical: 8,
     },
   });

@@ -1,5 +1,5 @@
 import {View} from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 
 import Slider from '@react-native-community/slider';
 import {CompletionParams} from '@pocketpalai/llama.rn';
@@ -43,6 +43,11 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
   const [newStopWord, setNewStopWord] = useState('');
   const theme = useTheme();
   const styles = createStyles(theme);
+
+  // Reset local values when settings change
+  useEffect(() => {
+    setLocalSliderValues({});
+  }, [settings]);
 
   const handleOnChange = (name, value) => {
     onChange(name, value);

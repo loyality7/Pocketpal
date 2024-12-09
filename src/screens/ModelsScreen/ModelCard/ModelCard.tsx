@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useState, useEffect} from 'react';
 import {Alert, Linking, View, Image, ScrollView} from 'react-native';
 
 import {observer} from 'mobx-react-lite';
@@ -58,26 +58,71 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
     const isDownloading = modelStore.isDownloading(model.id);
     const isHfModel = model.origin === ModelOrigin.HF;
 
-    const handleSettingsUpdate = useCallback(
-      (name: string, value: any) => {
-        const chatTemplateConfig =
-          name === 'name'
-            ? chatTemplates[value]
-            : {...model.chatTemplate, [name]: value};
-        modelStore.updateModelChatTemplate(model.id, chatTemplateConfig);
-      },
-      [model.id, model.chatTemplate],
+    // temporary settings
+    const [tempChatTemplate, setTempChatTemplate] = useState(
+      model.chatTemplate,
     );
+    const [tempCompletionSettings, setTempCompletionSettings] = useState(
+      model.completionSettings,
+    );
+
+    // Reset temp settings when model changes
+    useEffect(() => {
+      setTempChatTemplate(model.chatTemplate);
+      setTempCompletionSettings(model.completionSettings);
+    }, [model]);
+
+    const handleSettingsUpdate = useCallback((name: string, value: any) => {
+      setTempChatTemplate(prev => {
+        const newTemplate =
+          name === 'name' ? chatTemplates[value] : {...prev, [name]: value};
+        return newTemplate;
+      });
+    }, []);
 
     const handleCompletionSettingsUpdate = useCallback(
       (name: string, value: any) => {
-        modelStore.updateCompletionSettings(model.id, {
-          ...model.completionSettings,
+        setTempCompletionSettings(prev => ({
+          ...prev,
           [name]: value,
-        });
+        }));
       },
-      [model.id, model.completionSettings],
+      [],
     );
+
+    const handleOpenSettings = useCallback(() => {
+      setSettingsModalVisible(true);
+    }, []);
+
+    const handleCloseSettings = useCallback(() => {
+      setSettingsModalVisible(false);
+    }, []);
+
+    const handleSaveSettings = useCallback(() => {
+      modelStore.updateModelChatTemplate(model.id, tempChatTemplate);
+      modelStore.updateCompletionSettings(model.id, tempCompletionSettings);
+      handleCloseSettings();
+    }, [
+      model.id,
+      tempChatTemplate,
+      tempCompletionSettings,
+      handleCloseSettings,
+    ]);
+
+    const handleCancelSettings = useCallback(() => {
+      // Reset to store values
+      setTempChatTemplate(model.chatTemplate);
+      setTempCompletionSettings(model.completionSettings);
+      handleCloseSettings();
+    }, [model.chatTemplate, model.completionSettings, handleCloseSettings]);
+
+    const handleReset = useCallback(() => {
+      // Reset to model default values
+      modelStore.resetModelChatTemplate(model.id);
+      modelStore.resetCompletionSettings(model.id);
+      setTempChatTemplate(model.chatTemplate);
+      setTempCompletionSettings(model.completionSettings);
+    }, [model.id, model.chatTemplate, model.completionSettings]);
 
     const handleDelete = useCallback(() => {
       if (model.isDownloaded) {
@@ -96,11 +141,6 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
         );
       }
     }, [model]);
-
-    const handleReset = useCallback(() => {
-      modelStore.resetModelChatTemplate(model.id);
-      modelStore.resetCompletionSettings(model.id);
-    }, [model.id]);
 
     const openHuggingFaceUrl = useCallback(() => {
       if (model.hfUrl) {
@@ -126,13 +166,9 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
       );
     }, [model]);
 
-    const handleOpenSettings = useCallback(() => {
-      setSettingsModalVisible(true);
-    }, []);
-
-    const handleCloseSettings = useCallback(() => {
-      setSettingsModalVisible(false);
-    }, []);
+    const handleWarningPress = () => {
+      setSnackbarVisible(true);
+    };
 
     const renderDownloadOverlay = () => (
       <View>
@@ -220,9 +256,21 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
       );
     };
 
-    const handleWarningPress = () => {
-      setSnackbarVisible(true);
-    };
+    const dialogActions = [
+      {
+        label: 'Reset',
+        onPress: handleReset,
+      },
+      {
+        label: 'Cancel',
+        onPress: handleCancelSettings,
+      },
+      {
+        label: 'Save Changes',
+        onPress: handleSaveSettings,
+        mode: 'contained' as const,
+      },
+    ];
 
     return (
       <>
@@ -364,30 +412,13 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
         {/* Settings Modal */}
         <Dialog
           visible={settingsModalVisible}
-          onDismiss={handleCloseSettings}
+          onDismiss={handleCancelSettings}
           title="Model Settings"
-          actions={[
-            {
-              label: 'Reset',
-              onPress: handleReset,
-            },
-            {
-              label: 'Cancel',
-              onPress: handleCloseSettings,
-            },
-            {
-              label: 'Save',
-              onPress: () => {
-                handleCloseSettings();
-              },
-              mode: 'contained',
-            },
-          ]}>
+          actions={dialogActions}>
           <ScrollView style={styles.dialogScrollArea}>
             <ModelSettings
-              chatTemplate={model.chatTemplate}
-              completionSettings={model.completionSettings}
-              isActive={isActiveModel}
+              chatTemplate={tempChatTemplate}
+              completionSettings={tempCompletionSettings}
               onChange={handleSettingsUpdate}
               onCompletionSettingsChange={handleCompletionSettingsUpdate}
               onFocus={onFocus}

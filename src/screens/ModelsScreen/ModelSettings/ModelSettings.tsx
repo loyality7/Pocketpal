@@ -20,7 +20,6 @@ import {ChatTemplateConfig} from '../../../utils/types';
 interface ModelSettingsProps {
   chatTemplate: ChatTemplateConfig;
   completionSettings: CompletionParams;
-  isActive: boolean;
   onChange: (name: string, value: any) => void;
   onCompletionSettingsChange: (name: string, value: any) => void;
   onFocus?: () => void;
@@ -37,9 +36,7 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
   const [localChatTemplate, setLocalChatTemplate] = useState(
     chatTemplate.chatTemplate,
   );
-  const [localSystemPrompt, setLocalSystemPrompt] = useState(
-    chatTemplate.systemPrompt ?? '',
-  );
+
   const [selectedTemplateName, setSelectedTemplateName] = useState(
     chatTemplate.name,
   );
@@ -48,41 +45,31 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
   const styles = createStyles(theme);
 
   const textInputRef = useRef<RNTextInput>(null);
-  const systemPromptTextInputRef = useRef<RNTextInput>(null);
-
-  useEffect(() => {
-    setSelectedTemplateName(chatTemplate.name);
-  }, [chatTemplate.name]);
 
   useEffect(() => {
     setLocalChatTemplate(chatTemplate.chatTemplate);
-  }, [chatTemplate.chatTemplate]);
+    setSelectedTemplateName(chatTemplate.name);
+  }, [chatTemplate]);
 
   useEffect(() => {
     if (textInputRef.current) {
       textInputRef.current.setNativeProps({text: localChatTemplate});
     }
-  }, [localChatTemplate]);
+  }, [localChatTemplate, isDialogVisible]);
 
   useEffect(() => {
-    setLocalSystemPrompt(chatTemplate.systemPrompt ?? '');
-  }, [chatTemplate.systemPrompt]);
-
-  useEffect(() => {
-    if (systemPromptTextInputRef.current) {
-      systemPromptTextInputRef.current.setNativeProps({
-        text: localSystemPrompt,
-      });
+    if (selectedTemplateName !== chatTemplate.name) {
+      if (
+        chatTemplate.chatTemplate !== undefined &&
+        chatTemplate.chatTemplate !== null
+      ) {
+        setLocalChatTemplate(chatTemplate.chatTemplate);
+      }
     }
-  }, [localSystemPrompt]);
+  }, [chatTemplate.name, selectedTemplateName, chatTemplate.chatTemplate]);
 
   const handleSave = () => {
     onChange('chatTemplate', localChatTemplate);
-    setDialogVisible(false);
-  };
-
-  const handleSaveSystemPrompt = () => {
-    onChange('systemPrompt', localSystemPrompt);
     setDialogVisible(false);
   };
 
@@ -193,27 +180,27 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
 
           <Divider style={styles.divider} />
 
-          {renderTemplateSection()}
-
-          <Divider style={styles.divider} />
-
           {/* System Prompt Section */}
           <View style={styles.settingsSection}>
             <TextInput
               testID="system-prompt-input"
-              ref={systemPromptTextInputRef}
-              defaultValue={localSystemPrompt}
-              onChangeText={text => setLocalSystemPrompt(text)}
-              onBlur={() => handleSaveSystemPrompt()}
+              defaultValue={chatTemplate.systemPrompt ?? ''}
+              onChangeText={text => {
+                onChange('systemPrompt', text);
+              }}
               multiline
               numberOfLines={3}
               style={styles.textArea}
-              label={'System prompt'}
+              label={'System Prompt'}
               onFocus={() => {
                 onFocus && onFocus();
               }}
             />
           </View>
+
+          <Divider style={styles.divider} />
+
+          {renderTemplateSection()}
         </View>
 
         <Divider style={styles.divider} />
@@ -233,11 +220,7 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
           title="Edit Chat Template"
           actions={[
             {
-              label: 'Cancel',
-              onPress: () => setDialogVisible(false),
-            },
-            {
-              label: 'Save',
+              label: 'Close',
               onPress: handleSave,
               mode: 'contained',
             },
@@ -248,8 +231,10 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
               handleChatTemplateNameChange={handleChatTemplateNameChange}
             />
             <Text variant="labelSmall" style={styles.templateNote}>
-              Note: Uses Nunjucks format only. Leave empty to use model's
-              template.
+              Note: Changing the template may alter BOS, EOS, and system prompt.
+            </Text>
+            <Text variant="labelSmall" style={styles.templateNote}>
+              Uses Nunjucks. Leave empty to use model's template.
             </Text>
           </View>
           <ScrollView style={styles.scrollView}>
