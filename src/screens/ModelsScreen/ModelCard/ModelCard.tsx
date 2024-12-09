@@ -29,6 +29,7 @@ import {uiStore, modelStore} from '../../../store';
 import {chatTemplates} from '../../../utils/chat';
 import {getModelDescription, L10nContext} from '../../../utils';
 import {Model, ModelOrigin, RootDrawerParamList} from '../../../utils/types';
+import {validateCompletionSettings} from '../../../utils/validation';
 
 type ChatScreenNavigationProp = DrawerNavigationProp<RootDrawerParamList>;
 
@@ -99,6 +100,23 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
     }, []);
 
     const handleSaveSettings = useCallback(() => {
+      const {isValid, errors} = validateCompletionSettings(
+        tempCompletionSettings,
+      );
+
+      if (!isValid) {
+        Alert.alert(
+          'Invalid Values',
+          'Please correct the following:\n' +
+            Object.entries(errors)
+              .map(([key, msg]) => `• ${key}: ${msg}`)
+              .join('\n'),
+          [{text: 'OK'}],
+        );
+        return;
+      }
+
+      // All validations passed, save the settings
       modelStore.updateModelChatTemplate(model.id, tempChatTemplate);
       modelStore.updateCompletionSettings(model.id, tempCompletionSettings);
       handleCloseSettings();

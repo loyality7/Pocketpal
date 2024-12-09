@@ -11,6 +11,11 @@ import {useTheme} from '../../../hooks';
 
 import {createStyles} from './styles';
 
+import {
+  MODEL_VALIDATION_RULES,
+  validateNumericField,
+} from '../../../utils/validation';
+
 interface Props {
   settings: CompletionParams;
   onChange: (name: string, value: any) => void;
@@ -96,32 +101,41 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
 
   const renderIntegerInput = ({
     name,
-    min,
-    max,
     label,
   }: {
     name: string;
-    min: number;
-    max: number;
     label?: string;
-  }) => (
-    <View style={styles.settingItem}>
-      <Text style={styles.settingLabel}>{label ?? name}</Text>
-      <Text style={styles.description}>{PARAMETER_DESCRIPTIONS[name]}</Text>
-      <TextInput
-        value={settings[name].toString()}
-        onChangeText={value => {
-          const intValue = parseInt(value, 10);
-          if (!isNaN(intValue)) {
-            onChange(name, Math.max(min, Math.min(max, intValue)));
+  }) => {
+    const rule = MODEL_VALIDATION_RULES[name];
+    if (!rule) {
+      console.warn(`No validation rule found for ${name}`);
+      return null;
+    }
+
+    const value = settings[name].toString();
+    const isValid = validateNumericField(value, rule);
+
+    return (
+      <View style={styles.settingItem}>
+        <Text style={styles.settingLabel}>{label ?? name}</Text>
+        <Text style={styles.description}>{PARAMETER_DESCRIPTIONS[name]}</Text>
+        <TextInput
+          value={value}
+          onChangeText={_value => {
+            onChange(name, _value);
+          }}
+          keyboardType="numeric"
+          error={!isValid}
+          helperText={
+            !isValid
+              ? `Value must be between ${rule.min} and ${rule.max}`
+              : undefined
           }
-        }}
-        keyboardType="numeric"
-        /*left={<TextInput.Affix text={name} textStyle={styles.inputLabel} />}*/
-        testID={`${name}-input`}
-      />
-    </View>
-  );
+          testID={`${name}-input`}
+        />
+      </View>
+    );
+  };
 
   const renderSwitch = (name: string, label?: string) => (
     <View style={[styles.settingItem, styles.row]}>
@@ -209,55 +223,74 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
     <View>
       {renderIntegerInput({
         name: 'n_predict',
-        min: 0,
-        max: 2048,
         label: 'N-Predict',
       })}
       {renderSlider({
         name: 'temperature',
-        min: 0,
-        max: 1,
+        min: MODEL_VALIDATION_RULES.temperature.min,
+        max: MODEL_VALIDATION_RULES.temperature.max,
         label: 'Temperature',
       })}
-      {renderSlider({name: 'top_k', min: 1, max: 128, step: 1, label: 'Top-K'})}
-      {renderSlider({name: 'top_p', min: 0, max: 1, label: 'Top-P'})}
-      {renderSlider({name: 'min_p', min: 0, max: 1, label: 'Min-P'})}
+      {renderSlider({
+        name: 'top_k',
+        min: MODEL_VALIDATION_RULES.top_k.min,
+        max: MODEL_VALIDATION_RULES.top_k.max,
+        step: 1,
+        label: 'Top-K',
+      })}
+      {renderSlider({
+        name: 'top_p',
+        min: MODEL_VALIDATION_RULES.top_p.min,
+        max: MODEL_VALIDATION_RULES.top_p.max,
+        label: 'Top-P',
+      })}
+      {renderSlider({
+        name: 'min_p',
+        min: MODEL_VALIDATION_RULES.min_p.min,
+        max: MODEL_VALIDATION_RULES.min_p.max,
+        label: 'Min-P',
+      })}
       {renderSlider({
         name: 'xtc_threshold',
-        min: 0,
-        max: 1,
+        min: MODEL_VALIDATION_RULES.xtc_threshold.min,
+        max: MODEL_VALIDATION_RULES.xtc_threshold.max,
         label: 'XTC Threshold',
       })}
       {renderSlider({
         name: 'xtc_probability',
-        min: 0,
-        max: 1,
+        min: MODEL_VALIDATION_RULES.xtc_probability.min,
+        max: MODEL_VALIDATION_RULES.xtc_probability.max,
         label: 'XTC Probability',
       })}
-      {renderSlider({name: 'typical_p', min: 0, max: 2, label: 'Typical P'})}
+      {renderSlider({
+        name: 'typical_p',
+        min: MODEL_VALIDATION_RULES.typical_p.min,
+        max: MODEL_VALIDATION_RULES.typical_p.max,
+        label: 'Typical P',
+      })}
       {renderSlider({
         name: 'penalty_last_n',
-        min: 0,
-        max: 256,
+        min: MODEL_VALIDATION_RULES.penalty_last_n.min,
+        max: MODEL_VALIDATION_RULES.penalty_last_n.max,
         step: 1,
         label: 'Penalty Last N',
       })}
       {renderSlider({
         name: 'penalty_repeat',
-        min: 0,
-        max: 2,
+        min: MODEL_VALIDATION_RULES.penalty_repeat.min,
+        max: MODEL_VALIDATION_RULES.penalty_repeat.max,
         label: 'Penalty Repeat',
       })}
       {renderSlider({
         name: 'penalty_freq',
-        min: 0,
-        max: 2,
+        min: MODEL_VALIDATION_RULES.penalty_freq.min,
+        max: MODEL_VALIDATION_RULES.penalty_freq.max,
         label: 'Penalty Freq',
       })}
       {renderSlider({
         name: 'penalty_present',
-        min: 0,
-        max: 2,
+        min: MODEL_VALIDATION_RULES.penalty_present.min,
+        max: MODEL_VALIDATION_RULES.penalty_present.max,
         label: 'Penalty Present',
       })}
       {renderMirostatSelector()}
@@ -265,15 +298,15 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
         <>
           {renderSlider({
             name: 'mirostat_tau',
-            min: 0,
-            max: 10,
+            min: MODEL_VALIDATION_RULES.mirostat_tau.min,
+            max: MODEL_VALIDATION_RULES.mirostat_tau.max,
             step: 1,
             label: 'Mirostat Tau',
           })}
           {renderSlider({
             name: 'mirostat_eta',
-            min: 0,
-            max: 1,
+            min: MODEL_VALIDATION_RULES.mirostat_eta.min,
+            max: MODEL_VALIDATION_RULES.mirostat_eta.max,
             label: 'Mirostat Eta',
           })}
         </>
@@ -281,14 +314,10 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
       {renderSwitch('penalize_nl', 'Penalize NL')}
       {renderIntegerInput({
         name: 'seed',
-        min: 0,
-        max: Number.MAX_SAFE_INTEGER,
         label: 'Seed',
       })}
       {renderIntegerInput({
         name: 'n_probs',
-        min: 0,
-        max: 100,
         label: 'N-Probs',
       })}
       {renderStopWords()}
