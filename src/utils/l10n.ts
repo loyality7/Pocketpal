@@ -72,43 +72,58 @@ export const l10n = {
     availableToDownload: 'Available to Download',
     useAddButtonForMore: 'Use + button to find more models',
     // modelSettings
-    'modelSettings.grammar': 'Set grammar for grammar-based sampling',
+    'modelSettings.grammar':
+      'Enforce specific grammar rules to ensure the generated text follows a particular structure or format',
     'modelSettings.stop':
-      'Specify stopping strings that will not be included in the completion',
+      'Define specific phrases that will stop text generation',
     'modelSettings.n_predict':
-      'Maximum number of tokens to predict when generating text',
-    'modelSettings.n_probs':
-      'Number of top token probabilities to return per token',
-    'modelSettings.top_k': 'Limit token selection to K most probable tokens',
+      'Set how long the generated response should be (in tokens)',
+    'modelSettings.n_probs': 'Show probability scores for alternative words.',
+    'modelSettings.top_k':
+      'Control creativity by limiting word choices to the K most likely options. Lower values make responses more focused',
     'modelSettings.top_p':
-      'Limit token selection to tokens with cumulative probability above threshold P',
+      'Balance creativity and coherence. Higher values (near 1.0) allow more creative but potentially less focused responses',
     'modelSettings.min_p':
-      'Minimum probability for a token relative to the most likely token',
-    'modelSettings.xtc_probability': 'Chance for token removal via XTC sampler',
-    'modelSettings.xtc_threshold':
-      'Minimum probability threshold for XTC sampler token removal',
-    'modelSettings.typical_p': 'Parameter for locally typical sampling',
-    'modelSettings.temperature': 'Adjust randomness of generated text',
+      'The minimum probability for a token to be considered. Filter out unlikely words to reduce nonsensical or out-of-context responses',
+    'modelSettings.temperature':
+      'Control creativity vs predictability. Higher values make responses more creative but less focused',
     'modelSettings.penalty_last_n':
-      'Number of tokens to consider for repetition penalty',
-    'modelSettings.penalty_repeat': 'Control repetition of token sequences',
-    'modelSettings.penalty_freq': 'Repeat alpha frequency penalty',
-    'modelSettings.penalty_present': 'Repeat alpha presence penalty',
-    'modelSettings.penalize_nl': 'Apply repeat penalty to newline tokens',
-    'modelSettings.mirostat': 'Enable Mirostat sampling for perplexity control',
-    'modelSettings.mirostat_tau': 'Mirostat target entropy (tau)',
-    'modelSettings.mirostat_eta': 'Mirostat learning rate (eta)',
-    'modelSettings.dry_multiplier': 'DRY repetition penalty multiplier',
-    'modelSettings.dry_base': 'DRY repetition penalty base value',
+      'How far back to check for repetition. Larger values help prevent long-term repetition',
+    'modelSettings.penalty_repeat':
+      'Discourage word repetition. Higher values make responses use more diverse language',
+    'modelSettings.penalty_freq':
+      'Penalize overused words. Higher values encourage using a broader vocabulary',
+    'modelSettings.penalty_present':
+      'Reduce repetition of themes and ideas. Higher values encourage more diverse content',
+    'modelSettings.penalize_nl': 'Penalize newline tokens.',
+    'modelSettings.mirostat':
+      'Enable advanced control over response creativity. Set to 1 or 2 (smoother) for smart, real-time adjustments to randomness and coherence.',
+    'modelSettings.mirostat_tau':
+      'Set the target creativity level for Mirostat. Higher values allow for more diverse and imaginative responses, while lower values ensure more focused outputs.',
+    'modelSettings.mirostat_eta':
+      'How quickly Mirostat adjusts creativity. Higher values mean faster adjustments',
+    'modelSettings.dry_multiplier':
+      "Strength of the DRY (Don't Repeat Yourself) feature. Higher values strongly prevent repetition",
+    'modelSettings.dry_base':
+      'Base penalty for repetition in DRY mode. Higher values are more aggressive at preventing repetition',
     'modelSettings.dry_allowed_length':
-      'Maximum allowed length before exponential penalty',
+      'How many words can repeat before DRY penalty kicks in',
     'modelSettings.dry_penalty_last_n':
-      'Number of tokens to scan for repetitions',
-    'modelSettings.dry_sequence_breakers': 'Sequence breakers for DRY sampling',
+      'How far back to look for repetition in DRY mode',
+    'modelSettings.dry_sequence_breakers':
+      'Symbols that reset the repetition checker in DRY mode',
     'modelSettings.ignore_eos':
-      'Ignore end of stream token and continue generating',
-    'modelSettings.logit_bias': 'Modify likelihood of specific tokens',
-    'modelSettings.seed': 'Random number generator seed',
+      'Continue generating even if the model wants to stop. Useful for forcing longer responses',
+    'modelSettings.logit_bias':
+      'Influence how likely specific words are to appear in the response',
+    'modelSettings.seed':
+      'Set the random number generator seed. Useful for reproducible results',
+    'modelSettings.xtc_probability':
+      'Set the chance for token removal via XTC sampler. 0 is disabled',
+    'modelSettings.xtc_threshold':
+      'Set a minimum probability threshold for tokens to be removed via XTC sampler. (> 0.5 disables XTC)',
+    'modelSettings.typical_p':
+      'Enable locally typical sampling with parameter p. 1.0 is disabled',
   },
   es: {
     attachmentButtonAccessibilityLabel: 'Enviar multimedia',
