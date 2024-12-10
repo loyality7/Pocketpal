@@ -189,6 +189,8 @@ export interface SemanticColors {
   surfaceBright: string;
 
   textSecondary: string;
+  inverseText: string;
+  inverseTextSecondary: string;
 
   border: string;
   placeholder: string;
