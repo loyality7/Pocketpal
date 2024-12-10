@@ -1,5 +1,13 @@
 import React, {ReactNode} from 'react';
-import {ViewStyle, ScrollView} from 'react-native';
+import {
+  ViewStyle,
+  ScrollView,
+  Keyboard,
+  Platform,
+  TouchableWithoutFeedback,
+  TextInput,
+  Dimensions,
+} from 'react-native';
 
 import {Button, Portal, Dialog as PaperDialog} from 'react-native-paper';
 
@@ -25,6 +33,7 @@ interface CustomDialogProps {
   scrollable?: boolean;
   dismissableBackButton?: boolean;
   dismissable?: boolean;
+  avoidKeyboard?: boolean;
 }
 
 export const Dialog: React.FC<CustomDialogProps> = ({
@@ -39,9 +48,79 @@ export const Dialog: React.FC<CustomDialogProps> = ({
   scrollable = false,
   dismissableBackButton = true,
   dismissable = true,
+  avoidKeyboard = false,
 }) => {
   const theme = useTheme();
   const styles = createStyles(theme);
+  const [bottom, setBottom] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!avoidKeyboard || !visible) {
+      return;
+    }
+
+    function onKeyboardChange(e) {
+      if (Platform.OS === 'ios') {
+        const keyboardHeight = e.endCoordinates.height;
+        const keyboardY = e.endCoordinates.screenY;
+
+        // Get the currently focused input
+        const currentlyFocusedInput = TextInput.State.currentlyFocusedInput();
+        if (currentlyFocusedInput) {
+          currentlyFocusedInput.measure((x, y, width, height, pageX, pageY) => {
+            const inputBottom = pageY + height;
+            // Only adjust if the input is actually covered by keyboard
+            if (inputBottom > keyboardY) {
+              setBottom(keyboardHeight / 2);
+            } else {
+              setBottom(0);
+            }
+          });
+        } else {
+          setBottom(0);
+        }
+      } else {
+        // Android
+        if (e.eventType === 'keyboardDidShow') {
+          const keyboardHeight = e.endCoordinates.height;
+          const currentlyFocusedInput = TextInput.State.currentlyFocusedInput();
+          if (currentlyFocusedInput) {
+            currentlyFocusedInput.measure(
+              (x, y, width, height, pageX, pageY) => {
+                const windowHeight = Dimensions.get('window').height;
+                const inputBottom = pageY + height;
+                const keyboardY = windowHeight - keyboardHeight;
+
+                if (inputBottom > keyboardY) {
+                  setBottom(keyboardHeight / 2);
+                } else {
+                  setBottom(0);
+                }
+              },
+            );
+          } else {
+            setBottom(0);
+          }
+        } else {
+          setBottom(0);
+        }
+      }
+    }
+
+    if (Platform.OS === 'ios') {
+      const subscription = Keyboard.addListener(
+        'keyboardWillChangeFrame',
+        onKeyboardChange,
+      );
+      return () => subscription.remove();
+    }
+
+    const subscriptions = [
+      Keyboard.addListener('keyboardDidHide', onKeyboardChange),
+      Keyboard.addListener('keyboardDidShow', onKeyboardChange),
+    ];
+    return () => subscriptions.forEach(subscription => subscription.remove());
+  }, [avoidKeyboard, visible]);
 
   const content = scrollable ? (
     <PaperDialog.ScrollArea style={[styles.dialogContent, contentStyle]}>
@@ -54,9 +133,11 @@ export const Dialog: React.FC<CustomDialogProps> = ({
       </ScrollView>
     </PaperDialog.ScrollArea>
   ) : (
-    <PaperDialog.Content style={[styles.dialogContent, contentStyle]}>
-      {children}
-    </PaperDialog.Content>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <PaperDialog.Content style={[styles.dialogContent, contentStyle]}>
+        {children}
+      </PaperDialog.Content>
+    </TouchableWithoutFeedback>
   );
 
   return (
@@ -66,7 +147,7 @@ export const Dialog: React.FC<CustomDialogProps> = ({
         dismissable={dismissable}
         visible={visible}
         onDismiss={onDismiss}
-        style={[styles.dialog, style]}>
+        style={[styles.dialog, avoidKeyboard && {bottom}, style]}>
         <PaperDialog.Title style={styles.dialogTitle}>
           {title}
         </PaperDialog.Title>
