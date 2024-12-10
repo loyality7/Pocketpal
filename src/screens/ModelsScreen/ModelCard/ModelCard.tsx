@@ -1,5 +1,5 @@
 import React, {useCallback, useState, useEffect} from 'react';
-import {Alert, Linking, View, Image, ScrollView} from 'react-native';
+import {Alert, Linking, View, Image} from 'react-native';
 
 import {observer} from 'mobx-react-lite';
 import {useNavigation} from '@react-navigation/native';
@@ -433,16 +433,15 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
           visible={settingsModalVisible}
           onDismiss={handleCancelSettings}
           title="Model Settings"
+          scrollable
           actions={dialogActions}>
-          <ScrollView style={styles.dialogScrollArea}>
-            <ModelSettings
-              chatTemplate={tempChatTemplate}
-              completionSettings={tempCompletionSettings}
-              onChange={handleSettingsUpdate}
-              onCompletionSettingsChange={handleCompletionSettingsUpdate}
-              onFocus={onFocus}
-            />
-          </ScrollView>
+          <ModelSettings
+            chatTemplate={tempChatTemplate}
+            completionSettings={tempCompletionSettings}
+            onChange={handleSettingsUpdate}
+            onCompletionSettingsChange={handleCompletionSettingsUpdate}
+            onFocus={onFocus}
+          />
         </Dialog>
       </>
     );
