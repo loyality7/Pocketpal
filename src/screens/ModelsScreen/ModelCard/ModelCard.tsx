@@ -378,20 +378,21 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
                   style={styles.actionButton}>
                   {l10n.delete}
                 </Button>
-                <Button
-                  testID="settings-button"
-                  icon="tune"
-                  mode="text"
-                  compact
-                  onPress={handleOpenSettings}
-                  style={styles.actionButton}>
-                  Settings
+                <View style={styles.settingsContainer}>
+                  <Button
+                    testID="settings-button"
+                    icon="tune"
+                    mode="text"
+                    compact
+                    onPress={handleOpenSettings}>
+                    Settings
+                  </Button>
                   <IconButton
                     icon="chevron-down"
                     size={14}
                     style={styles.settingsChevron}
                   />
-                </Button>
+                </View>
                 {renderModelLoadButton()}
               </Card.Actions>
             ) : isDownloading ? (

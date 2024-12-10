@@ -34,11 +34,20 @@ export const createStyles = (theme: Theme) =>
       marginTop: 8,
     },
     actions: {
-      paddingHorizontal: 15,
-      paddingVertical: 0,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
     },
     actionButton: {
-      width: '33%',
+      margin: 0,
+    },
+    settingsContainer: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    settingsButton: {
+      flex: 1,
     },
     settingsChevron: {
       margin: 0,
