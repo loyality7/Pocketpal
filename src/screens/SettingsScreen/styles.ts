@@ -6,6 +6,7 @@ export const createStyles = (theme: Theme) =>
   StyleSheet.create({
     safeArea: {
       flex: 1,
+      backgroundColor: theme.colors.background,
     },
     container: {
       padding: 10,
