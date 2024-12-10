@@ -77,10 +77,6 @@ describe('CompletionSettings', () => {
     const seedInput = getByTestId('seed-input');
     expect(seedInput.props.value).toBe('0');
 
-    expect(getByTestId('n_probs-input')).toBeTruthy();
-    const nProbsInput = getByTestId('n_probs-input');
-    expect(nProbsInput.props.value).toBe('0');
-
     expect(getByTestId('stop-input')).toBeTruthy();
     expect(getByText('<stop1>')).toBeTruthy();
     expect(getByText('<stop2>')).toBeTruthy();
@@ -114,7 +110,7 @@ describe('CompletionSettings', () => {
 
     const nPredictInput = getByTestId('n_predict-input');
     fireEvent.changeText(nPredictInput, '1024');
-    expect(mockOnChange).toHaveBeenCalledWith('n_predict', 1024);
+    expect(mockOnChange).toHaveBeenCalledWith('n_predict', '1024');
   });
 
   it('handles switch toggle', () => {

@@ -92,6 +92,7 @@ export const CompletionSettings: React.FC<Props> = ({settings, onChange}) => {
           keyboardType="numeric"
           error={!validation.isValid}
           helperText={validation.errorMessage}
+          testID={`${name}-input`}
         />
       </View>
     );
