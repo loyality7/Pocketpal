@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
   TextInput,
   Dimensions,
+  View,
 } from 'react-native';
 
 import {Button, Portal, Dialog as PaperDialog} from 'react-native-paper';
@@ -147,24 +148,26 @@ export const Dialog: React.FC<CustomDialogProps> = ({
         dismissable={dismissable}
         visible={visible}
         onDismiss={onDismiss}
-        style={[styles.dialog, avoidKeyboard && {bottom}, style]}>
+        style={[styles.dialog, style]}>
         <PaperDialog.Title style={styles.dialogTitle}>
           {title}
         </PaperDialog.Title>
-        {content}
-        {actions.length > 0 && (
-          <PaperDialog.Actions style={styles.actionsContainer}>
-            {actions.map(action => (
-              <Button
-                key={action.label}
-                mode={action.mode || 'text'}
-                onPress={action.onPress}
-                style={styles.dialogActionButton}>
-                {action.label}
-              </Button>
-            ))}
-          </PaperDialog.Actions>
-        )}
+        <View style={[avoidKeyboard && {bottom}]}>
+          {content}
+          {actions.length > 0 && (
+            <PaperDialog.Actions style={styles.actionsContainer}>
+              {actions.map(action => (
+                <Button
+                  key={action.label}
+                  mode={action.mode || 'text'}
+                  onPress={action.onPress}
+                  style={styles.dialogActionButton}>
+                  {action.label}
+                </Button>
+              ))}
+            </PaperDialog.Actions>
+          )}
+        </View>
       </PaperDialog>
     </Portal>
   );
