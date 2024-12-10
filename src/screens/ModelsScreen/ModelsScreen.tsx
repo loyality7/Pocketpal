@@ -14,7 +14,7 @@ import {observer} from 'mobx-react-lite';
 import * as RNFS from '@dr.pogodin/react-native-fs';
 import DocumentPicker from 'react-native-document-picker';
 
-import {useTheme, useMoveScroll} from '../../hooks';
+import {useTheme} from '../../hooks';
 
 import {FABGroup} from './FABGroup';
 import {ModelCard} from './ModelCard';
@@ -188,7 +188,7 @@ export const ModelsScreen: React.FC = observer(() => {
     uiStore.setValue('modelsScreen', 'expandedGroups', updatedExpandedGroups);
   };
 
-  const {scrollRef, moveScrollToDown} = useMoveScroll();
+  //const {scrollRef, moveScrollToDown} = useMoveScroll();
 
   const renderGroupHeader = ({item: group}) => {
     const isExpanded = expandedGroups[group.type];
@@ -215,7 +215,7 @@ export const ModelsScreen: React.FC = observer(() => {
               activeModelId={activeModelId}
               onFocus={() => {
                 if (Platform.OS === 'ios') {
-                  moveScrollToDown();
+                  //moveScrollToDown();
                 }
               }}
             />
@@ -238,7 +238,7 @@ export const ModelsScreen: React.FC = observer(() => {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 80}
       style={styles.container}>
       <FlatList
-        ref={scrollRef}
+        //ref={scrollRef}
         testID="flat-list"
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
