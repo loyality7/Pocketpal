@@ -435,6 +435,7 @@ export const ModelCard: React.FC<ModelCardProps> = observer(
           onDismiss={handleCancelSettings}
           title="Model Settings"
           scrollable
+          avoidKeyboard
           actions={dialogActions}>
           <ModelSettings
             chatTemplate={tempChatTemplate}
