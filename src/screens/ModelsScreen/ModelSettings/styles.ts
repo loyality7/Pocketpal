@@ -35,7 +35,7 @@ export const createStyles = (theme: Theme) =>
       borderRadius: 8,
     },
     scrollView: {
-      maxHeight: screenHeight * 0.4,
+      maxHeight: screenHeight * 0.6,
     },
     completionSettingsContainer: {
       marginTop: 12,

@@ -218,6 +218,7 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
           visible={isDialogVisible}
           onDismiss={() => setDialogVisible(false)}
           title="Edit Chat Template"
+          avoidKeyboard
           actions={[
             {
               label: 'Close',
@@ -237,7 +238,9 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
               Uses Nunjucks. Leave empty to use model's template.
             </Text>
           </View>
-          <ScrollView style={styles.scrollView}>
+          <ScrollView
+            style={styles.scrollView}
+            keyboardShouldPersistTaps="handled">
             <TextInput
               ref={textInputRef}
               placeholder="Enter your chat template here..."
