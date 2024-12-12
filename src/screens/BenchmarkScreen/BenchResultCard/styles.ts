@@ -4,7 +4,6 @@ import type {Theme} from '../../../utils/types';
 export const createStyles = (theme: Theme) =>
   StyleSheet.create({
     resultCard: {
-      marginVertical: 8,
       backgroundColor: theme.colors.surface,
       borderRadius: 12,
       borderWidth: 1,

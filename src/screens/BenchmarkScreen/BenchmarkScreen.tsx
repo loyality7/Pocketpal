@@ -382,21 +382,24 @@ export const BenchmarkScreen: React.FC = observer(() => {
             )}
 
             {benchmarkStore.results.length > 0 && (
-              <View style={styles.resultsContainer}>
+              <View style={styles.resultsCard}>
                 <View style={styles.resultsHeader}>
-                  <Text variant="titleMedium" style={styles.resultsTitle}>
-                    Test Results:
-                  </Text>
-                  <Button mode="text" onPress={handleDeleteAll} icon="delete">
+                  <Text variant="titleSmall">Test Results</Text>
+                  <Button
+                    mode="text"
+                    onPress={handleDeleteAll}
+                    icon="delete"
+                    compact>
                     Clear All
                   </Button>
                 </View>
                 {benchmarkStore.results.map((result, index) => (
-                  <BenchResultCard
-                    key={index}
-                    result={result}
-                    onDelete={handleDeleteResult}
-                  />
+                  <View key={index} style={styles.resultItem}>
+                    <BenchResultCard
+                      result={result}
+                      onDelete={handleDeleteResult}
+                    />
+                  </View>
                 ))}
               </View>
             )}

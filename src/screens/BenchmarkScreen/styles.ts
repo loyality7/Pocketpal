@@ -127,7 +127,7 @@ export const createStyles = (theme: Theme) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 16,
+      paddingHorizontal: 8,
     },
     deviceInfoCard: {
       marginBottom: 16,
@@ -172,5 +172,13 @@ export const createStyles = (theme: Theme) =>
     },
     headerIcon: {
       marginRight: 8,
+    },
+    resultsCard: {
+      marginTop: 16,
+      padding: 0,
+      backgroundColor: theme.colors.surface,
+    },
+    resultItem: {
+      marginBottom: 16,
     },
   });
