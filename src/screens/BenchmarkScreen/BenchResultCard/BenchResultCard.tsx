@@ -19,6 +19,12 @@ type BenchmarkResult = {
   tgStd: number;
   timestamp: string;
   modelId: string;
+  peakMemoryUsage?: {
+    total: number;
+    used: number;
+    percentage: number;
+  };
+  wallTimeMs?: number;
 };
 
 type Props = {
@@ -58,8 +64,30 @@ export const BenchResultCard = ({result}: Props) => {
   const theme = useTheme();
   const styles = createStyles(theme);
 
+  const formatBytes = (bytes: number) => {
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    if (bytes === 0) {
+      return '0 Byte';
+    }
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return Math.round(bytes / Math.pow(1024, i)) + ' ' + sizes[i];
+  };
+
+  const formatDuration = (ms: number) => {
+    if (ms < 1000) {
+      return `${ms}ms`;
+    }
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    if (minutes > 0) {
+      const remainingSeconds = seconds % 60;
+      return `${minutes}m ${remainingSeconds}s`;
+    }
+    return `${seconds}s`;
+  };
+
   return (
-    <Card elevation={1} style={styles.resultCard}>
+    <Card elevation={0} style={styles.resultCard}>
       <Card.Content>
         <View style={styles.resultHeader}>
           <Text variant="titleMedium" style={styles.modelDesc}>
@@ -75,17 +103,43 @@ export const BenchResultCard = ({result}: Props) => {
 
         <View style={styles.benchmarkResults}>
           <View style={styles.resultRow}>
-            <Text style={styles.resultLabel}>Prompt Processing</Text>
-            <Text style={styles.resultValue}>
+            <Text variant="labelSmall" style={styles.resultLabel}>
+              Prompt Processing
+            </Text>
+            <Text variant="bodySmall" style={styles.resultValue}>
               {result.ppAvg.toFixed(2)} ± {result.ppStd.toFixed(2)} t/s
             </Text>
           </View>
           <View style={styles.resultRow}>
-            <Text style={styles.resultLabel}>Token Generation</Text>
-            <Text style={styles.resultValue}>
+            <Text variant="labelSmall" style={styles.resultLabel}>
+              Token Generation
+            </Text>
+            <Text variant="bodySmall" style={styles.resultValue}>
               {result.tgAvg.toFixed(2)} ± {result.tgStd.toFixed(2)} t/s
             </Text>
           </View>
+          {result.wallTimeMs && (
+            <View style={styles.resultRow}>
+              <Text variant="labelSmall" style={styles.resultLabel}>
+                Total Time
+              </Text>
+              <Text variant="bodySmall" style={styles.resultValue}>
+                {formatDuration(result.wallTimeMs)}
+              </Text>
+            </View>
+          )}
+          {result.peakMemoryUsage && (
+            <View style={styles.resultRow}>
+              <Text variant="labelSmall" style={styles.resultLabel}>
+                Peak Memory Usage
+              </Text>
+              <Text variant="bodySmall" style={styles.resultValue}>
+                {formatBytes(result.peakMemoryUsage.used)} /{' '}
+                {formatBytes(result.peakMemoryUsage.total)} (
+                {result.peakMemoryUsage.percentage.toFixed(1)}%)
+              </Text>
+            </View>
+          )}
         </View>
 
         <Text variant="bodySmall" style={styles.timestamp}>

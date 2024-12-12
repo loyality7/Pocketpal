@@ -63,7 +63,6 @@ export const createStyles = (theme: Theme) =>
       marginBottom: 8,
     },
     resultValue: {
-      fontWeight: '600',
       color: theme.colors.onSurface,
     },
     resultLabel: {

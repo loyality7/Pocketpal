@@ -4,18 +4,19 @@ import {observer} from 'mobx-react';
 import {Text, Button, Card, ActivityIndicator, Icon} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Slider from '@react-native-community/slider';
+import DeviceInfo from 'react-native-device-info';
 
 import {modelStore} from '../../store';
 import {useTheme} from '../../hooks';
 import {createStyles} from './styles';
 import type {Model} from '../../utils/types';
-import {Menu} from '../../components';
+import {Menu, Dialog} from '../../components';
 import {BenchResultCard} from './BenchResultCard';
 import {BenchmarkConfig, BenchmarkResult} from './types';
 
 const DEFAULT_CONFIGS: BenchmarkConfig[] = [
   {pp: 512, tg: 128, pl: 1, nr: 3, label: 'Default'},
-  {pp: 256, tg: 64, pl: 1, nr: 3, label: 'Fast'},
+  {pp: 128, tg: 32, pl: 1, nr: 3, label: 'Fast'},
 ];
 
 const BENCHMARK_PARAMS_METADATA = {
@@ -48,6 +49,7 @@ export const BenchmarkScreen: React.FC = observer(() => {
   const [localSliderValues, setLocalSliderValues] = useState<{
     [key: string]: number;
   }>({});
+  const [showAdvancedDialog, setShowAdvancedDialog] = useState(false);
 
   const theme = useTheme();
   const styles = createStyles(theme);
@@ -76,13 +78,55 @@ export const BenchmarkScreen: React.FC = observer(() => {
     }));
   };
 
+  const trackPeakMemoryUsage = async () => {
+    try {
+      const total = await DeviceInfo.getTotalMemory();
+      const used = await DeviceInfo.getUsedMemory();
+      const percentage = (used / total) * 100;
+      return {total, used, percentage};
+    } catch (error) {
+      console.error('Failed to fetch memory stats:', error);
+      return null;
+    }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const stopBenchmark = async () => {
+    if (modelStore.context) {
+      try {
+        // TODO: This is not working for bench.
+        await modelStore.context.stopCompletion();
+      } catch (error) {
+        console.error('Error stopping benchmark:', error);
+      }
+    }
+  };
+
   const runBenchmark = async () => {
     if (!modelStore.context || !modelStore.activeModel) {
       return;
     }
 
     setIsRunning(true);
+    let peakMemoryUsage: NonNullable<
+      BenchmarkResult['peakMemoryUsage']
+    > | null = null;
+    let memoryCheckInterval: ReturnType<typeof setInterval> | undefined;
+    const startTime = Date.now();
+
     try {
+      // Start memory tracking
+      memoryCheckInterval = setInterval(async () => {
+        const currentUsage = await trackPeakMemoryUsage();
+        if (
+          currentUsage &&
+          (!peakMemoryUsage ||
+            currentUsage.percentage > peakMemoryUsage.percentage)
+        ) {
+          peakMemoryUsage = currentUsage;
+        }
+      }, 1000);
+
       const {modelDesc, modelSize, modelNParams, ppAvg, ppStd, tgAvg, tgStd} =
         await modelStore.context.bench(
           selectedConfig.pp,
@@ -90,6 +134,8 @@ export const BenchmarkScreen: React.FC = observer(() => {
           selectedConfig.pl,
           selectedConfig.nr,
         );
+
+      const wallTimeMs = Date.now() - startTime;
 
       const result: BenchmarkResult = {
         config: selectedConfig,
@@ -102,6 +148,8 @@ export const BenchmarkScreen: React.FC = observer(() => {
         tgStd,
         timestamp: new Date().toISOString(),
         modelId: modelStore.activeModel.id,
+        peakMemoryUsage: peakMemoryUsage || undefined,
+        wallTimeMs,
       };
 
       setStoredResults(prev => [result, ...prev]);
@@ -110,6 +158,7 @@ export const BenchmarkScreen: React.FC = observer(() => {
         console.error('Benchmark error:', error);
       }
     } finally {
+      clearInterval(memoryCheckInterval);
       setIsRunning(false);
     }
   };
@@ -193,14 +242,75 @@ export const BenchmarkScreen: React.FC = observer(() => {
     </View>
   );
 
+  const renderAdvancedSettings = () => (
+    <Dialog
+      visible={showAdvancedDialog}
+      onDismiss={() => setShowAdvancedDialog(false)}
+      title="Advanced Settings"
+      actions={[
+        {
+          label: 'Done',
+          onPress: () => setShowAdvancedDialog(false),
+        },
+      ]}>
+      <View>
+        <Text variant="titleMedium" style={styles.sectionTitle}>
+          Test Profile
+        </Text>
+        <View style={styles.presetContainer}>
+          {DEFAULT_CONFIGS.map((config, index) => (
+            <Button
+              key={index}
+              mode={selectedConfig === config ? 'contained' : 'outlined'}
+              onPress={() => handlePresetSelect(config)}
+              style={styles.presetButton}>
+              {config.label}
+            </Button>
+          ))}
+        </View>
+
+        <Text variant="titleMedium" style={styles.sectionTitle}>
+          Custom Parameters
+        </Text>
+        <Text variant="bodySmall" style={styles.advancedDescription}>
+          Fine-tune the benchmark parameters for specific testing scenarios.
+        </Text>
+        <View style={styles.slidersContainer}>
+          {renderSlider({name: 'pp'})}
+          {renderSlider({name: 'tg'})}
+          {renderSlider({name: 'nr'})}
+        </View>
+      </View>
+    </Dialog>
+  );
+
+  const renderWarningMessage = () => (
+    <View style={styles.warningContainer}>
+      <Text variant="bodySmall" style={styles.warningText}>
+        Note: The benchmark process cannot be interrupted once started. Please
+        ensure you:
+      </Text>
+      <View style={styles.warningList}>
+        <Text variant="bodySmall" style={styles.warningText}>
+          • Stay on this screen during the test
+        </Text>
+        <Text variant="bodySmall" style={styles.warningText}>
+          • Allow sufficient time for completion (2-3 mins for larger models)
+        </Text>
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView style={styles.scrollView}>
         <Card elevation={0} style={styles.card}>
           <Card.Content>
-            <Text variant="bodyMedium" style={styles.description}>
-              Measure model performance for prompt processing and text
-              generation.
+            <Text variant="titleLarge" style={styles.title}>
+              Performance Test
+            </Text>
+            <Text variant="bodySmall" style={styles.description}>
+              Measure the AI model performance on your device.
             </Text>
 
             {renderModelSelector()}
@@ -218,40 +328,29 @@ export const BenchmarkScreen: React.FC = observer(() => {
                   </Text>
                 ) : (
                   <>
-                    <View style={styles.presetContainer}>
-                      {DEFAULT_CONFIGS.map((config, index) => (
-                        <Button
-                          key={index}
-                          mode={
-                            selectedConfig === config ? 'contained' : 'outlined'
-                          }
-                          onPress={() => handlePresetSelect(config)}
-                          style={styles.presetButton}>
-                          {config.label}
-                        </Button>
-                      ))}
-                    </View>
+                    <Button
+                      mode="text"
+                      onPress={() => setShowAdvancedDialog(true)}
+                      icon="tune"
+                      style={styles.advancedButton}>
+                      Advanced Settings
+                    </Button>
 
-                    <View style={styles.slidersContainer}>
-                      {renderSlider({name: 'pp'})}
-                      {renderSlider({name: 'tg'})}
-                      {/* {renderSlider({name: 'pl'})} */}
-                      {renderSlider({name: 'nr'})}
-                    </View>
+                    {!isRunning && renderWarningMessage()}
 
                     <Button
                       mode="contained"
                       onPress={runBenchmark}
                       disabled={isRunning}
                       style={styles.button}>
-                      {isRunning ? 'Running Benchmarks...' : 'Start Benchmark'}
+                      {isRunning ? 'Running Test...' : 'Start Test'}
                     </Button>
 
                     {isRunning && (
                       <View style={styles.loadingContainer}>
                         <ActivityIndicator size="large" />
-                        <Text style={styles.loadingText}>
-                          Running benchmarks...
+                        <Text style={styles.warningText}>
+                          Please keep this screen open until the test completes
                         </Text>
                       </View>
                     )}
@@ -259,15 +358,15 @@ export const BenchmarkScreen: React.FC = observer(() => {
                     {storedResults.length > 0 && (
                       <View style={styles.resultsContainer}>
                         <Text variant="titleMedium" style={styles.resultsTitle}>
-                          Results:
+                          Test Results:
                         </Text>
-                        {storedResults.map((result, index) => {
-                          return (
-                            <BenchResultCard key={index} result={result} />
-                          );
-                        })}
+                        {storedResults.map((result, index) => (
+                          <BenchResultCard key={index} result={result} />
+                        ))}
                       </View>
                     )}
+
+                    {renderAdvancedSettings()}
                   </>
                 )}
               </>

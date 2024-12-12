@@ -16,6 +16,8 @@ export const createStyles = (theme: Theme) =>
       backgroundColor: theme.colors.surface,
     },
     title: {
+      fontSize: 24,
+      fontWeight: 'bold',
       marginBottom: 8,
       color: theme.colors.primary,
     },
@@ -25,11 +27,11 @@ export const createStyles = (theme: Theme) =>
     },
     warning: {
       color: theme.colors.error,
-      marginVertical: 16,
+      marginVertical: 8,
       textAlign: 'center',
     },
     button: {
-      marginVertical: 16,
+      marginVertical: 6,
     },
     loadingContainer: {
       alignItems: 'center',
@@ -65,9 +67,12 @@ export const createStyles = (theme: Theme) =>
       flexDirection: 'row',
       marginBottom: 16,
       justifyContent: 'space-around',
+      flexWrap: 'wrap',
+      gap: 8,
     },
     presetButton: {
       flex: 1,
+      minWidth: 100,
       marginHorizontal: 4,
     },
     slidersContainer: {
@@ -92,5 +97,32 @@ export const createStyles = (theme: Theme) =>
     },
     slider: {
       height: 40,
+    },
+    sectionTitle: {
+      marginTop: 16,
+      marginBottom: 12,
+      color: theme.colors.primary,
+    },
+    advancedButton: {
+      marginBottom: 6,
+    },
+    advancedDescription: {
+      marginBottom: 16,
+      color: theme.colors.onSurfaceVariant,
+      fontSize: 12,
+    },
+    warningContainer: {
+      backgroundColor: theme.colors.errorContainer,
+      padding: 16,
+      borderRadius: 8,
+      marginBottom: 16,
+    },
+    warningList: {
+      marginTop: 8,
+      paddingLeft: 8,
+    },
+    warningText: {
+      color: theme.colors.error,
+      marginBottom: 4,
     },
   });
