@@ -17,18 +17,20 @@ export const createStyles = (theme: Theme) =>
       letterSpacing: 0.5,
     },
     resultHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
       marginBottom: 16,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.surfaceVariant,
-      paddingBottom: 12,
+    },
+    headerLeft: {
+      flex: 1,
+      marginRight: 16,
     },
     modelDesc: {
-      marginBottom: 8,
-      color: theme.colors.onSurface,
-      fontWeight: '600',
+      color: theme.colors.primary,
+      marginBottom: 4,
     },
     modelInfo: {
-      flexDirection: 'row',
       color: theme.colors.onSurfaceVariant,
     },
     benchmarkParams: {
@@ -83,5 +85,9 @@ export const createStyles = (theme: Theme) =>
     chipText: {
       color: theme.colors.onPrimaryContainer,
       fontSize: 12,
+    },
+    deleteButton: {
+      marginTop: -8,
+      marginRight: -8,
     },
   });

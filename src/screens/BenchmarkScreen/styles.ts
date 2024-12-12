@@ -125,4 +125,10 @@ export const createStyles = (theme: Theme) =>
       color: theme.colors.error,
       marginBottom: 4,
     },
+    resultsHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
   });

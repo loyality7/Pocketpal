@@ -1,7 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import {Card, Text} from 'react-native-paper';
+import {Card, Text, Button} from 'react-native-paper';
 
 import {useTheme} from '../../../hooks';
 
@@ -29,6 +29,7 @@ type BenchmarkResult = {
 
 type Props = {
   result: BenchmarkResult;
+  onDelete: (timestamp: string) => void;
 };
 
 const formatSize = (bytes: number) =>
@@ -60,7 +61,7 @@ const renderBenchmarkParams = (
   </View>
 );
 
-export const BenchResultCard = ({result}: Props) => {
+export const BenchResultCard = ({result, onDelete}: Props) => {
   const theme = useTheme();
   const styles = createStyles(theme);
 
@@ -90,13 +91,23 @@ export const BenchResultCard = ({result}: Props) => {
     <Card elevation={0} style={styles.resultCard}>
       <Card.Content>
         <View style={styles.resultHeader}>
-          <Text variant="titleMedium" style={styles.modelDesc}>
-            {result.modelDesc}
-          </Text>
-          <Text variant="bodySmall" style={styles.modelInfo}>
-            Size: {formatSize(result.modelSize)} • Params:{' '}
-            {formatParams(result.modelNParams)}
-          </Text>
+          <View style={styles.headerLeft}>
+            <Text variant="titleMedium" style={styles.modelDesc}>
+              {result.modelDesc}
+            </Text>
+            <Text variant="bodySmall" style={styles.modelInfo}>
+              Size: {formatSize(result.modelSize)} • Params:{' '}
+              {formatParams(result.modelNParams)}
+            </Text>
+          </View>
+          <Button
+            mode="text"
+            onPress={() => onDelete(result.timestamp)}
+            icon="delete"
+            compact
+            style={styles.deleteButton}>
+            {''}
+          </Button>
         </View>
 
         {renderBenchmarkParams(result.config, styles)}

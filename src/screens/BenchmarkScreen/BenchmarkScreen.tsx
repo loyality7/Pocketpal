@@ -6,7 +6,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Slider from '@react-native-community/slider';
 import DeviceInfo from 'react-native-device-info';
 
-import {modelStore} from '../../store';
+import {modelStore, benchmarkStore} from '../../store';
 import {useTheme} from '../../hooks';
 import {createStyles} from './styles';
 import type {Model} from '../../utils/types';
@@ -40,7 +40,6 @@ const BENCHMARK_PARAMS_METADATA = {
 
 export const BenchmarkScreen: React.FC = observer(() => {
   const [isRunning, setIsRunning] = useState(false);
-  const [storedResults, setStoredResults] = useState<BenchmarkResult[]>([]);
   const [selectedConfig, setSelectedConfig] = useState<BenchmarkConfig>(
     DEFAULT_CONFIGS[0],
   );
@@ -50,6 +49,11 @@ export const BenchmarkScreen: React.FC = observer(() => {
     [key: string]: number;
   }>({});
   const [showAdvancedDialog, setShowAdvancedDialog] = useState(false);
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
+  const [pendingDeleteTimestamp, setPendingDeleteTimestamp] = useState<
+    string | null
+  >(null);
+  const [deleteAllConfirmVisible, setDeleteAllConfirmVisible] = useState(false);
 
   const theme = useTheme();
   const styles = createStyles(theme);
@@ -152,7 +156,7 @@ export const BenchmarkScreen: React.FC = observer(() => {
         wallTimeMs,
       };
 
-      setStoredResults(prev => [result, ...prev]);
+      benchmarkStore.addResult(result);
     } catch (error) {
       if (error instanceof Error) {
         console.error('Benchmark error:', error);
@@ -166,6 +170,28 @@ export const BenchmarkScreen: React.FC = observer(() => {
   const handlePresetSelect = (config: BenchmarkConfig) => {
     setSelectedConfig(config);
     setLocalSliderValues({});
+  };
+
+  const handleDeleteResult = (timestamp: string) => {
+    setPendingDeleteTimestamp(timestamp);
+    setDeleteConfirmVisible(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (pendingDeleteTimestamp) {
+      benchmarkStore.removeResult(pendingDeleteTimestamp);
+    }
+    setDeleteConfirmVisible(false);
+    setPendingDeleteTimestamp(null);
+  };
+
+  const handleDeleteAll = () => {
+    setDeleteAllConfirmVisible(true);
+  };
+
+  const handleConfirmDeleteAll = () => {
+    benchmarkStore.clearResults();
+    setDeleteAllConfirmVisible(false);
   };
 
   const renderModelSelector = () => (
@@ -355,22 +381,69 @@ export const BenchmarkScreen: React.FC = observer(() => {
                       </View>
                     )}
 
-                    {storedResults.length > 0 && (
-                      <View style={styles.resultsContainer}>
-                        <Text variant="titleMedium" style={styles.resultsTitle}>
-                          Test Results:
-                        </Text>
-                        {storedResults.map((result, index) => (
-                          <BenchResultCard key={index} result={result} />
-                        ))}
-                      </View>
-                    )}
-
                     {renderAdvancedSettings()}
                   </>
                 )}
               </>
             )}
+
+            {benchmarkStore.results.length > 0 && (
+              <View style={styles.resultsContainer}>
+                <View style={styles.resultsHeader}>
+                  <Text variant="titleMedium" style={styles.resultsTitle}>
+                    Test Results:
+                  </Text>
+                  <Button mode="text" onPress={handleDeleteAll} icon="delete">
+                    Clear All
+                  </Button>
+                </View>
+                {benchmarkStore.results.map((result, index) => (
+                  <BenchResultCard
+                    key={index}
+                    result={result}
+                    onDelete={handleDeleteResult}
+                  />
+                ))}
+              </View>
+            )}
+
+            <Dialog
+              visible={deleteConfirmVisible}
+              onDismiss={() => setDeleteConfirmVisible(false)}
+              title="Delete Result"
+              actions={[
+                {
+                  label: 'Cancel',
+                  onPress: () => setDeleteConfirmVisible(false),
+                },
+                {
+                  label: 'Delete',
+                  onPress: handleConfirmDelete,
+                },
+              ]}>
+              <Text>
+                Are you sure you want to delete this benchmark result?
+              </Text>
+            </Dialog>
+
+            <Dialog
+              visible={deleteAllConfirmVisible}
+              onDismiss={() => setDeleteAllConfirmVisible(false)}
+              title="Clear All Results"
+              actions={[
+                {
+                  label: 'Cancel',
+                  onPress: () => setDeleteAllConfirmVisible(false),
+                },
+                {
+                  label: 'Clear All',
+                  onPress: handleConfirmDeleteAll,
+                },
+              ]}>
+              <Text>
+                Are you sure you want to delete all benchmark results?
+              </Text>
+            </Dialog>
           </Card.Content>
         </Card>
       </ScrollView>
