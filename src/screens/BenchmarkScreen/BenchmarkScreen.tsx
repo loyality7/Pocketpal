@@ -13,6 +13,7 @@ import type {Model} from '../../utils/types';
 import {Menu, Dialog} from '../../components';
 import {BenchResultCard} from './BenchResultCard';
 import {BenchmarkConfig, BenchmarkResult} from './types';
+import {DeviceInfoCard} from './DeviceInfoCard';
 
 const DEFAULT_CONFIGS: BenchmarkConfig[] = [
   {pp: 512, tg: 128, pl: 1, nr: 3, label: 'Default'},
@@ -338,6 +339,8 @@ export const BenchmarkScreen: React.FC = observer(() => {
             <Text variant="bodySmall" style={styles.description}>
               Measure the AI model performance on your device.
             </Text>
+
+            <DeviceInfoCard />
 
             {renderModelSelector()}
 

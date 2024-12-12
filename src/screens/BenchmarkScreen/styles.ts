@@ -131,4 +131,20 @@ export const createStyles = (theme: Theme) =>
       alignItems: 'center',
       marginBottom: 16,
     },
+    deviceInfoCard: {
+      marginBottom: 16,
+      backgroundColor: theme.colors.surfaceVariant,
+    },
+    deviceInfoRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 4,
+    },
+    deviceInfoLabel: {
+      color: theme.colors.onSurfaceVariant,
+    },
+    deviceInfoValue: {
+      color: theme.colors.onSurface,
+    },
   });
