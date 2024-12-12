@@ -15,6 +15,8 @@
 		36B03A5A5CA4CC82C7DB800B /* libPods-PocketPal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F375E195CC1974E75C558FD /* libPods-PocketPal.a */; };
 		6F48BC249E5E59B72A562202 /* libPods-PocketPal-PocketPalTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D27E0293B9D8C211B881E4C4 /* libPods-PocketPal-PocketPalTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		A88DF87F2D0B6F7400239E77 /* DeviceInfoModule.h in Sources */ = {isa = PBXBuildFile; fileRef = A88DF87D2D0B6F7400239E77 /* DeviceInfoModule.h */; };
+		A88DF8802D0B6F7400239E77 /* DeviceInfoModule.m in Sources */ = {isa = PBXBuildFile; fileRef = A88DF87E2D0B6F7400239E77 /* DeviceInfoModule.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,9 +42,11 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = PocketPal/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = PocketPal/main.m; sourceTree = "<group>"; };
 		2F375E195CC1974E75C558FD /* libPods-PocketPal.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PocketPal.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		56D1BD968C32BD43D7C02874 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = PocketPal/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		56D1BD968C32BD43D7C02874 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = PocketPal/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		7ED25E60B577DABD90D17D15 /* Pods-PocketPal.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PocketPal.release.xcconfig"; path = "Target Support Files/Pods-PocketPal/Pods-PocketPal.release.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = PocketPal/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		A88DF87D2D0B6F7400239E77 /* DeviceInfoModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DeviceInfoModule.h; path = PocketPal/DeviceInfoModule.h; sourceTree = "<group>"; };
+		A88DF87E2D0B6F7400239E77 /* DeviceInfoModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DeviceInfoModule.m; path = PocketPal/DeviceInfoModule.m; sourceTree = "<group>"; };
 		D27E0293B9D8C211B881E4C4 /* libPods-PocketPal-PocketPalTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PocketPal-PocketPalTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB8DF3A7DF5AEC7AECAC8163 /* Pods-PocketPal-PocketPalTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PocketPal-PocketPalTests.release.xcconfig"; path = "Target Support Files/Pods-PocketPal-PocketPalTests/Pods-PocketPal-PocketPalTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -98,6 +102,8 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				56D1BD968C32BD43D7C02874 /* PrivacyInfo.xcprivacy */,
+				A88DF87E2D0B6F7400239E77 /* DeviceInfoModule.m */,
+				A88DF87D2D0B6F7400239E77 /* DeviceInfoModule.h */,
 			);
 			name = PocketPal;
 			sourceTree = "<group>";
@@ -408,6 +414,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A88DF87F2D0B6F7400239E77 /* DeviceInfoModule.h in Sources */,
+				A88DF8802D0B6F7400239E77 /* DeviceInfoModule.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
@@ -644,10 +652,7 @@
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -719,10 +724,7 @@
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

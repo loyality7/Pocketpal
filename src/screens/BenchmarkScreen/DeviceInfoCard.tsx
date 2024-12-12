@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {Card, Text} from 'react-native-paper';
+import {View, TouchableOpacity} from 'react-native';
+import {Card, Text, Icon} from 'react-native-paper';
 import DeviceInfo from 'react-native-device-info';
 import {Platform, NativeModules} from 'react-native';
 
@@ -37,7 +37,6 @@ const getCPUInfo = async () => {
   }
   try {
     const info = await DeviceInfoModule.getCPUInfo();
-    console.log('CPU Info received:', info);
     if (!info) {
       return null;
     }
@@ -102,6 +101,7 @@ export const DeviceInfoCard = () => {
       hasI8mm: false,
     },
   });
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -163,137 +163,125 @@ export const DeviceInfoCard = () => {
 
   return (
     <Card elevation={0} style={styles.deviceInfoCard}>
-      <Card.Content>
-        <View style={styles.deviceInfoRow}>
-          <Text variant="labelSmall" style={styles.deviceInfoLabel}>
-            Device
-          </Text>
-          <Text variant="bodySmall" style={styles.deviceInfoValue}>
-            {deviceInfo.brand} {deviceInfo.model}
-          </Text>
-        </View>
-        <View style={styles.deviceInfoRow}>
-          <Text variant="labelSmall" style={styles.deviceInfoLabel}>
-            OS
-          </Text>
-          <Text variant="bodySmall" style={styles.deviceInfoValue}>
-            {deviceInfo.systemName} {deviceInfo.systemVersion}
-          </Text>
-        </View>
-        <View style={styles.deviceInfoRow}>
-          <Text variant="labelSmall" style={styles.deviceInfoLabel}>
-            Emulator
-          </Text>
-          <Text variant="bodySmall" style={styles.deviceInfoValue}>
-            {deviceInfo.isEmulator ? 'Yes' : 'No'}
-          </Text>
-        </View>
-        <View style={styles.deviceInfoRow}>
-          <Text variant="labelSmall" style={styles.deviceInfoLabel}>
-            Architecture
-          </Text>
-          <Text variant="bodySmall" style={styles.deviceInfoValue}>
-            {Array.isArray(deviceInfo.cpuArch)
-              ? deviceInfo.cpuArch.join(', ')
-              : deviceInfo.cpuArch}
-          </Text>
-        </View>
-        {Platform.OS === 'android' && deviceInfo.chipset && (
-          <View style={styles.deviceInfoRow}>
-            <Text variant="labelSmall" style={styles.deviceInfoLabel}>
-              Chipset
+      <TouchableOpacity onPress={() => setExpanded(!expanded)}>
+        <View style={styles.headerRow}>
+          <View style={styles.headerContent}>
+            <Text variant="titleSmall">Device Information</Text>
+            <Text variant="bodySmall" style={styles.headerSummary}>
+              {deviceInfo.brand} {deviceInfo.model} • {deviceInfo.systemName}{' '}
+              {deviceInfo.systemVersion}
             </Text>
-            <Text variant="bodySmall" style={styles.deviceInfoValue}>
-              {deviceInfo.chipset}
+            <Text variant="bodySmall" style={styles.headerSummary}>
+              {deviceInfo.cpuDetails.cores} cores •{' '}
+              {formatBytes(deviceInfo.totalMemory)}
             </Text>
           </View>
-        )}
-        {Platform.OS === 'android' && deviceInfo.cpu && (
-          <View style={styles.deviceInfoRow}>
-            <Text variant="labelSmall" style={styles.deviceInfoLabel}>
-              CPU/SoC
-            </Text>
-            <Text variant="bodySmall" style={styles.deviceInfoValue}>
-              {deviceInfo.cpu}
-            </Text>
-          </View>
-        )}
-        <View style={styles.deviceInfoRow}>
-          <Text variant="labelSmall" style={styles.deviceInfoLabel}>
-            App Version
-          </Text>
-          <Text variant="bodySmall" style={styles.deviceInfoValue}>
-            {deviceInfo.version} ({deviceInfo.buildNumber})
-          </Text>
+          <Icon
+            source={expanded ? 'chevron-up' : 'chevron-down'}
+            size={24}
+            color={theme.colors.onSurface}
+          />
         </View>
-        <View style={styles.deviceInfoRow}>
-          <Text variant="labelSmall" style={styles.deviceInfoLabel}>
-            Device ID
-          </Text>
-          <Text variant="bodySmall" style={styles.deviceInfoValue}>
-            {deviceInfo.device} ({deviceInfo.deviceId})
-          </Text>
-        </View>
-        <View style={styles.deviceInfoRow}>
-          <Text variant="labelSmall" style={styles.deviceInfoLabel}>
-            Total Memory
-          </Text>
-          <Text variant="bodySmall" style={styles.deviceInfoValue}>
-            {formatBytes(deviceInfo.totalMemory)}
-          </Text>
-        </View>
-        <View style={styles.deviceInfoRow}>
-          <Text variant="labelSmall" style={styles.deviceInfoLabel}>
-            CPU Cores
-          </Text>
-          <Text variant="bodySmall" style={styles.deviceInfoValue}>
-            {deviceInfo.cpuDetails.cores}
-          </Text>
-        </View>
-        {deviceInfo.cpuDetails.processors[0]?.['model name'] && (
-          <View style={styles.deviceInfoRow}>
-            <Text variant="labelSmall" style={styles.deviceInfoLabel}>
-              CPU Model
+      </TouchableOpacity>
+
+      {expanded && (
+        <Card.Content>
+          <View style={styles.section}>
+            <Text variant="labelSmall" style={styles.sectionTitle}>
+              Basic Info
             </Text>
-            <Text variant="bodySmall" style={styles.deviceInfoValue}>
-              {deviceInfo.cpuDetails.processors[0]['model name']}
-            </Text>
+            <View style={styles.deviceInfoRow}>
+              <Text variant="labelSmall" style={styles.deviceInfoLabel}>
+                Architecture
+              </Text>
+              <Text variant="bodySmall" style={styles.deviceInfoValue}>
+                {Array.isArray(deviceInfo.cpuArch)
+                  ? deviceInfo.cpuArch.join(', ')
+                  : deviceInfo.cpuArch}
+              </Text>
+            </View>
+            <View style={styles.deviceInfoRow}>
+              <Text variant="labelSmall" style={styles.deviceInfoLabel}>
+                Total Memory
+              </Text>
+              <Text variant="bodySmall" style={styles.deviceInfoValue}>
+                {formatBytes(deviceInfo.totalMemory)}
+              </Text>
+            </View>
           </View>
-        )}
-        {deviceInfo.cpuDetails.socModel && (
-          <View style={styles.deviceInfoRow}>
-            <Text variant="labelSmall" style={styles.deviceInfoLabel}>
-              SoC Model
+
+          <View style={styles.section}>
+            <Text variant="labelSmall" style={styles.sectionTitle}>
+              CPU Details
             </Text>
-            <Text variant="bodySmall" style={styles.deviceInfoValue}>
-              {deviceInfo.cpuDetails.socModel}
-            </Text>
+            <View style={styles.deviceInfoRow}>
+              <Text variant="labelSmall" style={styles.deviceInfoLabel}>
+                CPU Cores
+              </Text>
+              <Text variant="bodySmall" style={styles.deviceInfoValue}>
+                {deviceInfo.cpuDetails.cores}
+              </Text>
+            </View>
+            {deviceInfo.cpuDetails.processors[0]?.['model name'] && (
+              <View style={styles.deviceInfoRow}>
+                <Text variant="labelSmall" style={styles.deviceInfoLabel}>
+                  CPU Model
+                </Text>
+                <Text variant="bodySmall" style={styles.deviceInfoValue}>
+                  {deviceInfo.cpuDetails.processors[0]['model name']}
+                </Text>
+              </View>
+            )}
+            {Platform.OS === 'android' && deviceInfo.chipset && (
+              <View style={styles.deviceInfoRow}>
+                <Text variant="labelSmall" style={styles.deviceInfoLabel}>
+                  Chipset
+                </Text>
+                <Text variant="bodySmall" style={styles.deviceInfoValue}>
+                  {deviceInfo.chipset}
+                </Text>
+              </View>
+            )}
+            {Platform.OS === 'android' && (
+              <View style={styles.deviceInfoRow}>
+                <Text variant="labelSmall" style={styles.deviceInfoLabel}>
+                  ML Instructions
+                </Text>
+                <Text variant="bodySmall" style={styles.deviceInfoValue}>
+                  FP16: {deviceInfo.cpuDetails.hasFp16 ? '✓' : '✗'}, DotProd:{' '}
+                  {deviceInfo.cpuDetails.hasDotProd ? '✓' : '✗'}, SVE:{' '}
+                  {deviceInfo.cpuDetails.hasSve ? '✓' : '✗'}, I8MM:{' '}
+                  {deviceInfo.cpuDetails.hasI8mm ? '✓' : '✗'}
+                </Text>
+              </View>
+            )}
           </View>
-        )}
-        {deviceInfo.cpuDetails.features.length > 0 && (
-          <View style={styles.deviceInfoRow}>
-            <Text variant="labelSmall" style={styles.deviceInfoLabel}>
-              CPU Features
+
+          <View style={styles.section}>
+            <Text variant="labelSmall" style={styles.sectionTitle}>
+              App Info
             </Text>
-            <Text variant="bodySmall" style={styles.deviceInfoValue}>
-              {deviceInfo.cpuDetails.features.join(', ')}
-            </Text>
+            <View style={styles.deviceInfoRow}>
+              <Text variant="labelSmall" style={styles.deviceInfoLabel}>
+                Version
+              </Text>
+              <Text variant="bodySmall" style={styles.deviceInfoValue}>
+                {deviceInfo.version} ({deviceInfo.buildNumber})
+              </Text>
+            </View>
+            <View style={styles.deviceInfoRow}>
+              <Text variant="labelSmall" style={styles.deviceInfoLabel}>
+                Device ID
+              </Text>
+              <Text variant="bodySmall" style={styles.deviceInfoValue}>
+                {Platform.OS === 'ios'
+                  ? deviceInfo.deviceId
+                  : `${deviceInfo.device} (${deviceInfo.deviceId})`}
+              </Text>
+            </View>
           </View>
-        )}
-        {Platform.OS === 'android' && (
-          <View style={styles.deviceInfoRow}>
-            <Text variant="labelSmall" style={styles.deviceInfoLabel}>
-              ML Instructions
-            </Text>
-            <Text variant="bodySmall" style={styles.deviceInfoValue}>
-              FP16: {deviceInfo.cpuDetails.hasFp16 ? '✓' : '✗'}, DotProd:{' '}
-              {deviceInfo.cpuDetails.hasDotProd ? '✓' : '✗'}, SVE:{' '}
-              {deviceInfo.cpuDetails.hasSve ? '✓' : '✗'}, I8MM:{' '}
-              {deviceInfo.cpuDetails.hasI8mm ? '✓' : '✗'}
-            </Text>
-          </View>
-        )}
-      </Card.Content>
+        </Card.Content>
+      )}
     </Card>
   );
 };

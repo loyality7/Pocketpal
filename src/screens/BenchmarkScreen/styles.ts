@@ -99,9 +99,9 @@ export const createStyles = (theme: Theme) =>
       height: 40,
     },
     sectionTitle: {
-      marginTop: 16,
-      marginBottom: 12,
       color: theme.colors.primary,
+      marginBottom: 8,
+      textTransform: 'uppercase',
     },
     advancedButton: {
       marginBottom: 6,
@@ -133,7 +133,10 @@ export const createStyles = (theme: Theme) =>
     },
     deviceInfoCard: {
       marginBottom: 16,
-      backgroundColor: theme.colors.surfaceVariant,
+      backgroundColor: theme.colors.surface,
+      borderWidth: 1,
+      borderColor: theme.colors.outline,
+      borderRadius: 15,
     },
     deviceInfoRow: {
       flexDirection: 'row',
@@ -146,5 +149,23 @@ export const createStyles = (theme: Theme) =>
     },
     deviceInfoValue: {
       color: theme.colors.onSurface,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.outline,
+    },
+    headerContent: {
+      flex: 1,
+    },
+    headerSummary: {
+      color: theme.colors.onSurfaceVariant,
+      marginTop: 4,
+    },
+    section: {
+      marginBottom: 16,
     },
   });

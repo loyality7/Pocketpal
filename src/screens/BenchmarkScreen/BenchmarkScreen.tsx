@@ -333,15 +333,7 @@ export const BenchmarkScreen: React.FC = observer(() => {
       <ScrollView style={styles.scrollView}>
         <Card elevation={0} style={styles.card}>
           <Card.Content>
-            <Text variant="titleLarge" style={styles.title}>
-              Performance Test
-            </Text>
-            <Text variant="bodySmall" style={styles.description}>
-              Measure the AI model performance on your device.
-            </Text>
-
             <DeviceInfoCard />
-
             {renderModelSelector()}
 
             {modelStore.loadingModel ? (
