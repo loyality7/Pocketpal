@@ -35,13 +35,21 @@ const renderBenchmarkParams = (
 ) => (
   <View style={styles.benchmarkParams}>
     <Text variant="bodySmall" style={styles.configLabel}>
-      Config: {config.label}
+      BENCHMARK CONFIGURATION
     </Text>
-    <View style={styles.paramRow}>
-      <Text style={styles.paramLabel}>PP: {config.pp}</Text>
-      <Text style={styles.paramLabel}>TG: {config.tg}</Text>
-      <Text style={styles.paramLabel}>PL: {config.pl}</Text>
-      <Text style={styles.paramLabel}>Rep: {config.nr}</Text>
+    <View style={styles.chipContainer}>
+      <View style={styles.chip}>
+        <Text style={styles.chipText}>PP: {config.pp}</Text>
+      </View>
+      <View style={styles.chip}>
+        <Text style={styles.chipText}>TG: {config.tg}</Text>
+      </View>
+      <View style={styles.chip}>
+        <Text style={styles.chipText}>PL: {config.pl}</Text>
+      </View>
+      <View style={styles.chip}>
+        <Text style={styles.chipText}>Rep: {config.nr}</Text>
+      </View>
     </View>
   </View>
 );
@@ -51,34 +59,35 @@ export const BenchResultCard = ({result}: Props) => {
   const styles = createStyles(theme);
 
   return (
-    <Card elevation={0} style={styles.resultCard}>
+    <Card elevation={1} style={styles.resultCard}>
       <Card.Content>
         <View style={styles.resultHeader}>
-          <Text variant="titleSmall" style={styles.modelDesc}>
+          <Text variant="titleMedium" style={styles.modelDesc}>
             {result.modelDesc}
           </Text>
           <Text variant="bodySmall" style={styles.modelInfo}>
-            Size: {formatSize(result.modelSize)} | Params:{' '}
+            Size: {formatSize(result.modelSize)} • Params:{' '}
             {formatParams(result.modelNParams)}
           </Text>
         </View>
 
-        <View style={styles.resultDetails}>
-          {renderBenchmarkParams(result.config, styles)}
+        {renderBenchmarkParams(result.config, styles)}
 
-          <View style={styles.benchmarkResults}>
-            <View style={styles.resultRow}>
-              <Text>
-                PP: {result.ppAvg.toFixed(2)} ± {result.ppStd.toFixed(2)} t/s
-              </Text>
-            </View>
-            <View style={styles.resultRow}>
-              <Text>
-                TG: {result.tgAvg.toFixed(2)} ± {result.tgStd.toFixed(2)} t/s
-              </Text>
-            </View>
+        <View style={styles.benchmarkResults}>
+          <View style={styles.resultRow}>
+            <Text style={styles.resultLabel}>Prompt Processing</Text>
+            <Text style={styles.resultValue}>
+              {result.ppAvg.toFixed(2)} ± {result.ppStd.toFixed(2)} t/s
+            </Text>
+          </View>
+          <View style={styles.resultRow}>
+            <Text style={styles.resultLabel}>Token Generation</Text>
+            <Text style={styles.resultValue}>
+              {result.tgAvg.toFixed(2)} ± {result.tgStd.toFixed(2)} t/s
+            </Text>
           </View>
         </View>
+
         <Text variant="bodySmall" style={styles.timestamp}>
           {new Date(result.timestamp).toLocaleString()}
         </Text>
