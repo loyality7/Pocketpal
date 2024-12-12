@@ -199,6 +199,7 @@ export const BenchmarkScreen: React.FC = observer(() => {
     <Menu
       visible={showModelMenu}
       onDismiss={() => setShowModelMenu(false)}
+      anchorPosition="bottom"
       anchor={
         <Button
           mode="outlined"
@@ -206,9 +207,7 @@ export const BenchmarkScreen: React.FC = observer(() => {
           style={styles.modelSelector}
           contentStyle={styles.modelSelectorContent}
           icon={({color}) => (
-            <View style={styles.modelSelectorIconContainer}>
-              <Icon source="chevron-down" size={24} color={color} />
-            </View>
+            <Icon source="chevron-down" size={24} color={color} />
           )}>
           {selectedModel?.name ||
             modelStore.activeModel?.name ||

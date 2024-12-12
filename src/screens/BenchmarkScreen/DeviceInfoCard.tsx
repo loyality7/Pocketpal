@@ -208,6 +208,16 @@ export const DeviceInfoCard = () => {
                 {formatBytes(deviceInfo.totalMemory)}
               </Text>
             </View>
+            <View style={styles.deviceInfoRow}>
+              <Text variant="labelSmall" style={styles.deviceInfoLabel}>
+                Device ID
+              </Text>
+              <Text variant="bodySmall" style={styles.deviceInfoValue}>
+                {Platform.OS === 'ios'
+                  ? deviceInfo.deviceId
+                  : `${deviceInfo.device} (${deviceInfo.deviceId})`}
+              </Text>
+            </View>
           </View>
 
           <View style={styles.section}>
@@ -267,16 +277,6 @@ export const DeviceInfoCard = () => {
               </Text>
               <Text variant="bodySmall" style={styles.deviceInfoValue}>
                 {deviceInfo.version} ({deviceInfo.buildNumber})
-              </Text>
-            </View>
-            <View style={styles.deviceInfoRow}>
-              <Text variant="labelSmall" style={styles.deviceInfoLabel}>
-                Device ID
-              </Text>
-              <Text variant="bodySmall" style={styles.deviceInfoValue}>
-                {Platform.OS === 'ios'
-                  ? deviceInfo.deviceId
-                  : `${deviceInfo.device} (${deviceInfo.deviceId})`}
               </Text>
             </View>
           </View>

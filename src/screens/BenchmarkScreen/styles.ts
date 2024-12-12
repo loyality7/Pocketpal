@@ -48,12 +48,10 @@ export const createStyles = (theme: Theme) =>
       marginBottom: 8,
       color: theme.colors.primary,
     },
-    modelSelector: {
-      marginBottom: 16,
-    },
+    modelSelector: {},
     modelSelectorContent: {
-      flexDirection: 'row',
       justifyContent: 'space-between',
+      flexDirection: 'row-reverse',
       alignItems: 'center',
     },
     modelSelectorIconContainer: {
@@ -167,5 +165,12 @@ export const createStyles = (theme: Theme) =>
     },
     section: {
       marginBottom: 16,
+    },
+    titleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    headerIcon: {
+      marginRight: 8,
     },
   });
