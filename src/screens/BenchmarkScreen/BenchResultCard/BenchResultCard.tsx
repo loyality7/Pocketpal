@@ -1,58 +1,43 @@
-import React from 'react';
-import {View} from 'react-native';
+import {View, Linking} from 'react-native';
+import React, {useState} from 'react';
 
-import {Card, Text, Button} from 'react-native-paper';
+import {Card, Text, Button, Tooltip} from 'react-native-paper';
 
 import {useTheme} from '../../../hooks';
 
 import {createStyles} from './styles';
-import type {BenchmarkConfig, BenchmarkResult} from '../types';
+
+import {formatBytes} from '../../../utils';
+import {BenchmarkResult} from '../../../utils/types';
 
 type Props = {
   result: BenchmarkResult;
   onDelete: (timestamp: string) => void;
+  onShare: (result: BenchmarkResult) => Promise<void>;
 };
 
 const formatSize = (bytes: number) =>
   `${(bytes / 1024.0 / 1024.0 / 1024.0).toFixed(2)} GiB`;
 const formatParams = (params: number) => `${(params / 1e9).toFixed(2)}B`;
 
-const renderBenchmarkParams = (
-  config: BenchmarkConfig,
-  styles: ReturnType<typeof createStyles>,
-) => (
-  <View style={styles.benchmarkParams}>
-    <Text variant="bodySmall" style={styles.configLabel}>
-      BENCHMARK CONFIGURATION
-    </Text>
-    <View style={styles.chipContainer}>
-      <View style={styles.chip}>
-        <Text style={styles.chipText}>PP: {config.pp}</Text>
-      </View>
-      <View style={styles.chip}>
-        <Text style={styles.chipText}>TG: {config.tg}</Text>
-      </View>
-      <View style={styles.chip}>
-        <Text style={styles.chipText}>PL: {config.pl}</Text>
-      </View>
-      <View style={styles.chip}>
-        <Text style={styles.chipText}>Rep: {config.nr}</Text>
-      </View>
-    </View>
-  </View>
-);
-
-export const BenchResultCard = ({result, onDelete}: Props) => {
+export const BenchResultCard = ({result, onDelete, onShare}: Props) => {
   const theme = useTheme();
   const styles = createStyles(theme);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const formatBytes = (bytes: number) => {
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    if (bytes === 0) {
-      return '0 Byte';
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      await onShare(result);
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error ? error.message : 'Failed to submit benchmark',
+      );
+    } finally {
+      setIsSubmitting(false);
     }
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i)) + ' ' + sizes[i];
   };
 
   const formatDuration = (ms: number) => {
@@ -68,17 +53,23 @@ export const BenchResultCard = ({result, onDelete}: Props) => {
     return `${seconds}s`;
   };
 
+  const openLeaderboard = () => {
+    Linking.openURL(
+      'https://huggingface.co/spaces/a-ghorbani/ai-phone-leaderboard',
+    );
+  };
+
   return (
     <Card elevation={0} style={styles.resultCard}>
       <Card.Content>
         <View style={styles.resultHeader}>
           <View style={styles.headerLeft}>
-            <Text variant="titleMedium" style={styles.modelDesc}>
+            <Text variant="titleSmall" style={styles.modelName}>
               {result.modelName}
             </Text>
-            <Text variant="bodySmall" style={styles.modelInfo}>
-              Size: {formatSize(result.modelSize)} • Params:{' '}
-              {formatParams(result.modelNParams)}
+            <Text style={styles.modelMeta}>
+              {formatSize(result.modelSize)} •{' '}
+              {formatParams(result.modelNParams)} params
             </Text>
           </View>
           <Button
@@ -91,52 +82,108 @@ export const BenchResultCard = ({result, onDelete}: Props) => {
           </Button>
         </View>
 
-        {renderBenchmarkParams(result.config, styles)}
+        <View style={styles.configBar}>
+          <Text variant="labelSmall">Config</Text>
+          <Text style={styles.configText}>
+            PP: {result.config.pp} • TG: {result.config.tg} • PL:{' '}
+            {result.config.pl} • Rep: {result.config.nr}
+          </Text>
+        </View>
 
-        <View style={styles.benchmarkResults}>
+        <View style={styles.resultsContainer}>
           <View style={styles.resultRow}>
-            <Text variant="labelSmall" style={styles.resultLabel}>
-              Prompt Processing
-            </Text>
-            <Text variant="bodySmall" style={styles.resultValue}>
-              {result.ppAvg.toFixed(2)} ± {result.ppStd.toFixed(2)} t/s
-            </Text>
+            <View style={styles.resultItem}>
+              <Text style={styles.resultValue}>
+                {result.ppAvg.toFixed(2)}
+                <Text style={styles.resultUnit}> t/s</Text>
+              </Text>
+              <Text style={styles.resultLabel}>Prompt Processing</Text>
+              <Text style={styles.resultStd}>±{result.ppStd.toFixed(2)}</Text>
+            </View>
+            <View style={styles.resultItem}>
+              <Text style={styles.resultValue}>
+                {result.tgAvg.toFixed(2)}
+                <Text style={styles.resultUnit}> t/s</Text>
+              </Text>
+              <Text style={styles.resultLabel}>Token Generation</Text>
+              <Text style={styles.resultStd}>±{result.tgStd.toFixed(2)}</Text>
+            </View>
           </View>
-          <View style={styles.resultRow}>
-            <Text variant="labelSmall" style={styles.resultLabel}>
-              Token Generation
-            </Text>
-            <Text variant="bodySmall" style={styles.resultValue}>
-              {result.tgAvg.toFixed(2)} ± {result.tgStd.toFixed(2)} t/s
-            </Text>
-          </View>
-          {result.wallTimeMs && (
+
+          {(result.wallTimeMs || result.peakMemoryUsage) && (
             <View style={styles.resultRow}>
-              <Text variant="labelSmall" style={styles.resultLabel}>
-                Total Time
-              </Text>
-              <Text variant="bodySmall" style={styles.resultValue}>
-                {formatDuration(result.wallTimeMs)}
-              </Text>
+              {result.wallTimeMs && (
+                <View style={styles.resultItem}>
+                  <Text style={styles.resultValue}>
+                    {formatDuration(result.wallTimeMs)}
+                  </Text>
+                  <Text style={styles.resultLabel}>Total Time</Text>
+                </View>
+              )}
+              {result.peakMemoryUsage && (
+                <View style={styles.resultItem}>
+                  <Text style={styles.resultValue}>
+                    {result.peakMemoryUsage.percentage.toFixed(1)}%
+                  </Text>
+                  <Text style={styles.resultLabel}>Peak Memory</Text>
+                  <Text style={styles.resultStd}>
+                    {formatBytes(result.peakMemoryUsage.used, 0)} /{' '}
+                    {formatBytes(result.peakMemoryUsage.total, 0)}
+                  </Text>
+                </View>
+              )}
             </View>
           )}
-          {result.peakMemoryUsage && (
-            <View style={styles.resultRow}>
-              <Text variant="labelSmall" style={styles.resultLabel}>
-                Peak Memory Usage
+          <Text style={styles.timestamp}>
+            {new Date(result.timestamp).toLocaleString()}
+          </Text>
+        </View>
+
+        <View style={styles.footer}>
+          {result.submitted ? (
+            <View style={styles.shareContainer}>
+              <Text variant="bodySmall" style={styles.submittedText}>
+                ✓ Shared to{' '}
+                <Text onPress={openLeaderboard} style={styles.leaderboardLink}>
+                  AI Phone Leaderboard ↗
+                </Text>
               </Text>
-              <Text variant="bodySmall" style={styles.resultValue}>
-                {formatBytes(result.peakMemoryUsage.used)} /{' '}
-                {formatBytes(result.peakMemoryUsage.total)} (
-                {result.peakMemoryUsage.percentage.toFixed(1)}%)
+            </View>
+          ) : !result.oid ? (
+            <Tooltip title="Local model results cannot be shared">
+              <Text variant="bodySmall" style={styles.disabledText}>
+                Cannot share
+              </Text>
+            </Tooltip>
+          ) : result.config.label === 'Custom' ? (
+            <Tooltip title="Custom benchmark results cannot be shared">
+              <Text variant="bodySmall" style={styles.disabledText}>
+                Cannot share
+              </Text>
+            </Tooltip>
+          ) : (
+            <View style={styles.actionContainer}>
+              <Button
+                mode="outlined"
+                onPress={handleSubmit}
+                loading={isSubmitting}
+                disabled={isSubmitting}
+                icon="share"
+                compact
+                style={styles.submitButton}>
+                Submit to Leaderboard
+              </Button>
+              <Text
+                variant="bodySmall"
+                onPress={openLeaderboard}
+                style={styles.leaderboardLink}>
+                View leaderboard ↗
               </Text>
             </View>
           )}
         </View>
 
-        <Text variant="bodySmall" style={styles.timestamp}>
-          {new Date(result.timestamp).toLocaleString()}
-        </Text>
+        {submitError && <Text style={styles.errorText}>{submitError}</Text>}
       </Card.Content>
     </Card>
   );

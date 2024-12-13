@@ -1,11 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import {View, TouchableOpacity} from 'react-native';
-import {Card, Text, Icon} from 'react-native-paper';
-import DeviceInfo from 'react-native-device-info';
 import {Platform, NativeModules} from 'react-native';
 
+import {Card, Text, Icon} from 'react-native-paper';
+import RNDeviceInfo from 'react-native-device-info';
+
 import {useTheme} from '../../../hooks';
+
 import {createStyles} from './styles';
+
+import {DeviceInfo} from '../../../utils/types';
 
 const {DeviceInfoModule} = NativeModules;
 
@@ -59,27 +63,22 @@ const getCPUInfo = async () => {
   }
 };
 
-const checkCpuFeatures = (features: string[]) => {
-  return {
-    hasFp16: features.some(f => ['fphp', 'fp16'].includes(f)),
-    hasDotProd: features.some(f => ['dotprod', 'asimddp'].includes(f)),
-    hasSve: features.some(f => f === 'sve'),
-    hasI8mm: features.some(f => f === 'i8mm'),
-  };
+type Props = {
+  onDeviceInfo?: (info: DeviceInfo) => void;
 };
 
-export const DeviceInfoCard = () => {
+export const DeviceInfoCard = ({onDeviceInfo}: Props) => {
   const theme = useTheme();
   const styles = createStyles(theme);
   const [deviceInfo, setDeviceInfo] = useState({
-    model: DeviceInfo.getModel(),
+    model: RNDeviceInfo.getModel(),
     systemName: Platform.OS === 'ios' ? 'iOS' : 'Android',
     systemVersion: Platform.Version.toString(),
-    brand: DeviceInfo.getBrand(),
+    brand: RNDeviceInfo.getBrand(),
     cpuArch: [] as string[],
     isEmulator: false,
-    version: DeviceInfo.getVersion(),
-    buildNumber: DeviceInfo.getBuildNumber(),
+    version: RNDeviceInfo.getVersion(),
+    buildNumber: RNDeviceInfo.getBuildNumber(),
     device: '',
     deviceId: '',
     totalMemory: 0,
@@ -105,39 +104,29 @@ export const DeviceInfoCard = () => {
 
   useEffect(() => {
     Promise.all([
-      DeviceInfo.supportedAbis(),
-      DeviceInfo.isEmulator(),
-      DeviceInfo.getDevice(),
-      DeviceInfo.getDeviceId(),
-      DeviceInfo.getTotalMemory(),
+      RNDeviceInfo.supportedAbis(),
+      RNDeviceInfo.isEmulator(),
+      RNDeviceInfo.getDevice(),
+      RNDeviceInfo.getDeviceId(),
+      RNDeviceInfo.getTotalMemory(),
       getChipsetInfo(),
       getCPUInfo(),
     ]).then(
       ([abis, emulator, device, deviceId, totalMem, chipset, cpuInfo]) => {
-        console.log('cpuInfo', cpuInfo);
-        if (typeof cpuInfo === 'object' && Array.isArray(cpuInfo.features)) {
-          // Double-check features on JS side
-          const jsFeatures = checkCpuFeatures(cpuInfo.features);
-          console.log('JS-side feature check:', jsFeatures);
-          // Compare with native results
-          console.log(
-            'Native-side matches JS:',
-            jsFeatures.hasFp16 === cpuInfo.hasFp16 &&
-              jsFeatures.hasDotProd === cpuInfo.hasDotProd &&
-              jsFeatures.hasSve === cpuInfo.hasSve &&
-              jsFeatures.hasI8mm === cpuInfo.hasI8mm,
-          );
-        }
-
-        setDeviceInfo(prev => ({
-          ...prev,
+        const newDeviceInfo = {
+          model: RNDeviceInfo.getModel(),
+          systemName: Platform.OS === 'ios' ? 'iOS' : 'Android',
+          systemVersion: Platform.Version.toString(),
+          brand: RNDeviceInfo.getBrand(),
+          version: RNDeviceInfo.getVersion(),
+          buildNumber: RNDeviceInfo.getBuildNumber(),
           cpuArch: abis,
           isEmulator: emulator,
           device,
           deviceId,
           totalMemory: totalMem,
           chipset,
-          //cpu,
+          cpu: '',
           cpuDetails:
             typeof cpuInfo === 'object'
               ? cpuInfo
@@ -151,10 +140,13 @@ export const DeviceInfoCard = () => {
                   hasSve: false,
                   hasI8mm: false,
                 },
-        }));
+        };
+
+        setDeviceInfo(newDeviceInfo);
+        onDeviceInfo?.(newDeviceInfo);
       },
     );
-  }, []);
+  }, [onDeviceInfo]);
 
   const formatBytes = (bytes: number) => {
     const gb = bytes / (1024 * 1024 * 1024);

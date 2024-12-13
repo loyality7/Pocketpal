@@ -1,7 +1,7 @@
 import {makeAutoObservable, runInAction} from 'mobx';
 import {makePersistable} from 'mobx-persist-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type {BenchmarkResult} from '../screens/BenchmarkScreen/types';
+import {BenchmarkResult} from '../utils/types';
 
 export class BenchmarkStore {
   results: BenchmarkResult[] = [];
@@ -41,6 +41,15 @@ export class BenchmarkStore {
 
   get latestResult(): BenchmarkResult | undefined {
     return this.results[0];
+  }
+
+  markAsSubmitted(uuid: string) {
+    runInAction(() => {
+      const result = this.results.find(r => r.uuid === uuid);
+      if (result) {
+        result.submitted = true;
+      }
+    });
   }
 }
 

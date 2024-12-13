@@ -1,24 +1,27 @@
-import React, {useState} from 'react';
 import {View, ScrollView} from 'react-native';
+import React, {useState, useCallback} from 'react';
 
+import {v4 as uuidv4} from 'uuid';
 import {observer} from 'mobx-react';
-import DeviceInfo from 'react-native-device-info';
+import RNDeviceInfo from 'react-native-device-info';
 import Slider from '@react-native-community/slider';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Text, Button, Card, ActivityIndicator, Icon} from 'react-native-paper';
 
-import {Menu, Dialog} from '../../components';
+import {submitBenchmark} from '../../api/benchmark';
+
+import {Menu, Dialog, Checkbox} from '../../components';
 
 import {useTheme} from '../../hooks';
 
 import {createStyles} from './styles';
 import {DeviceInfoCard} from './DeviceInfoCard';
 import {BenchResultCard} from './BenchResultCard';
-import {BenchmarkConfig, BenchmarkResult} from './types';
 
-import {modelStore, benchmarkStore} from '../../store';
+import {modelStore, benchmarkStore, uiStore} from '../../store';
 
-import type {Model} from '../../utils/types';
+import type {DeviceInfo, Model} from '../../utils/types';
+import {BenchmarkConfig, BenchmarkResult} from '../../utils/types';
 
 const DEFAULT_CONFIGS: BenchmarkConfig[] = [
   {pp: 512, tg: 128, pl: 1, nr: 3, label: 'Default'},
@@ -60,6 +63,14 @@ export const BenchmarkScreen: React.FC = observer(() => {
     string | null
   >(null);
   const [deleteAllConfirmVisible, setDeleteAllConfirmVisible] = useState(false);
+  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [pendingShareResult, setPendingShareResult] =
+    useState<BenchmarkResult | null>(null);
+  const [shareError, setShareError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const theme = useTheme();
   const styles = createStyles(theme);
@@ -90,8 +101,8 @@ export const BenchmarkScreen: React.FC = observer(() => {
 
   const trackPeakMemoryUsage = async () => {
     try {
-      const total = await DeviceInfo.getTotalMemory();
-      const used = await DeviceInfo.getUsedMemory();
+      const total = await RNDeviceInfo.getTotalMemory();
+      const used = await RNDeviceInfo.getUsedMemory();
       const percentage = (used / total) * 100;
       return {total, used, percentage};
     } catch (error) {
@@ -164,6 +175,7 @@ export const BenchmarkScreen: React.FC = observer(() => {
         filename: modelStore.activeModel.filename,
         peakMemoryUsage: peakMemoryUsage || undefined,
         wallTimeMs,
+        uuid: uuidv4(),
       };
 
       benchmarkStore.addResult(result);
@@ -202,6 +214,56 @@ export const BenchmarkScreen: React.FC = observer(() => {
   const handleConfirmDeleteAll = () => {
     benchmarkStore.clearResults();
     setDeleteAllConfirmVisible(false);
+  };
+
+  const handleDeviceInfo = useCallback((info: DeviceInfo) => {
+    setDeviceInfo(info);
+  }, []);
+
+  const handleShareResult = async (result: BenchmarkResult) => {
+    if (!deviceInfo) {
+      throw new Error('Device information not available');
+    }
+    if (result.submitted) {
+      throw new Error('This benchmark has already been submitted');
+    }
+    try {
+      const response = await submitBenchmark(deviceInfo, result);
+      console.log('Benchmark submitted successfully:', response);
+      benchmarkStore.markAsSubmitted(result.uuid);
+    } catch (error) {
+      console.error('Failed to submit benchmark:', error);
+      throw error;
+    }
+  };
+
+  const handleSharePress = async (result: BenchmarkResult) => {
+    if (!uiStore.benchmarkShareDialog.shouldShow) {
+      await handleShareResult(result);
+      return;
+    }
+    setPendingShareResult(result);
+    setShowShareDialog(true);
+  };
+
+  const handleConfirmShare = async () => {
+    if (dontShowAgain) {
+      uiStore.setBenchmarkShareDialogPreference(false);
+    }
+    setIsSubmitting(true);
+    try {
+      if (pendingShareResult) {
+        await handleShareResult(pendingShareResult);
+      }
+      setShowShareDialog(false);
+      setPendingShareResult(null);
+    } catch (error) {
+      setShareError(
+        error instanceof Error ? error.message : 'Failed to share benchmark',
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderModelSelector = () => (
@@ -321,18 +383,84 @@ export const BenchmarkScreen: React.FC = observer(() => {
   const renderWarningMessage = () => (
     <View style={styles.warningContainer}>
       <Text variant="bodySmall" style={styles.warningText}>
-        Note: The benchmark process cannot be interrupted once started. Please
-        ensure you:
+        Note: Test could run for up to 2-3 minutes for larger models and cannot
+        be interrupted once started.
       </Text>
-      <View style={styles.warningList}>
-        <Text variant="bodySmall" style={styles.warningText}>
-          • Stay on this screen during the test
-        </Text>
-        <Text variant="bodySmall" style={styles.warningText}>
-          • Allow sufficient time for completion (2-3 mins for larger models)
+    </View>
+  );
+
+  const renderShareDialog = () => (
+    <Dialog
+      visible={showShareDialog}
+      onDismiss={() => {
+        setShowShareDialog(false);
+        setPendingShareResult(null);
+      }}
+      title="Share Benchmark Results"
+      scrollable
+      actions={[
+        {
+          label: 'Cancel',
+          onPress: () => {
+            setShowShareDialog(false);
+            setPendingShareResult(null);
+          },
+          disabled: isSubmitting,
+        },
+        {
+          label: isSubmitting ? 'Sharing...' : 'Share',
+          onPress: handleConfirmShare,
+          mode: 'contained',
+          loading: isSubmitting,
+          disabled: isSubmitting,
+        },
+      ]}>
+      <Text variant="bodyMedium" style={styles.dialogSection}>
+        Shared data includes:
+      </Text>
+      <View style={styles.dialogList}>
+        <Text variant="bodyMedium">• Device specs & model info</Text>
+        <Text variant="bodyMedium">• Performance metrics</Text>
+      </View>
+
+      <Button
+        mode="text"
+        onPress={() => setShowDetails(!showDetails)}
+        icon={showDetails ? 'chevron-up' : 'chevron-down'}
+        style={styles.detailsButton}>
+        {showDetails ? 'Hide Raw Data' : 'View Raw Data'}
+      </Button>
+
+      {showDetails && pendingShareResult && deviceInfo && (
+        <View style={styles.detailsContainer}>
+          <Text variant="bodySmall" style={styles.codeBlock}>
+            {JSON.stringify(
+              {
+                deviceInfo,
+                benchmark: pendingShareResult,
+              },
+              null,
+              2,
+            )}
+          </Text>
+        </View>
+      )}
+
+      {shareError && <Text style={styles.errorText}>{shareError}</Text>}
+
+      <View style={styles.checkboxContainer}>
+        <Checkbox
+          checked={dontShowAgain}
+          onPress={() => setDontShowAgain(!dontShowAgain)}
+        />
+        <Text
+          variant="bodySmall"
+          style={styles.checkboxLabel}
+          onPress={() => setDontShowAgain(!dontShowAgain)}>
+          Don't show this message again
         </Text>
       </View>
-    </View>
+    </Dialog>
   );
 
   return (
@@ -340,7 +468,7 @@ export const BenchmarkScreen: React.FC = observer(() => {
       <ScrollView style={styles.scrollView}>
         <Card elevation={0} style={styles.card}>
           <Card.Content>
-            <DeviceInfoCard />
+            <DeviceInfoCard onDeviceInfo={handleDeviceInfo} />
             {renderModelSelector()}
 
             {modelStore.loadingModel ? (
@@ -406,6 +534,7 @@ export const BenchmarkScreen: React.FC = observer(() => {
                     <BenchResultCard
                       result={result}
                       onDelete={handleDeleteResult}
+                      onShare={handleSharePress}
                     />
                   </View>
                 ))}
@@ -449,6 +578,8 @@ export const BenchmarkScreen: React.FC = observer(() => {
                 Are you sure you want to delete all benchmark results?
               </Text>
             </Dialog>
+
+            {renderShareDialog()}
           </Card.Content>
         </Card>
       </ScrollView>

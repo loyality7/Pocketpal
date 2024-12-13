@@ -20,6 +20,8 @@ export interface DialogAction {
   label: string;
   onPress: () => void;
   mode?: 'text' | 'contained' | 'outlined';
+  loading?: boolean;
+  disabled?: boolean;
 }
 
 interface CustomDialogProps {
@@ -32,6 +34,7 @@ interface CustomDialogProps {
   contentStyle?: ViewStyle;
   scrollAreaStyle?: ViewStyle;
   scrollable?: boolean;
+  scrollableBorderShown?: boolean;
   dismissableBackButton?: boolean;
   dismissable?: boolean;
   avoidKeyboard?: boolean;
@@ -47,12 +50,13 @@ export const Dialog: React.FC<CustomDialogProps> = ({
   contentStyle,
   scrollAreaStyle,
   scrollable = false,
+  scrollableBorderShown = false,
   dismissableBackButton = true,
   dismissable = true,
   avoidKeyboard = false,
 }) => {
   const theme = useTheme();
-  const styles = createStyles(theme);
+  const styles = createStyles(theme, scrollableBorderShown);
   const [bottom, setBottom] = React.useState(0);
 
   React.useEffect(() => {
@@ -161,6 +165,8 @@ export const Dialog: React.FC<CustomDialogProps> = ({
                   key={action.label}
                   mode={action.mode || 'text'}
                   onPress={action.onPress}
+                  loading={action.loading}
+                  disabled={action.disabled}
                   style={styles.dialogActionButton}>
                   {action.label}
                 </Button>
