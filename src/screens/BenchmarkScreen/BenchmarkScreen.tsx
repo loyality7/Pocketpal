@@ -1,19 +1,24 @@
 import React, {useState} from 'react';
 import {View, ScrollView} from 'react-native';
-import {observer} from 'mobx-react';
-import {Text, Button, Card, ActivityIndicator, Icon} from 'react-native-paper';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import Slider from '@react-native-community/slider';
-import DeviceInfo from 'react-native-device-info';
 
-import {modelStore, benchmarkStore} from '../../store';
-import {useTheme} from '../../hooks';
-import {createStyles} from './styles';
-import type {Model} from '../../utils/types';
+import {observer} from 'mobx-react';
+import DeviceInfo from 'react-native-device-info';
+import Slider from '@react-native-community/slider';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {Text, Button, Card, ActivityIndicator, Icon} from 'react-native-paper';
+
 import {Menu, Dialog} from '../../components';
+
+import {useTheme} from '../../hooks';
+
+import {createStyles} from './styles';
+import {DeviceInfoCard} from './DeviceInfoCard';
 import {BenchResultCard} from './BenchResultCard';
 import {BenchmarkConfig, BenchmarkResult} from './types';
-import {DeviceInfoCard} from './DeviceInfoCard';
+
+import {modelStore, benchmarkStore} from '../../store';
+
+import type {Model} from '../../utils/types';
 
 const DEFAULT_CONFIGS: BenchmarkConfig[] = [
   {pp: 512, tg: 128, pl: 1, nr: 3, label: 'Default'},
@@ -153,6 +158,10 @@ export const BenchmarkScreen: React.FC = observer(() => {
         tgStd,
         timestamp: new Date().toISOString(),
         modelId: modelStore.activeModel.id,
+        modelName: modelStore.activeModel.name,
+        oid: modelStore.activeModel.hfModelFile?.oid,
+        rfilename: modelStore.activeModel.hfModelFile?.rfilename,
+        filename: modelStore.activeModel.filename,
         peakMemoryUsage: peakMemoryUsage || undefined,
         wallTimeMs,
       };
@@ -204,7 +213,6 @@ export const BenchmarkScreen: React.FC = observer(() => {
         <Button
           mode="outlined"
           onPress={() => setShowModelMenu(true)}
-          style={styles.modelSelector}
           contentStyle={styles.modelSelectorContent}
           icon={({color}) => (
             <Icon source="chevron-down" size={24} color={color} />

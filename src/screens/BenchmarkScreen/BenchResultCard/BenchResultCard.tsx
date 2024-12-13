@@ -6,26 +6,7 @@ import {Card, Text, Button} from 'react-native-paper';
 import {useTheme} from '../../../hooks';
 
 import {createStyles} from './styles';
-import type {BenchmarkConfig} from '../types';
-
-type BenchmarkResult = {
-  config: BenchmarkConfig;
-  modelDesc: string;
-  modelSize: number;
-  modelNParams: number;
-  ppAvg: number;
-  ppStd: number;
-  tgAvg: number;
-  tgStd: number;
-  timestamp: string;
-  modelId: string;
-  peakMemoryUsage?: {
-    total: number;
-    used: number;
-    percentage: number;
-  };
-  wallTimeMs?: number;
-};
+import type {BenchmarkConfig, BenchmarkResult} from '../types';
 
 type Props = {
   result: BenchmarkResult;
@@ -93,7 +74,7 @@ export const BenchResultCard = ({result, onDelete}: Props) => {
         <View style={styles.resultHeader}>
           <View style={styles.headerLeft}>
             <Text variant="titleMedium" style={styles.modelDesc}>
-              {result.modelDesc}
+              {result.modelName}
             </Text>
             <Text variant="bodySmall" style={styles.modelInfo}>
               Size: {formatSize(result.modelSize)} • Params:{' '}

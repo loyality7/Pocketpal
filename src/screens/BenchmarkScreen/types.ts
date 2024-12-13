@@ -17,6 +17,10 @@ export type BenchmarkResult = {
   tgStd: number;
   timestamp: string;
   modelId: string;
+  modelName: string;
+  oid?: string;
+  rfilename?: string;
+  filename: string;
   peakMemoryUsage?: {
     total: number;
     used: number;

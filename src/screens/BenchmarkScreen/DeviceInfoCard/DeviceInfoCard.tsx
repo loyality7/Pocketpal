@@ -4,7 +4,7 @@ import {Card, Text, Icon} from 'react-native-paper';
 import DeviceInfo from 'react-native-device-info';
 import {Platform, NativeModules} from 'react-native';
 
-import {useTheme} from '../../hooks';
+import {useTheme} from '../../../hooks';
 import {createStyles} from './styles';
 
 const {DeviceInfoModule} = NativeModules;
