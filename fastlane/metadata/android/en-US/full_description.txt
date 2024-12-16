@@ -2,7 +2,7 @@ Unlock the power of AI with Private AI Chat, the ultimate app for secure and pri
 
 Key Features:
 - Offline Chatting: Interact with advanced AI models directly on your device without the need for an internet connection.
-- Supports H2O-Danube & GGUF Formats: At the moment we are supporting H2O-Danube and GGUF.
+- The app supports GGUF formats, allowing you to either load models locally or search directly in Hugging Face.
 - Secure & Private: Your data never leaves your device. All conversations are processed locally, providing security and peace of mind.
 
 How It Works:
