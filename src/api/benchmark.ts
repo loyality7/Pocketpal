@@ -15,7 +15,7 @@ export async function submitBenchmark(
   try {
     initializeAppCheck();
     const appCheckToken = await getAppCheckToken();
-    
+
     if (!appCheckToken) {
       throw new Error('Failed to obtain App Check token');
     }
